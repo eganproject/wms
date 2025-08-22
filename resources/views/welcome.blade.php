@@ -236,7 +236,7 @@
 										<!--begin::Col-->
 										<div class="col-xxl-6">
 											<!--begin::Tiles Widget 2-->
-											<div class="card h-175px bgi-no-repeat bgi-size-cover card-xxl-stretch mb-5 mb-xl-8" style="background-color: #663259; background-position: calc(100% + 0.5rem) 100%;background-size: 100% auto;background-image:url('assets/media/svg/misc/taieri.svg')">
+											<div class="card h-175px bgi-no-repeat bgi-size-cover card-xxl-stretch mb-5 mb-xl-8" style="background-color: #663259; background-position: calc(100% + 0.5rem) 100%;background-size: 100% auto;background-image:url('metronic/assets/media/svg/misc/taieri.svg')">
 												<!--begin::Body-->
 												<div class="card-body d-flex flex-column justify-content-between">
 													<!--begin::Title-->
@@ -305,7 +305,7 @@
 										<!--begin::Col-->
 										<div class="col-xxl-6">
 											<!--begin::Mixed Widget 3-->
-											<div class="card h-100 bgi-no-repeat bgi-size-cover card-xxl-stretch mb-5 mb-xl-8" style="background-image:url('assets/media/misc/bg-2.jpg')">
+											<div class="card h-100 bgi-no-repeat bgi-size-cover card-xxl-stretch mb-5 mb-xl-8" style="background-image:url('metronic/assets/media/misc/bg-2.jpg')">
 												<!--begin::Body-->
 												<div class="card-body d-flex flex-column justify-content-between">
 													<!--begin::Title-->
