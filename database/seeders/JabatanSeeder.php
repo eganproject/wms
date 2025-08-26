@@ -15,9 +15,9 @@ class JabatanSeeder extends Seeder
      */
     public function run()
     {
-        Jabatan::create([
-            'name' => 'Developer',
-            'description' => 'Pengembang Sistem',
-        ]);
+        Jabatan::updateOrCreate(
+            ['name' => 'Developer'],
+            ['description' => 'Pengembang Sistem']
+        );
     }
 }
