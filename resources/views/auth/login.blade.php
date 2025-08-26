@@ -121,11 +121,7 @@
                         <div>
                             <div class="flex items-center justify-between">
                                 <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
-                                @if (Route::has('password.request'))
-                                    <div class="text-sm">
-                                        <a href="{{ route('password.request') }}" class="font-semibold text-indigo-400 hover:text-indigo-300 transition-colors">Lupa password?</a>
-                                    </div>
-                                @endif
+                                
                             </div>
                             <div class="mt-2 relative">
                                 <input id="password" name="password" type="password" autocomplete="current-password" required 
@@ -155,10 +151,7 @@
                         </div>
                     </form>
 
-                    <p class="mt-10 text-center text-sm text-gray-400">
-                        Belum punya akun?
-                        <a href="{{ route('register') }}" class="font-semibold leading-6 text-indigo-400 hover:text-indigo-300 transition-colors">Daftar sekarang</a>
-                    </p>
+                    
                 </div>
             </div>
         </div>
