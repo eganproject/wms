@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Jabatan;
 use App\Models\Menu;
 use App\Models\Permission;
+use App\Models\UserActivity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PermissionController extends Controller
@@ -15,7 +17,7 @@ class PermissionController extends Controller
     {
         $jabatans = Jabatan::all();
         $menus = Menu::with('children')->whereNull('parent_id')->orderBy('order')->get();
-        $permissions = Permission::all()->groupBy(function($item) {
+        $permissions = Permission::all()->keyBy(function($item) {
             return $item->jabatan_id . '-' . $item->menu_id;
         });
 

@@ -13,76 +13,25 @@
                         <table class="table table-bordered table-striped">
                             <thead>
                                 <tr>
-                                    <th>Jabatan / Menu</th>
-                                    @foreach ($menus as $menu)
-                                        <th colspan="5" class="text-center">{{ $menu->name }}</th>
+                                    <th>Menu</th>
+                                    @foreach ($jabatans as $jabatan)
+                                        <th colspan="5" class="text-center">{{ $jabatan->name }}</th>
                                     @endforeach
                                 </tr>
                                 <tr>
                                     <th></th>
-                                    @foreach ($menus as $menu)
-                                        <th>C</th>
-                                        <th>R</th>
-                                        <th>U</th>
-                                        <th>D</th>
-                                        <th>A</th>
+                                    @foreach ($jabatans as $jabatan)
+                                        <th>Create</th>
+                                        <th>Read</th>
+                                        <th>Edit</th>
+                                        <th>Delete</th>
+                                        <th>Approve</th>
                                     @endforeach
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach ($jabatans as $jabatan)
-                                    <tr>
-                                        <td>{{ $jabatan->name }}</td>
-                                        @foreach ($menus as $menu)
-                                            @php
-                                                $menuPermissions = $permissions->get($jabatan->id . '-' . $menu->id, collect());
-                                            @endphp
-                                            <td>
-                                                <input type="checkbox" class="permission-checkbox" data-jabatan-id="{{ $jabatan->id }}" data-menu-id="{{ $menu->id }}" data-permission-type="can_create" {{ $menuPermissions->contains('permission_type', 'create') ? 'checked' : '' }}>
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" class="permission-checkbox" data-jabatan-id="{{ $jabatan->id }}" data-menu-id="{{ $menu->id }}" data-permission-type="can_read" {{ $menuPermissions->contains('permission_type', 'read') ? 'checked' : '' }}>
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" class="permission-checkbox" data-jabatan-id="{{ $jabatan->id }}" data-menu-id="{{ $menu->id }}" data-permission-type="can_update" {{ $menuPermissions->contains('permission_type', 'update') ? 'checked' : '' }}>
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" class="permission-checkbox" data-jabatan-id="{{ $jabatan->id }}" data-menu-id="{{ $menu->id }}" data-permission-type="can_delete" {{ $menuPermissions->contains('permission_type', 'delete') ? 'checked' : '' }}>
-                                            </td>
-                                            <td>
-                                                <input type="checkbox" class="permission-checkbox" data-jabatan-id="{{ $jabatan->id }}" data-menu-id="{{ $menu->id }}" data-permission-type="can_approve" {{ $menuPermissions->contains('permission_type', 'approve') ? 'checked' : '' }}>
-                                            </td>
-                                        @endforeach
-                                    </tr>
-                                    @foreach ($menu->children as $childMenu)
-                                        <tr>
-                                            <td>-- {{ $childMenu->name }}</td>
-                                            @foreach ($menus as $parentMenu)
-                                                @if ($parentMenu->id == $menu->id)
-                                                    @php
-                                                        $childMenuPermissions = $permissions->get($jabatan->id . '-' . $childMenu->id, collect());
-                                                    @endphp
-                                                    <td>
-                                                        <input type="checkbox" class="permission-checkbox" data-jabatan-id="{{ $jabatan->id }}" data-menu-id="{{ $childMenu->id }}" data-permission-type="can_create" {{ $childMenuPermissions->contains('permission_type', 'create') ? 'checked' : '' }}>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" class="permission-checkbox" data-jabatan-id="{{ $jabatan->id }}" data-menu-id="{{ $childMenu->id }}" data-permission-type="can_read" {{ $childMenuPermissions->contains('permission_type', 'read') ? 'checked' : '' }}>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" class="permission-checkbox" data-jabatan-id="{{ $jabatan->id }}" data-menu-id="{{ $childMenu->id }}" data-permission-type="can_update" {{ $childMenuPermissions->contains('permission_type', 'update') ? 'checked' : '' }}>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" class="permission-checkbox" data-jabatan-id="{{ $jabatan->id }}" data-menu-id="{{ $childMenu->id }}" data-permission-type="can_delete" {{ $childMenuPermissions->contains('permission_type', 'delete') ? 'checked' : '' }}>
-                                                    </td>
-                                                    <td>
-                                                        <input type="checkbox" class="permission-checkbox" data-jabatan-id="{{ $jabatan->id }}" data-menu-id="{{ $childMenu->id }}" data-permission-type="can_approve" {{ $childMenuPermissions->contains('permission_type', 'approve') ? 'checked' : '' }}>
-                                                    </td>
-                                                @else
-                                                    <td colspan="5"></td>
-                                                @endif
-                                            @endforeach
-                                        </tr>
-                                    @endforeach
+                                @foreach ($menus as $menu)
+                                    @include('admin.permissions._menu_permission_row', ['menu' => $menu, 'level' => 0, 'jabatans' => $jabatans, 'permissions' => $permissions])
                                 @endforeach
                             </tbody>
                         </table>
