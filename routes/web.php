@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\JabatanController;
-use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Admin\Masterdata\JabatanController;
+use App\Http\Controllers\Admin\Masterdata\UserController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
