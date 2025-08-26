@@ -67,6 +67,16 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        $menusMenu = Menu::updateOrCreate(
+            ['name' => 'Menus'],
+            [
+                'url' => '/admin/menus',
+                'icon' => 'fas fa-bars',
+                'parent_id' => $masterdata->id,
+                'order' => 4,
+            ]
+        );
+
         // Assign permissions to a role
         $developerJabatan = Jabatan::where('name', 'Developer')->first();
 
