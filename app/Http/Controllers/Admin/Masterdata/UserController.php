@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin\Masterdata;
 use App\Http\Controllers\Controller;
 use App\Models\Jabatan;
 use App\Models\User;
+use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -24,21 +26,34 @@ class UserController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'jabatan_id' => 'nullable|exists:jabatans,id',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:8',
+                'jabatan_id' => 'nullable|exists:jabatans,id',
+            ]);
 
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'jabatan_id' => $request->jabatan_id,
-        ]);
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'jabatan_id' => $request->jabatan_id,
+            ]);
 
-        return redirect()->route('users.index')->with('success', 'User created successfully.');
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'activity' => 'created',
+                'menu' => 'users',
+                'description' => 'Menambahkan pengguna baru: ' . $user->name,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+            ]);
+
+            return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal menambahkan pengguna: ' . $e->getMessage()]);
+        }
     }
 
     public function edit(User $user)
@@ -49,27 +64,54 @@ class UserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-            'password' => 'nullable|string|min:8',
-            'jabatan_id' => 'nullable|exists:jabatans,id',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+                'password' => 'nullable|string|min:8',
+                'jabatan_id' => 'nullable|exists:jabatans,id',
+            ]);
 
-        $data = $request->except('password');
-        if ($request->filled('password')) {
-            $data['password'] = Hash::make($request->password);
+            $data = $request->except('password');
+            if ($request->filled('password')) {
+                $data['password'] = Hash::make($request->password);
+            }
+
+            $user->update($data);
+
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'activity' => 'updated',
+                'menu' => 'users',
+                'description' => 'Memperbarui pengguna: ' . $user->name,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+            ]);
+
+            return redirect()->route('users.index')->with('success', 'Pengguna berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal memperbarui pengguna: ' . $e->getMessage()]);
         }
-
-        $user->update($data);
-
-        return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
 
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
-        $user->delete();
+        try {
+            $userName = $user->name;
+            $user->delete();
 
-        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'activity' => 'deleted',
+                'menu' => 'users',
+                'description' => 'Menghapus pengguna: ' . $userName,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+            ]);
+
+            return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Gagal menghapus pengguna: ' . $e->getMessage()]);
+        }
     }
 }

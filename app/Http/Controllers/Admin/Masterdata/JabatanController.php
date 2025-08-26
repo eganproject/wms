@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Admin\Masterdata;
 
 use App\Http\Controllers\Controller;
 use App\Models\Jabatan;
+use App\Models\UserActivity;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class JabatanController extends Controller
 {
@@ -21,14 +23,27 @@ class JabatanController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+            ]);
 
-        Jabatan::create($request->all());
+            $jabatan = Jabatan::create($request->all());
 
-        return redirect()->route('jabatans.index')->with('success', 'Jabatan created successfully.');
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'activity' => 'created',
+                'menu' => 'jabatans',
+                'description' => 'Menambahkan jabatan baru: ' . $jabatan->name,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+            ]);
+
+            return redirect()->route('jabatans.index')->with('success', 'Jabatan berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal menambahkan jabatan: ' . $e->getMessage()]);
+        }
     }
 
     public function edit(Jabatan $jabatan)
@@ -38,20 +53,47 @@ class JabatanController extends Controller
 
     public function update(Request $request, Jabatan $jabatan)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'description' => 'nullable|string',
+            ]);
 
-        $jabatan->update($request->all());
+            $jabatan->update($request->all());
 
-        return redirect()->route('jabatans.index')->with('success', 'Jabatan updated successfully.');
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'activity' => 'updated',
+                'menu' => 'jabatans',
+                'description' => 'Memperbarui jabatan: ' . $jabatan->name,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+            ]);
+
+            return redirect()->route('jabatans.index')->with('success', 'Jabatan berhasil diperbarui.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal memperbarui jabatan: ' . $e->getMessage()]);
+        }
     }
 
-    public function destroy(Jabatan $jabatan)
+    public function destroy(Request $request, Jabatan $jabatan)
     {
-        $jabatan->delete();
+        try {
+            $jabatanName = $jabatan->name;
+            $jabatan->delete();
 
-        return redirect()->route('jabatans.index')->with('success', 'Jabatan deleted successfully.');
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'activity' => 'deleted',
+                'menu' => 'jabatans',
+                'description' => 'Menghapus jabatan: ' . $jabatanName,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+            ]);
+
+            return redirect()->route('jabatans.index')->with('success', 'Jabatan berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'Gagal menghapus jabatan: ' . $e->getMessage()]);
+        }
     }
 }
