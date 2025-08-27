@@ -32,6 +32,17 @@
                         <input type="text" id="item_search_input" class="form-control form-control-solid w-250px ps-15"
                             placeholder="Search Items">
                     </div>
+                    <div class="d-flex align-items-center position-relative my-1 ms-3">
+                        <select id="category_filter" class="form-select form-select-solid" data-control="select2" data-placeholder="Filter by Kategori">
+                            <option></option>
+                            <option value="">All Categories</option>
+                            @foreach ($itemcategories as $category)
+                                <option value="{{ $category->id }}" {{ (isset($selected_category_id) && $selected_category_id == $category->id) ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
                 <div class="card-toolbar">
                     <!--begin::Toolbar-->
@@ -52,6 +63,7 @@
                                     <th class="min-w-125px sorting">Product Code</th>
                                     <th class="min-w-125px sorting">SKU</th>
                                     <th class="min-w-125px sorting">Nama Barang</th>
+                                    <th class="min-w-125px sorting">Kategori</th>
                                     <th class="min-w-125px sorting">Koli</th>
                                     <th class="min-w-125px sorting">UOM</th>
                                     <th class="min-w-125px sorting">Deskripsi</th>
@@ -66,6 +78,7 @@
                                         <td>{{ $item->product_code }}</td>
                                         <td>{{ $item->sku }}</td>
                                         <td>{{ $item->nama_barang }}</td>
+                                        <td>{{ $item->itemCategory->name ?? '' }}</td>
                                         <td>{{ $item->koli }}</td>
                                         <td>{{ $item->uom->name ?? '' }}</td>
                                         <td>{{ $item->deskripsi }}</td>
@@ -197,6 +210,17 @@
                         toastr.info("Penghapusan data " + n + " dibatalkan.");
                     }
                 });
+            });
+
+            $('#category_filter').on('change', function() {
+                var categoryId = $(this).val();
+                var url = new URL(window.location.href);
+                if (categoryId) {
+                    url.searchParams.set('category_id', categoryId);
+                } else {
+                    url.searchParams.delete('category_id');
+                }
+                window.location.href = url.toString();
             });
         });
     </script>

@@ -18,7 +18,7 @@
             <div class="card-body">
                 <form action="{{ route('admin.masterdata.items.store') }}" method="POST">
                     @csrf
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
                         <label for="product_code" class="form-label required">Product Code</label>
                         <input type="text" class="form-control form-control-solid" id="product_code" name="product_code"
                             value="{{ old('product_code', $generatedProductCode) }}" readonly required>
@@ -26,7 +26,24 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
-                      <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
+                        <label for="item_category_id" class="form-label required">Kategori Item</label>
+                        <select class="form-select form-select-solid fw-bolder select2-hidden-accessible"
+                            id="item_category_id" name="item_category_id" data-control="select2"
+                            data-placeholder="Pilih Kategori Item">
+                            <option></option>
+                            @foreach ($itemcategories as $category)
+                                <option value="{{ $category->id }}"
+                                    {{ old('item_category_id') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('item_category_id')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="fv-row mb-7 ">
                         <label for="sku" class="form-label required">SKU</label>
                         <input type="text" class="form-control form-control-solid" id="sku" name="sku"
                             value="{{ old('sku') }}" required>
@@ -35,7 +52,7 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
                         <label for="nama_barang" class="form-label required">Nama Barang</label>
                         <input type="text" class="form-control form-control-solid" id="nama_barang" name="nama_barang"
                             value="{{ old('nama_barang') }}" required>
@@ -43,7 +60,7 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
                         <label for="uom_id" class="form-label required">UOM</label>
                         <select class="form-select form-select-solid fw-bolder select2-hidden-accessible" id="uom_id"
                             name="uom_id" data-control="select2" data-placeholder="Pilih UOM">
@@ -58,19 +75,19 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
                         <label for="koli" class="form-label required">Koli</label>
-                        <input type="number" class="form-control form-control-solid" id="koli" name="koli"
+                        <input type="number" class="form-control form-control-solid" value="{{ old('koli') }}" id="koli" name="koli"
                             required>
                     </div>
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
                         <label for="deskripsi" class="form-label">Deskripsi</label>
                         <textarea class="form-control form-control-solid" id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
                         @error('deskripsi')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
-                    </div>   
-                    
+                    </div>
+
                     <button type="submit" class="btn btn-primary mt-3">Tambah Item</button>
                 </form>
             </div>
@@ -130,15 +147,18 @@
                     },
                     success: function(response) {
                         if (response.isUnique) {
-                            skuFeedback.html('SKU tersedia.').removeClass('text-danger').addClass('text-success');
+                            skuFeedback.html('SKU tersedia.').removeClass('text-danger').addClass(
+                                'text-success');
                             submitButton.prop('disabled', false);
                         } else {
-                            skuFeedback.html('SKU sudah digunakan.').removeClass('text-success').addClass('text-danger');
+                            skuFeedback.html('SKU sudah digunakan.').removeClass('text-success')
+                                .addClass('text-danger');
                             submitButton.prop('disabled', true);
                         }
                     },
                     error: function() {
-                        skuFeedback.html('Terjadi kesalahan saat memeriksa SKU.').removeClass('text-success').addClass('text-danger');
+                        skuFeedback.html('Terjadi kesalahan saat memeriksa SKU.').removeClass(
+                            'text-success').addClass('text-danger');
                         submitButton.prop('disabled', true);
                     }
                 });

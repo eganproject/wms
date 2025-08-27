@@ -19,7 +19,7 @@
                 <form action="{{ route('admin.masterdata.items.update', $item->id) }}" method="POST">
                     @csrf
                     @method('PUT')
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
                         <label for="product_code" class="form-label required">Product Code</label>
                         <input type="text" class="form-control form-control-solid" id="product_code" name="product_code"
                             value="{{ old('product_code', $item->product_code) }}" readonly required>
@@ -27,7 +27,26 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
+                        <label for="item_category_id" class="form-label">Kategori Item</label>
+                        <select class="form-select form-select-solid fw-bolder select2-hidden-accessible" id="item_category_id"
+                            name="item_category_id" data-control="select2" data-placeholder="Pilih Kategori Item">
+                            <option></option>
+                            @foreach ($itemcategories as $category)
+                                <option value="{{ $category->id }}"
+                                    {{ old('item_category_id', $item->item_category_id) == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('item_category_id')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                        @error('item_category_id')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="fv-row mb-7 ">
                         <label for="sku" class="form-label required">SKU</label>
                         <input type="text" class="form-control form-control-solid" id="sku" name="sku"
                             value="{{ old('sku', $item->sku) }}" required>
@@ -36,7 +55,7 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
                         <label for="nama_barang" class="form-label required">Nama Barang</label>
                         <input type="text" class="form-control form-control-solid" id="nama_barang" name="nama_barang"
                             value="{{ old('nama_barang', $item->nama_barang) }}" required>
@@ -44,7 +63,7 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
                         <label for="uom_id" class="form-label required">UOM</label>
                         <select class="form-select form-select-solid fw-bolder select2-hidden-accessible" id="uom_id"
                             name="uom_id" data-control="select2" data-placeholder="Pilih UOM">
@@ -60,12 +79,12 @@
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
                         <label for="koli" class="form-label required">Koli</label>
                         <input type="number" class="form-control form-control-solid" id="koli" name="koli"
                             value="{{ old('koli', $item->koli) }}" required>
                     </div>
-                    <div class="fv-row mb-3 ">
+                    <div class="fv-row mb-7 ">
                         <label for="deskripsi" class="form-label">Deskripsi</label>
                         <textarea class="form-control form-control-solid" id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi', $item->deskripsi) }}</textarea>
                         @error('deskripsi')

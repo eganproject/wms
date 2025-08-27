@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin\Masterdata;
 use App\Http\Controllers\Controller;
 use App\Models\Item;
 use App\Models\Uom;
+use App\Models\ItemCategory;
 use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -15,10 +16,19 @@ class ItemController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $items = Item::with('uom')->latest()->paginate(10);
-        return view('admin.masterdata.items.index', compact('items'));
+        $itemcategories = ItemCategory::all();
+        $selected_category_id = $request->get('category_id');
+
+        $items = Item::with(['uom', 'itemCategory'])
+            ->when($selected_category_id, function ($query, $category_id) {
+                return $query->where('item_category_id', $category_id);
+            })
+            ->latest()
+            ->paginate(10);
+
+        return view('admin.masterdata.items.index', compact('items', 'itemcategories', 'selected_category_id'));
     }
 
     /**
@@ -27,8 +37,9 @@ class ItemController extends Controller
     public function create()
     {
         $uoms = Uom::all();
+        $itemcategories = ItemCategory::all();
         $generatedProductCode = $this->generateProductCode();
-        return view('admin.masterdata.items.create', compact('uoms', 'generatedProductCode'));
+        return view('admin.masterdata.items.create', compact('uoms', 'generatedProductCode', 'itemcategories'));
     }
 
     /**
@@ -36,38 +47,35 @@ class ItemController extends Controller
      */
     public function store(Request $request)
     {
-        try {
-            $request->validate([
-                'koli' => 'required|integer',
-                'sku' => 'required|string|unique:items,sku',
-                'uom_id' => 'required|exists:uoms,id',
-                'nama_barang' => 'required|string',
-                'deskripsi' => 'nullable|string',
-                'product_code' => 'nullable|string|unique:items,product_code',
-            ]);
+        $request->validate([
+            'koli' => 'required|integer',
+            'sku' => 'required|string|unique:items,sku',
+            'uom_id' => 'required|exists:uoms,id',
+            'item_category_id' => 'required|exists:item_categories,id|not_in:null',
+            'nama_barang' => 'required|string',
+            'deskripsi' => 'nullable|string',
+            'product_code' => 'nullable|string|unique:items,product_code',
+        ]);
 
-            $data = $request->all();
-            // If product_code is not provided (e.g., from a hidden field or JS generation), generate it
-            if (empty($data['product_code'])) {
-                $data['product_code'] = $this->generateProductCode();
-            }
-
-            $item = Item::create($data);
-
-            UserActivity::create([
-                'user_id' => Auth::id(),
-                'activity' => 'created',
-                'menu' => 'items',
-                'description' => 'Menambahkan item baru: ' . $item->nama_barang . ' (SKU: ' . $item->sku . ')',
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->header('User-Agent'),
-            ]);
-
-            return redirect()->route('admin.masterdata.items.index')
-                ->with('success', 'Item created successfully.');
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal menambahkan item: ' . $e->getMessage()]);
+        $data = $request->all();
+        // If product_code is not provided (e.g., from a hidden field or JS generation), generate it
+        if (empty($data['product_code'])) {
+            $data['product_code'] = $this->generateProductCode();
         }
+
+        $item = Item::create($data);
+
+        UserActivity::create([
+            'user_id' => Auth::id(),
+            'activity' => 'created',
+            'menu' => 'items',
+            'description' => 'Menambahkan item baru: ' . $item->nama_barang . ' (SKU: ' . $item->sku . ')',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->header('User-Agent'),
+        ]);
+
+        return redirect()->route('admin.masterdata.items.index')
+            ->with('success', 'Item created successfully.');
     }
 
     /**
@@ -86,7 +94,8 @@ class ItemController extends Controller
     {
         $item = Item::findOrFail($id);
         $uoms = Uom::all();
-        return view('admin.masterdata.items.edit', compact('item', 'uoms'));
+        $itemcategories = ItemCategory::all();
+        return view('admin.masterdata.items.edit', compact('item', 'uoms', 'itemcategories'));
     }
 
     /**
@@ -94,34 +103,31 @@ class ItemController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        try {
-            $item = Item::findOrFail($id);
+        $item = Item::findOrFail($id);
 
-            $request->validate([
-                'koli' => 'required|integer',
-                'sku' => 'required|string|unique:items,sku,' . $item->id,
-                'uom_id' => 'required|exists:uoms,id',
-                'nama_barang' => 'required|string',
-                'deskripsi' => 'nullable|string',
-                'product_code' => 'nullable|string|unique:items,product_code,' . $item->id,
-            ]);
+        $request->validate([
+            'koli' => 'required|integer',
+            'sku' => 'required|string|unique:items,sku,' . $item->id,
+            'uom_id' => 'required|exists:uoms,id',
+            'item_category_id' => 'required|exists:item_categories,id|not_in:null',
+            'nama_barang' => 'required|string',
+            'deskripsi' => 'nullable|string',
+            'product_code' => 'nullable|string|unique:items,product_code,' . $item->id,
+        ]);
 
-            $item->update($request->except(['product_code']));
+        $item->update($request->except(['product_code']));
 
-            UserActivity::create([
-                'user_id' => Auth::id(),
-                'activity' => 'updated',
-                'menu' => 'items',
-                'description' => 'Memperbarui item: ' . $item->nama_barang . ' (SKU: ' . $item->sku . ')',
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->header('User-Agent'),
-            ]);
+        UserActivity::create([
+            'user_id' => Auth::id(),
+            'activity' => 'updated',
+            'menu' => 'items',
+            'description' => 'Memperbarui item: ' . $item->nama_barang . ' (SKU: ' . $item->sku . ')',
+            'ip_address' => $request->ip(),
+            'user_agent' => $request->header('User-Agent'),
+        ]);
 
-            return redirect()->route('admin.masterdata.items.index')
-                ->with('success', 'Item updated successfully.');
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal memperbarui item: ' . $e->getMessage()]);
-        }
+        return redirect()->route('admin.masterdata.items.index')
+            ->with('success', 'Item updated successfully.');
     }
 
     /**
