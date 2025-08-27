@@ -87,6 +87,26 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        $uomMenu = Menu::updateOrCreate(
+            ['name' => 'UOMs'],
+            [
+                'url' => '/admin/masterdata/uoms',
+                'icon' => 'fas fa-balance-scale',
+                'parent_id' => $masterdata->id,
+                'order' => 6,
+            ]
+        );
+
+        $itemMenu = Menu::updateOrCreate(
+            ['name' => 'Items'],
+            [
+                'url' => '/admin/masterdata/items',
+                'icon' => 'fas fa-box',
+                'parent_id' => $masterdata->id,
+                'order' => 7,
+            ]
+        );
+
         // Assign permissions to a role
         $developerJabatan = Jabatan::where('name', 'Developer')->first();
 

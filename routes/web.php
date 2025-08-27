@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\Masterdata\UserController;
 use App\Http\Controllers\Admin\Masterdata\MenuController;
 use App\Http\Controllers\Admin\Masterdata\PermissionController;
 use App\Http\Controllers\Admin\Masterdata\UomController;
+use App\Http\Controllers\Admin\Masterdata\ItemController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -33,6 +34,16 @@ Route::middleware(['auth', 'permission'])->group(function () {
         'edit' => 'masterdata.uoms.edit',
         'update' => 'masterdata.uoms.update',
         'destroy' => 'masterdata.uoms.destroy',
+    ]);
+
+    Route::resource('admin/masterdata/items', ItemController::class)->names([
+        'index' => 'admin.masterdata.items.index',
+        'create' => 'admin.masterdata.items.create',
+        'store' => 'admin.masterdata.items.store',
+        'show' => 'admin.masterdata.items.show',
+        'edit' => 'admin.masterdata.items.edit',
+        'update' => 'admin.masterdata.items.update',
+        'destroy' => 'admin.masterdata.items.destroy',
     ]);
 
     Route::get('/admin/permissions', [PermissionController::class, 'index'])->name('permissions.index');
