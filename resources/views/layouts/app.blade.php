@@ -17,6 +17,8 @@
                 @include('layouts.partials._header')
 
                 <!--begin::Content-->
+                @stack('toolbar')
+                
                 <div id="kt_content_container" class="d-flex flex-column-fluid align-items-start container-xxl">
                         @yield('content')
                 </div>
