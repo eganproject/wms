@@ -77,6 +77,16 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        $warehouseMenu = Menu::updateOrCreate(
+            ['name' => 'Warehouses'],
+            [
+                'url' => '/admin/warehouses',
+                'icon' => 'fas fa-warehouse',
+                'parent_id' => $masterdata->id,
+                'order' => 5,
+            ]
+        );
+
         // Assign permissions to a role
         $developerJabatan = Jabatan::where('name', 'Developer')->first();
 
