@@ -1,4 +1,7 @@
 @extends('layouts.app')
+@push('styles')
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+@endpush
 @push('toolbar')
     @include('layouts.partials._toolbar', [
         'title' => 'Users',
@@ -44,4 +47,35 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+            toastr.options = {
+                "closeButton": true,
+                "debug": false,
+                "newestOnTop": false,
+                "progressBar": true,
+                "positionClass": "toast-top-center",
+                "preventDuplicates": false,
+                "showDuration": "300",
+                "hideDuration": "1000",
+                "timeOut": "5000",
+                "extendedTimeOut": "1000",
+                "showEasing": "swing",
+                "hideEasing": "linear",
+                "showMethod": "fadeIn",
+                "hideMethod": "fadeOut"
+            };
+
+            @if (Session::has('success'))
+                toastr.success("{{ session('success') }}");
+            @endif
+
+            @if (Session::has('error'))
+                toastr.error("{{ session('error') }}");
+            @endif
+        });
+    </script>
+@endpush
 
