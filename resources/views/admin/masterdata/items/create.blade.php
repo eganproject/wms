@@ -19,28 +19,28 @@
                 <form action="{{ route('admin.masterdata.items.store') }}" method="POST">
                     @csrf
                     <div class="fv-row mb-3 ">
-                        <label for="koli" class="form-label required">Koli</label>
-                        <input type="number" class="form-control form-control-solid" id="koli" name="koli"
-                            required>
+                        <label for="product_code" class="form-label required">Product Code</label>
+                        <input type="text" class="form-control form-control-solid" id="product_code" name="product_code"
+                            value="{{ old('product_code', $generatedProductCode) }}" readonly required>
+                        @error('product_code')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
-                    <div class="fv-row mb-3 ">
+                      <div class="fv-row mb-3 ">
                         <label for="sku" class="form-label required">SKU</label>
                         <input type="text" class="form-control form-control-solid" id="sku" name="sku"
-                            required>
+                            value="{{ old('sku') }}" required>
+                        @error('sku')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="fv-row mb-3 ">
                         <label for="nama_barang" class="form-label required">Nama Barang</label>
                         <input type="text" class="form-control form-control-solid" id="nama_barang" name="nama_barang"
-                            required>
-                    </div>
-                    <div class="fv-row mb-3 ">
-                        <label for="deskripsi" class="form-label">Deskripsi</label>
-                        <textarea class="form-control form-control-solid" id="deskripsi" name="deskripsi" rows="3"></textarea>
-                    </div>
-                    <div class="fv-row mb-3 ">
-                        <label for="product_code" class="form-label required">Product Code</label>
-                        <input type="text" class="form-control form-control-solid" id="product_code" name="product_code"
-                            required>
+                            value="{{ old('nama_barang') }}" required>
+                        @error('nama_barang')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
                     <div class="fv-row mb-3 ">
                         <label for="uom_id" class="form-label required">UOM</label>
@@ -48,10 +48,28 @@
                             name="uom_id" data-control="select2" data-placeholder="Pilih UOM">
                             <option></option>
                             @foreach ($uoms as $uom)
-                                <option value="{{ $uom->id }}">{{ $uom->name }}</option>
+                                <option value="{{ $uom->id }}" {{ old('uom_id') == $uom->id ? 'selected' : '' }}>
+                                    {{ $uom->name }}
+                                </option>
                             @endforeach
                         </select>
+                        @error('uom_id')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
                     </div>
+                    <div class="fv-row mb-3 ">
+                        <label for="koli" class="form-label required">Koli</label>
+                        <input type="number" class="form-control form-control-solid" id="koli" name="koli"
+                            required>
+                    </div>
+                    <div class="fv-row mb-3 ">
+                        <label for="deskripsi" class="form-label">Deskripsi</label>
+                        <textarea class="form-control form-control-solid" id="deskripsi" name="deskripsi" rows="3">{{ old('deskripsi') }}</textarea>
+                        @error('deskripsi')
+                            <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>   
+                    
                     <button type="submit" class="btn btn-primary mt-3">Tambah Item</button>
                 </form>
             </div>

@@ -49,12 +49,12 @@
                             <thead>
                                 <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
                                     <th class="sorting">No</th>
-                                    <th class="min-w-125px sorting">Koli</th>
+                                    <th class="min-w-125px sorting">Product Code</th>
                                     <th class="min-w-125px sorting">SKU</th>
                                     <th class="min-w-125px sorting">Nama Barang</th>
-                                    <th class="min-w-125px sorting">Deskripsi</th>
-                                    <th class="min-w-125px sorting">Product Code</th>
+                                    <th class="min-w-125px sorting">Koli</th>
                                     <th class="min-w-125px sorting">UOM</th>
+                                    <th class="min-w-125px sorting">Deskripsi</th>
                                     <th class="min-w-125px sorting">Tanggal Dibuat</th>
                                     <th class="min-w-125px sorting">Actions</th>
                                 </tr>
@@ -63,12 +63,12 @@
                                 @foreach ($items as $item)
                                     <tr>
                                         <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $item->koli }}</td>
+                                        <td>{{ $item->product_code }}</td>
                                         <td>{{ $item->sku }}</td>
                                         <td>{{ $item->nama_barang }}</td>
-                                        <td>{{ $item->deskripsi }}</td>
-                                        <td>{{ $item->product_code }}</td>
+                                        <td>{{ $item->koli }}</td>
                                         <td>{{ $item->uom->name ?? '' }}</td>
+                                        <td>{{ $item->deskripsi }}</td>
                                         <td>{{ $item->created_at }}</td>
                                         <td>
                                             <a href="#" class="btn btn-sm btn-light btn-active-light-primary"
