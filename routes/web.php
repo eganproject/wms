@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\Masterdata\MenuController;
 use App\Http\Controllers\Admin\Masterdata\PermissionController;
 use App\Http\Controllers\Admin\Masterdata\UomController;
 use App\Http\Controllers\Admin\Masterdata\ItemController;
+use App\Http\Controllers\Admin\Masterdata\ItemCategoryController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -25,6 +26,7 @@ Route::middleware(['auth', 'permission'])->group(function () {
     Route::resource('admin/users', UserController::class);
     Route::resource('admin/warehouses', \App\Http\Controllers\Admin\Masterdata\WarehouseController::class);
     Route::resource('admin/menus', MenuController::class);
+    Route::resource('admin/itemcategories', ItemCategoryController::class);
 
     Route::resource('admin/masterdata/uoms', UomController::class)->names([
         'index' => 'masterdata.uoms.index',

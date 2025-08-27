@@ -16,10 +16,16 @@ class Item extends Model
         'nama_barang',
         'deskripsi',
         'product_code',
+        'item_category_id',
     ];
 
     public function uom()
     {
         return $this->belongsTo(Uom::class);
+    }
+
+    public function itemCategory()
+    {
+        return $this->belongsTo(ItemCategory::class);
     }
 }

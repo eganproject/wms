@@ -107,6 +107,16 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        $itemCategoryMenu = Menu::updateOrCreate(
+            ['name' => 'Kategori Item'],
+            [
+                'url' => '/admin/itemcategories',
+                'icon' => 'fas fa-tags',
+                'parent_id' => $masterdata->id,
+                'order' => 8,
+            ]
+        );
+
         // Assign permissions to a role
         $developerJabatan = Jabatan::where('name', 'Developer')->first();
 
