@@ -13,6 +13,6 @@
 </tr>
 @if ($menu->children->isNotEmpty())
     @foreach ($menu->children as $child)
-        @include('admin.permissions._menu_permission_row', ['menu' => $child, 'level' => $level + 1, 'jabatans' => $jabatans, 'permissions' => $permissions])
+        @include('admin.masterdata.permissions._menu_permission_row', ['menu' => $child, 'level' => $level + 1, 'jabatans' => $jabatans, 'permissions' => $permissions])
     @endforeach
 @endif

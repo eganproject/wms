@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\Masterdata;
 
 use App\Http\Controllers\Controller;
 use App\Models\Jabatan;
@@ -21,7 +21,7 @@ class PermissionController extends Controller
             return $item->jabatan_id . '-' . $item->menu_id;
         });
 
-        return view('admin.permissions.index', compact('jabatans', 'menus', 'permissions'));
+        return view('admin.masterdata.permissions.index', compact('jabatans', 'menus', 'permissions'));
     }
 
     public function update(Request $request)

@@ -13,12 +13,12 @@ class JabatanController extends Controller
     public function index()
     {
         $jabatans = Jabatan::all();
-        return view('admin.jabatans.index', compact('jabatans'));
+        return view('admin.masterdata.jabatans.index', compact('jabatans'));
     }
 
     public function create()
     {
-        return view('admin.jabatans.create');
+        return view('admin.masterdata.jabatans.create');
     }
 
     public function store(Request $request)
@@ -48,7 +48,7 @@ class JabatanController extends Controller
 
     public function edit(Jabatan $jabatan)
     {
-        return view('admin.jabatans.edit', compact('jabatan'));
+        return view('admin.masterdata.jabatans.edit', compact('jabatan'));
     }
 
     public function update(Request $request, Jabatan $jabatan)

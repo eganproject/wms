@@ -31,7 +31,7 @@
                             </thead>
                             <tbody>
                                 @foreach ($menus as $menu)
-                                    @include('admin.permissions._menu_permission_row', ['menu' => $menu, 'level' => 0, 'jabatans' => $jabatans, 'permissions' => $permissions])
+                                    @include('admin.masterdata.permissions._menu_permission_row', ['menu' => $menu, 'level' => 0, 'jabatans' => $jabatans, 'permissions' => $permissions])
                                 @endforeach
                             </tbody>
                         </table>

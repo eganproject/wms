@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Admin\Masterdata;
 
 use App\Http\Controllers\Controller;
 use App\Models\Menu;
@@ -13,13 +13,13 @@ class MenuController extends Controller
     public function index()
     {
         $menus = Menu::with('parent')->orderBy('order')->get();
-        return view('admin.menus.index', compact('menus'));
+        return view('admin.masterdata.menus.index', compact('menus'));
     }
 
     public function create()
     {
         $parentMenus = Menu::whereNull('parent_id')->get();
-        return view('admin.menus.create', compact('parentMenus'));
+        return view('admin.masterdata.menus.create', compact('parentMenus'));
     }
 
     public function store(Request $request)
@@ -54,7 +54,7 @@ class MenuController extends Controller
     public function edit(Menu $menu)
     {
         $parentMenus = Menu::whereNull('parent_id')->where('id', '!=', $menu->id)->get();
-        return view('admin.menus.edit', compact('menu', 'parentMenus'));
+        return view('admin.masterdata.menus.edit', compact('menu', 'parentMenus'));
     }
 
     public function update(Request $request, Menu $menu)

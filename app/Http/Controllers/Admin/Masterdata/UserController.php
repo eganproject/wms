@@ -15,13 +15,13 @@ class UserController extends Controller
     public function index()
     {
         $users = User::with('jabatan')->get();
-        return view('admin.users.index', compact('users'));
+        return view('admin.masterdata.users.index', compact('users'));
     }
 
     public function create()
     {
         $jabatans = Jabatan::all();
-        return view('admin.users.create', compact('jabatans'));
+        return view('admin.masterdata.users.create', compact('jabatans'));
     }
 
     public function store(Request $request)
@@ -59,7 +59,7 @@ class UserController extends Controller
     public function edit(User $user)
     {
         $jabatans = Jabatan::all();
-        return view('admin.users.edit', compact('user', 'jabatans'));
+        return view('admin.masterdata.users.edit', compact('user', 'jabatans'));
     }
 
     public function update(Request $request, User $user)
