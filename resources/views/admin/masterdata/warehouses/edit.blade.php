@@ -1,0 +1,32 @@
+@extends('layouts.app')
+@push('toolbar')
+    @include('layouts.partials._toolbar', [
+        'title' => 'Warehouses',
+        'breadcrumbs' => ['Admin', 'Masterdata', 'Warehouses', 'Ubah Warehouse'],
+    ])
+@endpush
+@section('content')
+    <div class="content flex-row-fluid" id="kt_content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Edit Warehouse</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('warehouses.update', $warehouse->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="mb-3">
+                        <label for="name" class="form-label required">Nama Warehouse</label>
+                        <input type="text" class="form-control form-control-solid" id="name" name="name" value="{{ $warehouse->name }}"
+                            required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Alamat</label>
+                        <textarea class="form-control form-control-solid" id="address" name="address" rows="3">{{ $warehouse->address }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+@endsection

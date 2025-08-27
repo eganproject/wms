@@ -21,6 +21,7 @@ Route::middleware(['auth', 'permission'])->group(function () {
 
     Route::resource('admin/jabatans', JabatanController::class);
     Route::resource('admin/users', UserController::class);
+    Route::resource('admin/warehouses', \App\Http\Controllers\Admin\Masterdata\WarehouseController::class);
     Route::resource('admin/menus', MenuController::class);
 
     Route::get('/admin/permissions', [PermissionController::class, 'index'])->name('permissions.index');
