@@ -13,3 +13,4 @@
 		<script src="/metronic/assets/js/custom/modals/upgrade-plan.js"></script>
 		<!--end::Page Custom Javascript-->
 		<!--end::Javascript-->
+@stack('scripts')
