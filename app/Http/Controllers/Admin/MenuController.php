@@ -103,7 +103,7 @@ class MenuController extends Controller
 
             return redirect()->route('menus.index')->with('success', 'Menu berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Gagal menghapus menu: ' . $e->getMessage()]);
+            return redirect()->back()->with('error', 'Gagal menghapus menu: ' . $e->getMessage());
         }
     }
 }
