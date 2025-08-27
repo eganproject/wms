@@ -93,7 +93,7 @@ class JabatanController extends Controller
 
             return redirect()->route('jabatans.index')->with('success', 'Jabatan berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Gagal menghapus jabatan: ' . $e->getMessage()]);
+            return redirect()->back()->with('error', 'Gagal menghapus jabatan: ' . $e->getMessage());
         }
     }
 }

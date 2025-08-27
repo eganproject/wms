@@ -1,30 +1,32 @@
 @extends('layouts.app')
-
+@push('toolbar')
+    @include('layouts.partials._toolbar', [
+        'title' => 'Jabatans',
+        'breadcrumbs' => ['Admin', 'Masterdata', 'Jabatans', 'Ubah Jabatan'],
+    ])
+@endpush
 @section('content')
-<div class="container">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Edit Jabatan</h3>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('jabatans.update', $jabatan->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" value="{{ $jabatan->name }}" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
-                            <textarea class="form-control" id="description" name="description">{{ $jabatan->description }}</textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                </div>
+    <div class="content flex-row-fluid" id="kt_content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Ubah Jabatan</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{ route('jabatans.update', $jabatan->id) }}" method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="fv-row mb-3">
+                        <label for="name" class="form-label required">Name</label>
+                        <input type="text" class="form-control form-control-solid" id="name" name="name" value="{{ $jabatan->name }}"
+                            required>
+                    </div>
+                    <div class="fv-row mb-3">
+                        <label for="description" class="form-label">Description</label>
+                        <textarea class="form-control form-control-solid" id="description" name="description">{{ $jabatan->description }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+                </form>
             </div>
         </div>
     </div>
-</div>
 @endsection
