@@ -176,10 +176,26 @@ class ItemController extends Controller
                 return $prefix . $date . $newNumber;
             } else {
                 // If the last 4 characters are not numeric, generate a new random 4-digit number
-                return $prefix . $date . str_pad(mt_rand(0, 99), 2, '0', STR_PAD_LEFT);
+                return $prefix . $date . str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
             }
         } else {
-            return $prefix . $date . str_pad(mt_rand(0, 99), 2, '0', STR_PAD_LEFT);
+            return $prefix . $date . str_pad(mt_rand(0, 9999), 4, '0', STR_PAD_LEFT);
         }
+    }
+
+    public function checkSkuUniqueness(Request $request)
+    {
+        $sku = $request->input('sku');
+        $itemId = $request->input('item_id');
+
+        $query = Item::where('sku', $sku);
+
+        if ($itemId) {
+            $query->where('id', '!=', $itemId);
+        }
+
+        $isUnique = !$query->exists();
+
+        return response()->json(['isUnique' => $isUnique]);
     }
 }

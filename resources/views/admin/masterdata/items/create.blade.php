@@ -30,6 +30,7 @@
                         <label for="sku" class="form-label required">SKU</label>
                         <input type="text" class="form-control form-control-solid" id="sku" name="sku"
                             value="{{ old('sku') }}" required>
+                        <div id="sku-feedback" class="mt-2"></div>
                         @error('sku')
                             <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -104,6 +105,49 @@
             @if (Session::has('error'))
                 toastr.error("{{ session('error') }}");
             @endif
+
+            var skuInput = $('#sku');
+            var skuFeedback = $('#sku-feedback');
+            var submitButton = $('button[type="submit"]');
+
+            function checkSkuUniqueness() {
+                var sku = skuInput.val();
+                if (sku.length === 0) {
+                    skuFeedback.html('').removeClass('text-success text-danger');
+                    submitButton.prop('disabled', false);
+                    return;
+                }
+
+                $.ajax({
+                    url: "{{ route('admin.masterdata.items.checkSkuUniqueness') }}",
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        sku: sku
+                    },
+                    success: function(response) {
+                        if (response.isUnique) {
+                            skuFeedback.html('SKU tersedia.').removeClass('text-danger').addClass('text-success');
+                            submitButton.prop('disabled', false);
+                        } else {
+                            skuFeedback.html('SKU sudah digunakan.').removeClass('text-success').addClass('text-danger');
+                            submitButton.prop('disabled', true);
+                        }
+                    },
+                    error: function() {
+                        skuFeedback.html('Terjadi kesalahan saat memeriksa SKU.').removeClass('text-success').addClass('text-danger');
+                        submitButton.prop('disabled', true);
+                    }
+                });
+            }
+
+            skuInput.on('keyup', checkSkuUniqueness);
+
+            // Initial check if there's an old value
+            checkSkuUniqueness();
         });
     </script>
 @endpush

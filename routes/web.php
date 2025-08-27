@@ -46,6 +46,8 @@ Route::middleware(['auth', 'permission'])->group(function () {
         'destroy' => 'admin.masterdata.items.destroy',
     ]);
 
+    Route::post('admin/masterdata/items/check-sku', [ItemController::class, 'checkSkuUniqueness'])->name('admin.masterdata.items.checkSkuUniqueness');
+
     Route::get('/admin/permissions', [PermissionController::class, 'index'])->name('permissions.index');
     Route::post('/admin/permissions/update', [PermissionController::class, 'update'])->name('permissions.update');
 });
