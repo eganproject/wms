@@ -40,9 +40,9 @@ class ItemCategoryController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('itemcategories.index')->with('success', 'Kategori item berhasil ditambahkan.');
+            return redirect()->route('admin.masterdata.itemcategories.index')->with('success', 'Kategori item berhasil ditambahkan.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal menambahkan kategori item: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan kategori item: ' . $e->getMessage());
         }
     }
 
@@ -70,9 +70,9 @@ class ItemCategoryController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('itemcategories.index')->with('success', 'Kategori item berhasil diperbarui.');
+            return redirect()->route('admin.masterdata.itemcategories.index')->with('success', 'Kategori item berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal memperbarui kategori item: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error' , 'Gagal memperbarui kategori item: ' . $e->getMessage());
         }
     }
 
@@ -91,7 +91,7 @@ class ItemCategoryController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('itemcategories.index')->with('success', 'Kategori item berhasil dihapus.');
+            return redirect()->route('admin.masterdata.itemcategories.index')->with('success', 'Kategori item berhasil dihapus.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus kategori item: ' . $e->getMessage());
         }

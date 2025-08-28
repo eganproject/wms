@@ -15,7 +15,7 @@
                 <h3 class="card-title">Edit User</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('users.update', $user->id) }}" method="POST">
+                <form action="{{ route('admin.masterdata.users.update', $user->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="mb-3">

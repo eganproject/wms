@@ -40,9 +40,9 @@ class JabatanController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('jabatans.index')->with('success', 'Jabatan berhasil ditambahkan.');
+            return redirect()->route('admin.masterdata.jabatans.index')->with('success', 'Jabatan berhasil ditambahkan.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal menambahkan jabatan: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan jabatan: ' . $e->getMessage());
         }
     }
 
@@ -70,9 +70,9 @@ class JabatanController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('jabatans.index')->with('success', 'Jabatan berhasil diperbarui.');
+            return redirect()->route('admin.masterdata.jabatans.index')->with('success', 'Jabatan berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal memperbarui jabatan: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui jabatan: ' . $e->getMessage());
         }
     }
 
@@ -91,7 +91,7 @@ class JabatanController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('jabatans.index')->with('success', 'Jabatan berhasil dihapus.');
+            return redirect()->route('admin.masterdata.jabatans.index')->with('success', 'Jabatan berhasil dihapus.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus jabatan: ' . $e->getMessage());
         }

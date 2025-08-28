@@ -31,7 +31,7 @@ class UserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users',
                 'password' => 'required|string|min:8',
-                'jabatan_id' => 'nullable|exists:jabatans,id',
+                'jabatan_id' => 'required|exists:jabatans,id',
             ]);
 
             $user = User::create([
@@ -50,9 +50,9 @@ class UserController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('users.index')->with('success', 'Pengguna berhasil ditambahkan.');
+            return redirect()->route('admin.masterdata.users.index')->with('success', 'Pengguna berhasil ditambahkan.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal menambahkan pengguna: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan pengguna: ' . $e->getMessage());
         }
     }
 
@@ -69,7 +69,7 @@ class UserController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
                 'password' => 'nullable|string|min:8',
-                'jabatan_id' => 'nullable|exists:jabatans,id',
+                'jabatan_id' => 'required|exists:jabatans,id',
             ]);
 
             $data = $request->except('password');
@@ -88,9 +88,9 @@ class UserController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('users.index')->with('success', 'Pengguna berhasil diperbarui.');
+            return redirect()->route('admin.masterdata.users.index')->with('success', 'Pengguna berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal memperbarui pengguna: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui pengguna: ' . $e->getMessage());
         }
     }
 
@@ -109,9 +109,9 @@ class UserController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('users.index')->with('success', 'Pengguna berhasil dihapus.');
+            return redirect()->route('admin.masterdata.users.index')->with('success', 'Pengguna berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Gagal menghapus pengguna: ' . $e->getMessage()]);
+            return redirect()->back()->with('error', 'Gagal menghapus pengguna: ' . $e->getMessage());
         }
     }
 }

@@ -13,7 +13,7 @@
                 <h3 class="card-title">Tambah Warehouse</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('warehouses.store') }}" method="POST">
+                <form action="{{ route('admin.masterdata.warehouses.store') }}" method="POST">
                     @csrf
                     <div class="fv-row mb-3 ">
                         <label for="name" class="form-label required">Nama Warehouse</label>

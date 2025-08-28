@@ -58,7 +58,7 @@
                         const permissionType = this.dataset.permissionType;
                         const isChecked = this.checked;
 
-                        axios.post('{{ route('permissions.update') }}', {
+                        axios.post('{{ route('admin.masterdata.permissions.update') }}', {
                                 jabatan_id: jabatanId,
                                 menu_id: menuId,
                                 permission_type: permissionType,

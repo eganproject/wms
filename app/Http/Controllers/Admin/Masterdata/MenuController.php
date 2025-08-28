@@ -45,9 +45,9 @@ class MenuController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('menus.index')->with('success', 'Menu berhasil ditambahkan.');
+            return redirect()->route('admin.masterdata.menus.index')->with('success', 'Menu berhasil ditambahkan.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal menambahkan menu: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan menu: ' . $e->getMessage());
         }
     }
 
@@ -80,9 +80,9 @@ class MenuController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('menus.index')->with('success', 'Menu berhasil diperbarui.');
+            return redirect()->route('admin.masterdata.menus.index')->with('success', 'Menu berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal memperbarui menu: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error' , 'Gagal memperbarui menu: ' . $e->getMessage());
         }
     }
 
@@ -101,7 +101,7 @@ class MenuController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('menus.index')->with('success', 'Menu berhasil dihapus.');
+            return redirect()->route('admin.masterdata.menus.index')->with('success', 'Menu berhasil dihapus.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus menu: ' . $e->getMessage());
         }

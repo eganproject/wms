@@ -12,7 +12,7 @@
                 <h3 class="card-title">Ubah Kategori Item</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('itemcategories.update', $itemcategory->id) }}" method="POST">
+                <form action="{{ route('admin.masterdata.itemcategories.update', $itemcategory->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="fv-row mb-3">

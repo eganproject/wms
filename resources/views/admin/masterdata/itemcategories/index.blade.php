@@ -36,7 +36,7 @@
                 <div class="card-toolbar">
                     <!--begin::Toolbar-->
                     <div class="d-flex justify-content-end">
-                        <a href="{{ route('itemcategories.create') }}" class="btn btn-primary">Tambah Kategori Item</a>
+                        <a href="{{ route('admin.masterdata.itemcategories.create') }}" class="btn btn-primary">Tambah Kategori Item</a>
                     </div>
                     <!--end::Toolbar-->
                 </div>
@@ -76,12 +76,12 @@
                                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
                                                 data-kt-menu="true" style="">
                                                 <div class="menu-item px-3">
-                                                    <a href="{{ route('itemcategories.edit', $itemcategory->id) }}"
+                                                    <a href="{{ route('admin.masterdata.itemcategories.edit', $itemcategory->id) }}"
                                                         class="menu-link px-3">Edit</a>
                                                 </div>
                                                 <div class="menu-item px-3">
                                                     <form class="form-delete"
-                                                        action="{{ route('itemcategories.destroy', $itemcategory->id) }}" method="POST"
+                                                        action="{{ route('admin.masterdata.itemcategories.destroy', $itemcategory->id) }}" method="POST"
                                                         style="display: inline-block;">
                                                         @csrf
                                                         @method('DELETE')

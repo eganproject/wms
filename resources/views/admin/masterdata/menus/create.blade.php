@@ -13,7 +13,7 @@
                 <h3 class="card-title">Tambah Menu</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('menus.store') }}" method="POST">
+                <form action="{{ route('admin.masterdata.menus.store') }}" method="POST">
                     @csrf
                     <div class="fv-row mb-3 ">
                         <label for="name" class="form-label required">Nama Menu</label>

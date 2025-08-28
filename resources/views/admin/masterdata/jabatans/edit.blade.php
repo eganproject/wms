@@ -12,7 +12,7 @@
                 <h3 class="card-title">Ubah Jabatan</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('jabatans.update', $jabatan->id) }}" method="POST">
+                <form action="{{ route('admin.masterdata.jabatans.update', $jabatan->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="fv-row mb-3">

@@ -13,7 +13,7 @@
                 <h3 class="card-title">Tambah Jabatan</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('jabatans.store') }}" method="POST">
+                <form action="{{ route('admin.masterdata.jabatans.store') }}" method="POST">
                     @csrf
                     <div class="fv-row mb-3 ">
                         <label for="name" class="form-label required">Name</label>

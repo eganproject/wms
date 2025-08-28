@@ -59,9 +59,9 @@ class WarehouseController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('warehouses.index')->with('success', 'Warehouse berhasil ditambahkan.');
+            return redirect()->route('admin.masterdata.warehouses.index')->with('success', 'Warehouse berhasil ditambahkan.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal menambahkan warehouse: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal menambahkan warehouse: ' . $e->getMessage());
         }
     }
 
@@ -114,9 +114,9 @@ class WarehouseController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('warehouses.index')->with('success', 'Warehouse berhasil diperbarui.');
+            return redirect()->route('admin.masterdata.warehouses.index')->with('success', 'Warehouse berhasil diperbarui.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Gagal memperbarui warehouse: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Gagal memperbarui warehouse: ' . $e->getMessage());
         }
     }
 
@@ -141,9 +141,9 @@ class WarehouseController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('warehouses.index')->with('success', 'Warehouse berhasil dihapus.');
+            return redirect()->route('admin.masterdata.warehouses.index')->with('success', 'Warehouse berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'Gagal menghapus warehouse: ' . $e->getMessage()]);
+            return redirect()->back()->with('error', 'Gagal menghapus warehouse: ' . $e->getMessage());
         }
     }
 }

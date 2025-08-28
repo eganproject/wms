@@ -40,7 +40,7 @@ class MenuSeeder extends Seeder
         $userMenu = Menu::updateOrCreate(
             ['name' => 'Users'],
             [
-                'url' => '/admin/users',
+                'url' => '/admin/masterdata/users',
                 'icon' => 'fas fa-users',
                 'parent_id' => $masterdata->id,
                 'order' => 1,
@@ -50,7 +50,7 @@ class MenuSeeder extends Seeder
         $jabatanMenu = Menu::updateOrCreate(
             ['name' => 'Jabatan'],
             [
-                'url' => '/admin/jabatans',
+                'url' => '/admin/masterdata/jabatans',
                 'icon' => 'fas fa-briefcase',
                 'parent_id' => $masterdata->id,
                 'order' => 2,
@@ -60,7 +60,7 @@ class MenuSeeder extends Seeder
         $permissionMenu = Menu::updateOrCreate(
             ['name' => 'Permissions'],
             [
-                'url' => '/admin/permissions',
+                'url' => '/admin/masterdata/permissions',
                 'icon' => 'fas fa-key',
                 'parent_id' => $masterdata->id,
                 'order' => 3,
@@ -70,7 +70,7 @@ class MenuSeeder extends Seeder
         $menusMenu = Menu::updateOrCreate(
             ['name' => 'Menus'],
             [
-                'url' => '/admin/menus',
+                'url' => '/admin/masterdata/menus',
                 'icon' => 'fas fa-bars',
                 'parent_id' => $masterdata->id,
                 'order' => 4,
@@ -80,7 +80,7 @@ class MenuSeeder extends Seeder
         $warehouseMenu = Menu::updateOrCreate(
             ['name' => 'Warehouses'],
             [
-                'url' => '/admin/warehouses',
+                'url' => '/admin/masterdata/warehouses',
                 'icon' => 'fas fa-warehouse',
                 'parent_id' => $masterdata->id,
                 'order' => 5,
@@ -110,7 +110,7 @@ class MenuSeeder extends Seeder
         $itemCategoryMenu = Menu::updateOrCreate(
             ['name' => 'Kategori Item'],
             [
-                'url' => '/admin/itemcategories',
+                'url' => '/admin/masterdata/itemcategories',
                 'icon' => 'fas fa-tags',
                 'parent_id' => $masterdata->id,
                 'order' => 8,

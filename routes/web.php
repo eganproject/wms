@@ -22,34 +22,17 @@ Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 Route::middleware(['auth', 'permission'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    Route::resource('admin/jabatans', JabatanController::class);
-    Route::resource('admin/users', UserController::class);
-    Route::resource('admin/warehouses', \App\Http\Controllers\Admin\Masterdata\WarehouseController::class);
-    Route::resource('admin/menus', MenuController::class);
-    Route::resource('admin/itemcategories', ItemCategoryController::class);
+    Route::prefix('admin/masterdata')->name('admin.masterdata.')->group(function () {
+        Route::resource('jabatans', JabatanController::class);
+        Route::resource('users', UserController::class);
+        Route::resource('warehouses', \App\Http\Controllers\Admin\Masterdata\WarehouseController::class);
+        Route::resource('menus', MenuController::class);
+        Route::resource('itemcategories', ItemCategoryController::class);
+        Route::resource('uoms', UomController::class);
+        Route::resource('items', ItemController::class);
+        Route::post('items/check-sku', [ItemController::class, 'checkSkuUniqueness'])->name('items.checkSkuUniqueness');
 
-    Route::resource('admin/masterdata/uoms', UomController::class)->names([
-        'index' => 'masterdata.uoms.index',
-        'create' => 'masterdata.uoms.create',
-        'store' => 'masterdata.uoms.store',
-        'show' => 'masterdata.uoms.show',
-        'edit' => 'masterdata.uoms.edit',
-        'update' => 'masterdata.uoms.update',
-        'destroy' => 'masterdata.uoms.destroy',
-    ]);
-
-    Route::resource('admin/masterdata/items', ItemController::class)->names([
-        'index' => 'admin.masterdata.items.index',
-        'create' => 'admin.masterdata.items.create',
-        'store' => 'admin.masterdata.items.store',
-        'show' => 'admin.masterdata.items.show',
-        'edit' => 'admin.masterdata.items.edit',
-        'update' => 'admin.masterdata.items.update',
-        'destroy' => 'admin.masterdata.items.destroy',
-    ]);
-
-    Route::post('admin/masterdata/items/check-sku', [ItemController::class, 'checkSkuUniqueness'])->name('admin.masterdata.items.checkSkuUniqueness');
-
-    Route::get('/admin/permissions', [PermissionController::class, 'index'])->name('permissions.index');
-    Route::post('/admin/permissions/update', [PermissionController::class, 'update'])->name('permissions.update');
+        Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
+        Route::post('permissions/update', [PermissionController::class, 'update'])->name('permissions.update');
+    });
 });

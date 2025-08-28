@@ -13,7 +13,7 @@
                 <h3 class="card-title">Tambah Kategori Item</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('itemcategories.store') }}" method="POST">
+                <form action="{{ route('admin.masterdata.itemcategories.store') }}" method="POST">
                     @csrf
                     <div class="fv-row mb-3 ">
                         <label for="name" class="form-label required">Nama</label>

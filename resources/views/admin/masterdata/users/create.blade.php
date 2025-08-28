@@ -10,23 +10,29 @@
 @endpush
 @section('content')
     <div class="content flex-row-fluid" id="kt_content">
-
+        @if ($errors->any())
+            @php
+                dump($errors);
+            @endphp
+        @endif
         <div class="card">
             <div class="card-header">
                 <h3 class="card-title">Tambah User</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('users.store') }}" method="POST">
+                <form action="{{ route('admin.masterdata.users.store') }}" method="POST">
                     @csrf
                     <div class="fv-row mb-3 ">
                         <label for="name" class="form-label required">Nama</label>
                         <input type="text" class="form-control form-control-solid" id="name" name="name"
-                            required>
+                            value="{{ old('name') }}" required>
+                       
                     </div>
                     <div class="fv-row mb-3 ">
                         <label for="email" class="form-label required">Email</label>
                         <input type="email" class="form-control form-control-solid" id="email" name="email"
-                            required>
+                            value="{{ old('email') }}" required>
+                      
                     </div>
                     <div class="fv-row mb-3 ">
                         <label for="password" class="form-label required">Password</label>
@@ -42,6 +48,7 @@
                                 <option value="{{ $jabatan->id }}">{{ $jabatan->name }}</option>
                             @endforeach
                         </select>
+                       
                     </div>
                     <button type="submit" class="btn btn-primary mt-3">Submit</button>
                 </form>

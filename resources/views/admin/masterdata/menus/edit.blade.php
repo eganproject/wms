@@ -12,7 +12,7 @@
                 <h3 class="card-title">Ubah Menu: {{ $menu->name }}</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('menus.update', $menu->id) }}" method="POST">
+                <form action="{{ route('admin.masterdata.menus.update', $menu->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="fv-row mb-3">
