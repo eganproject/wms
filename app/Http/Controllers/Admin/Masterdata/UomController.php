@@ -49,10 +49,10 @@ class UomController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('masterdata.uoms.index')
+            return redirect()->route('admin.masterdata.uoms.index')
                              ->with('success', 'UOM created successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Failed to create UOM: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Failed to create UOM: ' . $e->getMessage());
         }
     }
 
@@ -94,10 +94,10 @@ class UomController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('masterdata.uoms.index')
+            return redirect()->route('admin.masterdata.uoms.index')
                              ->with('success', 'UOM updated successfully.');
         } catch (\Exception $e) {
-            return redirect()->back()->withInput()->withErrors(['error' => 'Failed to update UOM: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Failed to update UOM: ' . $e->getMessage());
         }
     }
 
@@ -119,7 +119,7 @@ class UomController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
-            return redirect()->route('masterdata.uoms.index')
+            return redirect()->route('admin.masterdata.uoms.index')
                              ->with('success', 'UOM deleted successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'Failed to delete UOM: ' . $e->getMessage()]);

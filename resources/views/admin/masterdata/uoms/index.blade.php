@@ -37,7 +37,7 @@
                 <div class="card-toolbar">
                     <!--begin::Toolbar-->
                     <div class="d-flex justify-content-end">
-                        <a href="{{ route('masterdata.uoms.create') }}" class="btn btn-primary">Tambah UOM</a>
+                        <a href="{{ route('admin.masterdata.uoms.create') }}" class="btn btn-primary">Tambah UOM</a>
                     </div>
                     <!--end::Toolbar-->
                 </div>
@@ -75,12 +75,12 @@
                                             <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
                                                 data-kt-menu="true" style="">
                                                 <div class="menu-item px-3">
-                                                    <a href="{{ route('masterdata.uoms.edit', $uom->id) }}"
+                                                    <a href="{{ route('admin.masterdata.uoms.edit', $uom->id) }}"
                                                         class="menu-link px-3">Edit</a>
                                                 </div>
                                                 <div class="menu-item px-3">
                                                     <form class="form-delete"
-                                                        action="{{ route('masterdata.uoms.destroy', $uom->id) }}" method="POST"
+                                                        action="{{ route('admin.masterdata.uoms.destroy', $uom->id) }}" method="POST"
                                                         style="display: inline-block;">
                                                         @csrf
                                                         @method('DELETE')

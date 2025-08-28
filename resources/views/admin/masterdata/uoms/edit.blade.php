@@ -15,7 +15,7 @@
                 <h3 class="card-title">Edit UOM</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('masterdata.uoms.update', $uom->id) }}" method="POST">
+                <form action="{{ route('admin.masterdata.uoms.update', $uom->id) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="fv-row mb-3">
@@ -38,7 +38,7 @@
                         @enderror
                     </div>
                     <button type="submit" class="btn btn-primary mt-3">Update</button>
-                    <a href="{{ route('masterdata.uoms.index') }}" class="btn btn-secondary mt-3">Batal</a>
+                    <a href="{{ route('admin.masterdata.uoms.index') }}" class="btn btn-secondary mt-3">Batal</a>
                 </form>
             </div>
         </div>

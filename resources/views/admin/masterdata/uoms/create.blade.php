@@ -16,7 +16,7 @@
                 <h3 class="card-title">Tambah UOM Baru</h3>
             </div>
             <div class="card-body">
-                <form action="{{ route('masterdata.uoms.store') }}" method="POST">
+                <form action="{{ route('admin.masterdata.uoms.store') }}" method="POST">
                     @csrf
                     <div class="fv-row mb-3 ">
                         <label for="name" class="form-label required">Nama UOM</label>
@@ -38,7 +38,7 @@
                         @enderror
                     </div>
                     <button type="submit" class="btn btn-primary mt-3">Simpan</button>
-                    <a href="{{ route('masterdata.uoms.index') }}" class="btn btn-secondary mt-3">Batal</a>
+                    <a href="{{ route('admin.masterdata.uoms.index') }}" class="btn btn-secondary mt-3">Batal</a>
                 </form>
             </div>
         </div>
