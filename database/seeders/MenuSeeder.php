@@ -103,7 +103,7 @@ class MenuSeeder extends Seeder
                 'url' => '/admin/masterdata/items',
                 'icon' => 'fas fa-box',
                 'parent_id' => $masterdata->id,
-                'order' => 7,
+                'order' => 8,
             ]
         );
 
@@ -113,7 +113,7 @@ class MenuSeeder extends Seeder
                 'url' => '/admin/masterdata/itemcategories',
                 'icon' => 'fas fa-tags',
                 'parent_id' => $masterdata->id,
-                'order' => 8,
+                'order' => 7,
             ]
         );
 
