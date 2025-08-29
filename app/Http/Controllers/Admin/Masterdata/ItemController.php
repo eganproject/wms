@@ -10,6 +10,7 @@ use App\Models\UserActivity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ItemController extends Controller
 {
@@ -57,25 +58,33 @@ class ItemController extends Controller
             'product_code' => 'nullable|string|unique:items,product_code',
         ]);
 
-        $data = $request->all();
-        // If product_code is not provided (e.g., from a hidden field or JS generation), generate it
-        if (empty($data['product_code'])) {
-            $data['product_code'] = $this->generateProductCode();
+        DB::beginTransaction();
+        try {
+            $data = $request->all();
+            // If product_code is not provided (e.g., from a hidden field or JS generation), generate it
+            if (empty($data['product_code'])) {
+                $data['product_code'] = $this->generateProductCode();
+            }
+
+            $item = Item::create($data);
+
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'activity' => 'created',
+                'menu' => 'items',
+                'description' => 'Menambahkan item baru: ' . $item->nama_barang . ' (SKU: ' . $item->sku . ')',
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('admin.masterdata.items.index')
+                ->with('success', 'Item created successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal membuat item: ' . $e->getMessage())->withInput();
         }
-
-        $item = Item::create($data);
-
-        UserActivity::create([
-            'user_id' => Auth::id(),
-            'activity' => 'created',
-            'menu' => 'items',
-            'description' => 'Menambahkan item baru: ' . $item->nama_barang . ' (SKU: ' . $item->sku . ')',
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->header('User-Agent'),
-        ]);
-
-        return redirect()->route('admin.masterdata.items.index')
-            ->with('success', 'Item created successfully.');
     }
 
     /**
@@ -115,26 +124,35 @@ class ItemController extends Controller
             'product_code' => 'nullable|string|unique:items,product_code,' . $item->id,
         ]);
 
-        $item->update($request->except(['product_code']));
+        DB::beginTransaction();
+        try {
+            $item->update($request->except(['product_code']));
 
-        UserActivity::create([
-            'user_id' => Auth::id(),
-            'activity' => 'updated',
-            'menu' => 'items',
-            'description' => 'Memperbarui item: ' . $item->nama_barang . ' (SKU: ' . $item->sku . ')',
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->header('User-Agent'),
-        ]);
+            UserActivity::create([
+                'user_id' => Auth::id(),
+                'activity' => 'updated',
+                'menu' => 'items',
+                'description' => 'Memperbarui item: ' . $item->nama_barang . ' (SKU: ' . $item->sku . ')',
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->header('User-Agent'),
+            ]);
 
-        return redirect()->route('admin.masterdata.items.index')
-            ->with('success', 'Item updated successfully.');
+            DB::commit();
+
+            return redirect()->route('admin.masterdata.items.index')
+                ->with('success', 'Item updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memperbarui item: ' . $e->getMessage())->withInput();
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request,$id)
+    public function destroy(Request $request, $id)
     {
+        DB::beginTransaction();
         try {
             $item = Item::findOrFail($id);
             $itemName = $item->nama_barang;
@@ -150,9 +168,12 @@ class ItemController extends Controller
                 'user_agent' => $request->header('User-Agent'),
             ]);
 
+            DB::commit();
+
             return redirect()->route('admin.masterdata.items.index')
                 ->with('success', 'Item deleted successfully.');
         } catch (\Exception $e) {
+            DB::rollBack();
             return redirect()->back()->with('error', 'Gagal menghapus item: ' . $e->getMessage());
         }
     }
