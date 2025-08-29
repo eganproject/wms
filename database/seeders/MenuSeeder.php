@@ -162,7 +162,7 @@ class MenuSeeder extends Seeder
         Menu::updateOrCreate(
             ['name' => 'Daftar Penerimaan Barang'],
             [
-                'url' => '/admin/stok-masuk/daftar-penerimaan',
+                'url' => '/admin/stok-masuk/daftar-penerimaan-barang',
                 'icon' => 'fas fa-list-alt',
                 'parent_id' => $stokMasuk->id,
                 'order' => 1,

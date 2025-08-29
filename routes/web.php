@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\StokMasuk\DaftarPenerimaanBarangController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -35,4 +36,12 @@ Route::middleware(['auth', 'permission'])->group(function () {
         Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
         Route::post('permissions/update', [PermissionController::class, 'update'])->name('permissions.update');
     });
+
+    Route::prefix('admin/stok-masuk')->name('admin.stok-masuk.')->group(function () {
+
+        Route::get('daftar-penerimaan-barang', [DaftarPenerimaanBarangController::class, 'index'])->name('daftar-penerimaan-barang.index');
+    });
+
 });
+
+

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Http\Controllers\Admin\Masterdata;
+namespace App\Http\Controllers\Admin\ManajemenStok;
 
 use App\Http\Controllers\Controller;
 
