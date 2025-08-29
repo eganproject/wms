@@ -148,6 +148,37 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        // Stok Masuk
+        $stokMasuk = Menu::updateOrCreate(
+            ['name' => 'Stok Masuk'],
+            [
+                'url' => null,
+                'icon' => 'fas fa-dolly',
+                'order' => 4,
+            ]
+        );
+
+        // Children of Stok Masuk
+        Menu::updateOrCreate(
+            ['name' => 'Daftar Penerimaan Barang'],
+            [
+                'url' => '/admin/stok-masuk/daftar-penerimaan',
+                'icon' => 'fas fa-list-alt',
+                'parent_id' => $stokMasuk->id,
+                'order' => 1,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['name' => 'Penerimaan Transfer'],
+            [
+                'url' => '/admin/stok-masuk/penerimaan-transfer',
+                'icon' => 'fas fa-exchange-alt',
+                'parent_id' => $stokMasuk->id,
+                'order' => 2,
+            ]
+        );
+
         // Assign permissions to a role
         $developerJabatan = Jabatan::where('name', 'Developer')->first();
 
