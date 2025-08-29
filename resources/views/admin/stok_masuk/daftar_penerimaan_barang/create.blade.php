@@ -11,15 +11,16 @@
     <div class="content flex-row-fluid" id="kt_content">
         <div class="card">
             <div class="card-body">
-                <form action="{{ route('admin.stok-masuk.daftar-penerimaan-barang.store') }}" method="POST">
+                <form id="penerimaan-form" action="{{ route('admin.stok-masuk.daftar-penerimaan-barang.store') }}"
+                    method="POST">
                     @csrf
                     <div class="row">
-                        <div class="col-md-12 mb-5">
+                        <div class="col-md-6 mb-5">
                             <label class="form-label fs-6 fw-bolder text-dark">Kode Dokumen</label>
                             <input type="text" name="code" class="form-control form-control-solid"
                                 value="{{ $newCode }}" readonly>
                         </div>
-                        <div class="col-md-12 mb-5">
+                        <div class="col-md-6 mb-5">
                             <label class="form-label fs-6 fw-bolder text-dark">Tanggal</label>
                             <input type="text" name="date"
                                 class="form-control form-control-solid flatpickr-input @error('date') is-invalid @enderror"
@@ -31,7 +32,7 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-md-12 mb-5">
+                        <div class="col-md-6 mb-5">
                             <label class="form-label fs-6 fw-bolder text-dark">Gudang</label>
                             <select name="warehouse_id"
                                 class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror"
@@ -47,7 +48,7 @@
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>
-                        <div class="col-md-12 mb-5">
+                        <div class="col-md-6 mb-5">
                             <label class="form-label fs-6 fw-bolder text-dark">Deskripsi</label>
                             <textarea name="description" class="form-control form-control-solid">{{ old('description') }}</textarea>
                         </div>
@@ -82,6 +83,8 @@
 
 @push('scripts')
     <script>
+        var itemsData = @json($items);
+
         $(document).ready(function() {
             $(".flatpickr-input").flatpickr({
                 dateFormat: "Y-m-d",
@@ -96,22 +99,33 @@
             }
 
             function addNewRow() {
-                let newRow = `
+                let newRowHtml = `
                     <tr data-index="${itemIndex}">
                         <td>
-                            <select name="items[${itemIndex}][item_id]" class="form-select item-select" data-control="select2" required>
-                                <option></option>
-                                @foreach ($items as $item)
-                                    <option value="{{ $item->id }}">{{ $item->nama_barang }}</option>
-                                @endforeach
-                            </select>
+                            <select name="items[${itemIndex}][item_id]" class="form-select item-select" required></select>
                         </td>
-                        <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control" value="1" min="1" required></td>
-                        <td><input type="number" name="items[${itemIndex}][koli]" class="form-control" value="0" min="0"></td>
+                        <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control quantity-input" value="1" min="1" required></td>
+                        <td><input type="number" name="items[${itemIndex}][koli]" class="form-control koli-input" value="0" min="0" step="any"></td>
                         <td><button type="button" class="btn btn-danger btn-sm remove-item-btn">X</button></td>
                     </tr>`;
-                $('#items-table tbody').append(newRow);
-                initializeSelect2($('tr[data-index="' + itemIndex + '"] .item-select'));
+
+                $('#items-table tbody').append(newRowHtml);
+
+                let newSelect = $('tr[data-index="' + itemIndex + '"] .item-select');
+
+                // Tambahkan placeholder option
+                newSelect.append(new Option('', '', true, true));
+
+                // Populate dropdown dengan data item dari JSON
+                itemsData.forEach(function(item) {
+                    let option = new Option(item.nama_barang, item.id, false, false);
+                    $(option).attr('data-koli', item.koli || 1);
+                    newSelect.append(option);
+                });
+
+                newSelect.val(null).trigger('change');
+
+                initializeSelect2(newSelect);
                 itemIndex++;
             }
 
@@ -123,8 +137,54 @@
                 $(this).closest('tr').remove();
             });
 
+            // Kalkulasi otomatis Quantity -> Koli
+            $('#items-table').on('input change', '.quantity-input, .item-select', function() {
+                let row = $(this).closest('tr');
+                let quantity = parseFloat(row.find('.quantity-input').val()) || 0;
+                let productKoli = parseFloat(row.find('.item-select option:selected').data('koli')) || 1;
+
+                if (productKoli > 0) {
+                    let calculatedKoli = quantity / productKoli;
+                    row.find('.koli-input').val(calculatedKoli.toFixed(2));
+                }
+            });
+
+            // Kalkulasi otomatis Koli -> Quantity
+            $('#items-table').on('input', '.koli-input', function() {
+                let row = $(this).closest('tr');
+                let koli = parseFloat($(this).val()) || 0;
+                let productKoli = parseFloat(row.find('.item-select option:selected').data('koli')) || 1;
+
+                let calculatedQuantity = koli * productKoli;
+                row.find('.quantity-input').val(calculatedQuantity);
+            });
+
             // Tambah baris pertama secara default
             addNewRow();
+
+            // SweetAlert for form submission
+            $('#penerimaan-form').on('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                var form = $(this);
+
+                Swal.fire({
+                    text: "Apakah Anda yakin ingin menyimpan data penerimaan barang ini?",
+                    icon: "question",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "Ya, Simpan!",
+                    cancelButtonText: "Tidak, Batalkan",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-primary",
+                        cancelButton: "btn fw-bold btn-active-light-primary"
+                    }
+                }).then(function(result) {
+                    if (result.value) {
+                        form.submit(); // Submit the form if confirmed
+                    }
+                });
+            });
         });
     </script>
 @endpush

@@ -8,84 +8,100 @@
 @endpush
 
 @section('content')
-  <div class="content flex-row-fluid" id="kt_content">
-<div class="card">
-    <div class="card-body">
-        <form action="{{ route('admin.stok-masuk.daftar-penerimaan-barang.update', $stockInOrder->id) }}" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="row">
-                <div class="col-md-12 mb-5">
-                    <label class="form-label fs-6 fw-bolder text-dark">Kode Dokumen</label>
-                    <input type="text" name="code" class="form-control form-control-solid" value="{{ old('code', $stockInOrder->code) }}" readonly>
-                </div>
-                <div class="col-md-12 mb-5">
-                    <label class="form-label fs-6 fw-bolder text-dark">Tanggal</label>
-                    <input type="text" name="date" class="form-control form-control-solid flatpickr-input @error('date') is-invalid @enderror" value="{{ old('date', $stockInOrder->date) }}" required>
-                    @error('date')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-            </div>
+    <div class="content flex-row-fluid" id="kt_content">
+        <div class="card">
+            <div class="card-body">
+                <form id="penerimaan-form"
+                    action="{{ route('admin.stok-masuk.daftar-penerimaan-barang.update', $stockInOrder->id) }}"
+                    method="POST">
+                    @csrf
+                    @method('PUT')
+                    <div class="row">
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fs-6 fw-bolder text-dark">Kode Dokumen</label>
+                            <input type="text" name="code" class="form-control form-control-solid"
+                                value="{{ old('code', $stockInOrder->code) }}" readonly>
+                        </div>
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fs-6 fw-bolder text-dark">Tanggal</label>
+                            <input type="text" name="date"
+                                class="form-control form-control-solid flatpickr-input @error('date') is-invalid @enderror"
+                                value="{{ old('date', $stockInOrder->date) }}" required>
+                            @error('date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                    </div>
 
-            <div class="row">
-                <div class="col-md-12 mb-5">
-                    <label class="form-label fs-6 fw-bolder text-dark">Gudang</label>
-                    <select name="warehouse_id" class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror" data-control="select2" data-placeholder="Pilih Gudang" required>
-                        <option></option>
-                        @foreach($warehouses as $warehouse)
-                            <option value="{{ $warehouse->id }}" {{ old('warehouse_id', $stockInOrder->warehouse_id) == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
-                        @endforeach
-                    </select>
-                    @error('warehouse_id')
-                        <div class="invalid-feedback">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="col-md-12 mb-5">
-                    <label class="form-label fs-6 fw-bolder text-dark">Deskripsi</label>
-                    <textarea name="description" class="form-control form-control-solid">{{ old('description', $stockInOrder->description) }}</textarea>
-                </div>
-            </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fs-6 fw-bolder text-dark">Gudang</label>
+                            <select name="warehouse_id"
+                                class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror"
+                                data-control="select2" data-placeholder="Pilih Gudang" required>
+                                <option></option>
+                                @foreach ($warehouses as $warehouse)
+                                    <option value="{{ $warehouse->id }}"
+                                        {{ old('warehouse_id', $stockInOrder->warehouse_id) == $warehouse->id ? 'selected' : '' }}>
+                                        {{ $warehouse->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('warehouse_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fs-6 fw-bolder text-dark">Deskripsi</label>
+                            <textarea name="description" class="form-control form-control-solid">{{ old('description', $stockInOrder->description) }}</textarea>
+                        </div>
+                    </div>
 
-            <h3 class="mt-5">Item</h3>
-            <table class="table table-bordered" id="items-table">
-                <thead>
-                    <tr>
-                        <th>Item</th>
-                        <th width="150px">Quantity</th>
-                        <th width="150px">Koli</th>
-                        <th width="50px">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($stockInOrder->items as $index => $existingItem)
-                        <tr data-index="{{ $index }}">
-                            <td>
-                                <select name="items[{{ $index }}][item_id]" class="form-select item-select" data-control="select2" required>
-                                    <option></option>
-                                    @foreach($items as $item)
-                                        <option value="{{ $item->id }}" {{ $existingItem->item_id == $item->id ? 'selected' : '' }}>{{ $item->nama_barang }}</option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td><input type="number" name="items[{{ $index }}][quantity]" class="form-control" value="{{ $existingItem->quantity }}" min="1" required></td>
-                            <td><input type="number" name="items[{{ $index }}][koli]" class="form-control" value="{{ $existingItem->koli }}" min="0"></td>
-                            <td><button type="button" class="btn btn-danger btn-sm remove-item-btn">X</button></td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-            <button type="button" class="btn btn-primary btn-sm" id="add-item-btn">Tambah Item</button>
+                    <h3 class="mt-5">Item</h3>
+                    <table class="table table-bordered" id="items-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th width="150px">Quantity</th>
+                                <th width="150px">Koli</th>
+                                <th width="50px">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($stockInOrder->items as $index => $existingItem)
+                                <tr data-index="{{ $index }}">
+                                    <td>
+                                        <select name="items[{{ $index }}][item_id]" class="form-select item-select"
+                                            data-control="select2" required>
+                                            <option></option>
+                                            @foreach ($items as $item)
+                                                <option value="{{ $item->id }}" data-koli="{{ $item->koli ?? 1 }}"
+                                                    {{ $existingItem->item_id == $item->id ? 'selected' : '' }}>
+                                                    {{ $item->nama_barang }}</option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td><input type="number" name="items[{{ $index }}][quantity]"
+                                            class="form-control quantity-input" value="{{ $existingItem->quantity }}"
+                                            min="1" required></td>
+                                    <td><input type="number" name="items[{{ $index }}][koli]"
+                                            class="form-control koli-input" value="{{ $existingItem->koli }}"
+                                            min="0" step="any"></td>
+                                    <td><button type="button" class="btn btn-danger btn-sm remove-item-btn">X</button></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary btn-sm" id="add-item-btn">Tambah Item</button>
 
-            <div class="d-flex justify-content-end mt-10">
-                <a href="{{ route('admin.stok-masuk.daftar-penerimaan-barang.index') }}" class="btn btn-light me-3">Batal</a>
-                <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    <div class="d-flex justify-content-end mt-10">
+                        <a href="{{ route('admin.stok-masuk.daftar-penerimaan-barang.index') }}"
+                            class="btn btn-light me-3">Batal</a>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     </div>
-</div>
-</div>
-
 @endsection
 
 @push('scripts')
@@ -114,13 +130,13 @@
                         <td>
                             <select name="items[${itemIndex}][item_id]" class="form-select item-select" data-control="select2" required>
                                 <option></option>
-                                @foreach($items as $item)
-                                    <option value="{{ $item->id }}">{{ $item->nama_barang }}</option>
+                                @foreach ($items as $item)
+                                    <option value="{{ $item->id }}" data-koli="{{ $item->koli ?? 1 }}">{{ $item->nama_barang }}</option>
                                 @endforeach
                             </select>
                         </td>
-                        <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control" value="1" min="1" required></td>
-                        <td><input type="number" name="items[${itemIndex}][koli]" class="form-control" value="0" min="0"></td>
+                        <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control quantity-input" value="1" min="1" required></td>
+                        <td><input type="number" name="items[${itemIndex}][koli]" class="form-control koli-input" value="0" min="0" step="any"></td>
                         <td><button type="button" class="btn btn-danger btn-sm remove-item-btn">X</button></td>
                     </tr>`;
                 $('#items-table tbody').append(newRow);
@@ -134,6 +150,52 @@
 
             $('#items-table').on('click', '.remove-item-btn', function() {
                 $(this).closest('tr').remove();
+            });
+
+            // Kalkulasi otomatis Quantity -> Koli
+            $('#items-table').on('input', '.quantity-input', function() {
+                let row = $(this).closest('tr');
+                let quantity = parseFloat($(this).val()) || 0;
+                let productKoli = parseFloat(row.find('.item-select option:selected').data('koli')) || 1;
+
+                if (productKoli > 0) {
+                    let calculatedKoli = quantity / productKoli;
+                    row.find('.koli-input').val(calculatedKoli.toFixed(2));
+                }
+            });
+
+            // Kalkulasi otomatis Koli -> Quantity
+            $('#items-table').on('input', '.koli-input', function() {
+                let row = $(this).closest('tr');
+                let koli = parseFloat($(this).val()) || 0;
+                let productKoli = parseFloat(row.find('.item-select option:selected').data('koli')) || 1;
+
+                let calculatedQuantity = koli * productKoli;
+                row.find('.quantity-input').val(calculatedQuantity);
+            });
+
+            // SweetAlert for form submission
+            $('#penerimaan-form').on('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                var form = $(this);
+
+                Swal.fire({
+                    text: "Apakah Anda yakin ingin mengubah data penerimaan barang ini?",
+                    icon: "question",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "Ya, Ubah!",
+                    cancelButtonText: "Tidak, Batalkan",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-primary",
+                        cancelButton: "btn fw-bold btn-active-light-primary"
+                    }
+                }).then(function(result) {
+                    if (result.value) {
+                        form.submit(); // Submit the form if confirmed
+                    }
+                });
             });
         });
     </script>
