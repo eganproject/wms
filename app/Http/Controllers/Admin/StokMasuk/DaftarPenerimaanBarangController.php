@@ -35,6 +35,8 @@ class DaftarPenerimaanBarangController extends Controller
             $start = $request->input('start', 0);
             $length = $request->input('length', 10);
             $draw = $request->input('draw', 0);
+            $statusFilter = $request->input('status');
+            $dateFilter = $request->input('date');
 
             // Define columns for sorting
             $columns = [
@@ -49,40 +51,38 @@ class DaftarPenerimaanBarangController extends Controller
             $orderDirection = $request->input('order.0.dir', 'asc');
 
             // Base query
-            $baseQuery = "FROM stock_in_orders AS sio LEFT JOIN warehouses AS w ON sio.warehouse_id = w.id";
-            $bindings = [];
-
-            // Search filter
-            $whereClause = "";
-            if (!empty($searchValue)) {
-                $whereClause = "WHERE (sio.code LIKE ? OR sio.date LIKE ? OR w.name LIKE ? OR sio.status LIKE ?)";
-                $bindings = array_fill(0, 4, '%' . $searchValue . '%');
-            }
+            $query = StockInOrder::query()->from('stock_in_orders as sio')->leftJoin('warehouses as w', 'sio.warehouse_id', '=', 'w.id');
 
             // Total records
-            $totalRecordsResult = DB::selectOne("SELECT COUNT(sio.id) as aggregate " . $baseQuery);
-            $totalRecords = $totalRecordsResult->aggregate;
+            $totalRecords = $query->count();
 
-            // Total filtered records
-            $totalFilteredResult = DB::selectOne("SELECT COUNT(sio.id) as aggregate " . $baseQuery . " " . $whereClause, $bindings);
-            $totalFiltered = $totalFilteredResult->aggregate;
-
-            // Data query
-            $dataQuery = "SELECT sio.id, sio.code, sio.date, sio.status, w.name as warehouse_name " . $baseQuery . " " . $whereClause;
-
-            // Sorting
-            if ($orderByColumnName !== 'sio.id') { // Don't sort by action column
-                $dataQuery .= " ORDER BY " . $orderByColumnName . " " . $orderDirection;
-            } else {
-                $dataQuery .= " ORDER BY sio.id DESC"; // Default sort
+            // Apply filters
+            if (!empty($searchValue)) {
+                $query->where(function($q) use ($searchValue) {
+                    $q->where('sio.code', 'LIKE', "%{$searchValue}%")
+                      ->orWhere('sio.date', 'LIKE', "%{$searchValue}%")
+                      ->orWhere('w.name', 'LIKE', "%{$searchValue}%")
+                      ->orWhere('sio.status', 'LIKE', "%{$searchValue}%");
+                });
             }
 
+            if ($statusFilter && $statusFilter !== 'semua') {
+                $query->where('sio.status', $statusFilter);
+            }
 
-            // Pagination
-            $dataQuery .= " LIMIT ? OFFSET ?";
-            $paginationBindings = array_merge($bindings, [$length, $start]);
+            if ($dateFilter) {
+                $query->whereDate('sio.date', $dateFilter);
+            }
 
-            $data = DB::select($dataQuery, $paginationBindings);
+            // Total filtered records
+            $totalFiltered = $query->count();
+
+            // Data query
+            $data = $query->select('sio.id', 'sio.code', 'sio.date', 'sio.status', 'w.name as warehouse_name')
+                         ->orderBy($orderByColumnName, $orderDirection)
+                         ->offset($start)
+                         ->limit($length)
+                         ->get();
 
             return response()->json([
                 'draw' => intval($draw),

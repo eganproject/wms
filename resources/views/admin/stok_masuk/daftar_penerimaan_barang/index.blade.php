@@ -32,8 +32,63 @@
                     </div>
                 </div>
                 <div class="card-toolbar">
+
+                    <div class="d-flex justify-content-end" data-kt-customer-table-toolbar="base">
+                        <!--begin::Filter-->
+                        <button type="button" class="btn btn-light-primary me-3" data-kt-menu-trigger="click"
+                            data-kt-menu-placement="bottom-end">
+                            <!--begin::Svg Icon | path: icons/duotune/general/gen031.svg-->
+                            <span class="svg-icon svg-icon-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    fill="none">
+                                    <path
+                                        d="M19.0759 3H4.72777C3.95892 3 3.47768 3.83148 3.86067 4.49814L8.56967 12.6949C9.17923 13.7559 9.5 14.9582 9.5 16.1819V19.5072C9.5 20.2189 10.2223 20.7028 10.8805 20.432L13.8805 19.1977C14.2553 19.0435 14.5 18.6783 14.5 18.273V13.8372C14.5 12.8089 14.8171 11.8056 15.408 10.964L19.8943 4.57465C20.3596 3.912 19.8856 3 19.0759 3Z"
+                                        fill="black" />
+                                </svg>
+                            </span>
+                            <!--end::Svg Icon-->Filter</button>
+                        <!--begin::Menu 1-->
+                        <div class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true"
+                            id="kt-toolbar-filter">
+                            <!--begin::Header-->
+                            <div class="px-7 py-5">
+                                <div class="fs-4 text-dark fw-bolder">Filter Options</div>
+                            </div>
+                            <!--end::Header-->
+                            <!--begin::Separator-->
+                            <div class="separator border-gray-200"></div>
+                            <!--end::Separator-->
+                            <!--begin::Content-->
+                            <div class="px-7 py-5">
+                                <div class="mb-10">
+                                    <label class="form-label fs-5 fw-bold mb-3">Status:</label>
+                                    <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
+                                        id="status_filter" data-dropdown-parent="#kt-toolbar-filter">
+                                        <option value="semua">Semua</option>
+                                        <option value="requested">Dalam Request</option>
+                                        <option value="shipped">Dalam Pengiriman</option>
+                                        <option value="completed">Selesai</option>
+                                        <option value="rejected">Ditolak</option>
+                                    </select>
+                                </div>
+                                <div class="mb-10">
+                                    <label class="form-label fs-5 fw-bold mb-3">Tanggal:</label>
+                                    <input class="form-control form-control-solid" placeholder="Pilih Tanggal"
+                                        id="date_filter" />
+                                </div>
+                                <div class="d-flex justify-content-end">
+                                    <button type="reset" class="btn btn-light btn-active-light-primary me-2"
+                                        data-kt-menu-dismiss="true">Batal</button>
+                                    <button type="button" class="btn btn-primary" id="apply_filter" >Submit</button>
+                                </div>
+                            </div>
+                            <!--end::Content-->
+                        </div>
+                    </div>
+
                     <div class="d-flex justify-content-end">
-                        <a href="{{ route('admin.stok-masuk.daftar-penerimaan-barang.create') }}" class="btn btn-primary">Tambah Penerimaan</a>
+                        <a href="{{ route('admin.stok-masuk.daftar-penerimaan-barang.create') }}"
+                            class="btn btn-primary">Tambah Penerimaan</a>
                     </div>
                 </div>
             </div>
@@ -64,6 +119,9 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            $('#date_filter').flatpickr({
+                defaultDate: new Date()
+            })
             toastr.options = {
                 "closeButton": true,
                 "debug": false,
@@ -90,58 +148,90 @@
                 toastr.error("{{ session('error') }}");
             @endif
 
-            var table = $('#table-on-page').DataTable({
-                processing: true,
-                serverSide: true,
-                ajax: {
-                    url: "{{ route('admin.stok-masuk.daftar-penerimaan-barang.index') }}",
-                    type: "GET",
-                    data: function (d) {
-                        d.search.value = $('#search_input').val(); // Pass search input value
-                    }
-                },
-                drawCallback: function(settings) {
-                    KTMenu.createInstances();
+            function loadDataTable() {
+                var statusFilter = $('#status_filter').val();
+                var dateFilter = $('#date_filter').val();
 
-                },
-                columns: [
-                    { data: 'code', name: 'sio.code' },
-                    { data: 'date', name: 'sio.date' },
-                    { data: 'warehouse_name', name: 'warehouse_name' },
-                    { data: 'status', name: 'sio.status' },
-                    { data: 'id', name: 'sio.id', orderable: false, searchable: false },
-                ],
-                order: [[0, 'desc']], // Default order by code descending
-                columnDefs: [
-                    {
-                        targets: 1, // Date column
-                        render: function(data, type, row) {
-                            const d = new Date(data);
-                            const day = ('0' + d.getDate()).slice(-2);
-                            const month = d.toLocaleString('en-GB', { month: 'short' });
-                            const year = d.getFullYear();
-                            return `${day} ${month} ${year}`;
+                if ($.fn.DataTable.isDataTable('#table-on-page')) {
+                    $('#table-on-page').DataTable().destroy();
+                }
+
+                var table = $('#table-on-page').DataTable({
+                    processing: true,
+                    serverSide: true,
+                    ajax: {
+                        url: "{{ route('admin.stok-masuk.daftar-penerimaan-barang.index') }}",
+                        type: "GET",
+                        data: function(d) {
+                            d.search.value = $('#search_input').val();
+                            d.status = statusFilter;
+                            d.date = dateFilter;
                         }
                     },
-                    {
-                        targets: 3, // Status column
-                        render: function(data, type, row) {
-                            let badgeClass = 'primary';
-                            if (data === 'completed') {
-                                badgeClass = 'success';
-                            } else if (data === 'rejected') {
-                                badgeClass = 'danger';
+                    drawCallback: function(settings) {
+                        KTMenu.createInstances();
+                    },
+                    columns: [{
+                            data: 'code',
+                            name: 'sio.code'
+                        },
+                        {
+                            data: 'date',
+                            name: 'sio.date'
+                        },
+                        {
+                            data: 'warehouse_name',
+                            name: 'warehouse_name'
+                        },
+                        {
+                            data: 'status',
+                            name: 'sio.status'
+                        },
+                        {
+                            data: 'id',
+                            name: 'sio.id',
+                            orderable: false,
+                            searchable: false
+                        },
+                    ],
+                    order: [
+                        [0, 'desc']
+                    ], // Default order by code descending
+                    columnDefs: [{
+                            targets: 1, // Date column
+                            render: function(data, type, row) {
+                                const d = new Date(data);
+                                const day = ('0' + d.getDate()).slice(-2);
+                                const month = d.toLocaleString('en-GB', {
+                                    month: 'short'
+                                });
+                                const year = d.getFullYear();
+                                return `${day} ${month} ${year}`;
                             }
-                            return `<span class="badge badge-light-${badgeClass}">${data}</span>`;
-                        }
-                    },
-                    {
-                        targets: 4, // Actions column
-                        render: function(data, type, row) {
-                            let editUrl = "{{ route('admin.stok-masuk.daftar-penerimaan-barang.edit', ':id') }}".replace(':id', row.id);
-                            let destroyUrl = "{{ route('admin.stok-masuk.daftar-penerimaan-barang.destroy', ':id') }}".replace(':id', row.id);
-                            let csrfToken = "{{ csrf_token() }}";
-                            return `
+                        },
+                        {
+                            targets: 3, // Status column
+                            render: function(data, type, row) {
+                                let badgeClass = 'primary';
+                                if (data === 'completed') {
+                                    badgeClass = 'success';
+                                } else if (data === 'rejected') {
+                                    badgeClass = 'danger';
+                                }
+                                return `<span class="badge badge-light-${badgeClass}">${data}</span>`;
+                            }
+                        },
+                        {
+                            targets: 4, // Actions column
+                            render: function(data, type, row) {
+                                let editUrl =
+                                    "{{ route('admin.stok-masuk.daftar-penerimaan-barang.edit', ':id') }}"
+                                    .replace(':id', row.id);
+                                let destroyUrl =
+                                    "{{ route('admin.stok-masuk.daftar-penerimaan-barang.destroy', ':id') }}"
+                                    .replace(':id', row.id);
+                                let csrfToken = "{{ csrf_token() }}";
+                                return `
                                 <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
                                     <span class="svg-icon svg-icon-5 m-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -164,9 +254,17 @@
                                     </div>
                                 </div>
                             `;
+                            }
                         }
-                    }
-                ],
+                    ],
+                });
+            }
+
+            loadDataTable();
+
+            $('#apply_filter').on('click', function() {
+                loadDataTable();
+                $('[data-kt-menu-dismiss="true"]').click();
             });
 
             // --- Debounce function start ---
@@ -182,7 +280,7 @@
             // --- Debounce function end ---
 
             // Re-draw table on search input change with debounce
-            $('#search_input').on('keyup', debounce(function () {
+            $('#search_input').on('keyup', debounce(function() {
                 table.draw();
             }, 500)); // 500ms delay
 
