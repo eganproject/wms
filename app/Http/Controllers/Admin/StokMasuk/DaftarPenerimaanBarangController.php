@@ -96,6 +96,12 @@ class DaftarPenerimaanBarangController extends Controller
         return view('admin.stok_masuk.daftar_penerimaan_barang.index');
     }
 
+    public function show(StockInOrder $stockInOrder)
+    {
+        $stockInOrder->load('warehouse', 'items.item', 'requestedBy.jabatan');
+        return view('admin.stok_masuk.daftar_penerimaan_barang.show', compact('stockInOrder'));
+    }
+
     public function create()
     {
         $warehouses = Warehouse::all();

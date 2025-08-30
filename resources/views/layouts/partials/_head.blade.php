@@ -22,5 +22,7 @@
 		<link href="/metronic/assets/plugins/global/plugins.bundle.css" rel="stylesheet" type="text/css" />
 		<link href="/metronic/assets/css/style.bundle.css" rel="stylesheet" type="text/css" />
 			<link href="/metronic/assets/plugins/custom/datatables/datatables.bundle.css" rel="stylesheet" type="text/css"/>
+
+			@stack('styles')
 		<!--end::Global Stylesheets Bundle-->
 	</head>
