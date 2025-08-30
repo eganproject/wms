@@ -33,8 +33,7 @@
                 </div>
                 <div class="card-toolbar">
                     <div class="d-flex justify-content-end">
-                        {{-- TODO: Ganti href ke route yang sesuai --}}
-                                                <a href="{{ route('admin.stok-masuk.daftar-penerimaan-barang.create') }}" class="btn btn-primary">Tambah Penerimaan</a>
+                        <a href="{{ route('admin.stok-masuk.daftar-penerimaan-barang.create') }}" class="btn btn-primary">Tambah Penerimaan</a>
                     </div>
                 </div>
             </div>
@@ -44,7 +43,6 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="table-on-page">
                             <thead>
                                 <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
-                                    <th class="sorting">No</th>
                                     <th class="min-w-125px sorting">Kode</th>
                                     <th class="min-w-125px sorting">Tanggal</th>
                                     <th class="min-w-125px sorting">Gudang</th>
@@ -53,53 +51,7 @@
                                 </tr>
                             </thead>
                             <tbody class="fw-bold text-gray-600">
-                                @forelse ($stockInOrders as $order)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $order->code }}</td>
-                                        <td>{{ \Carbon\Carbon::parse($order->date)->format('d M Y') }}</td>
-                                        <td>{{ $order->warehouse->name ?? '' }}</td>
-                                        <td>
-                                            <span class="badge badge-light-{{ $order->status == 'completed' ? 'success' : ($order->status == 'rejected' ? 'danger' : 'primary') }}">{{ $order->status }}</span>
-                                        </td>
-                                        <td>
-                                            <a href="#" class="btn btn-sm btn-light btn-active-light-primary"
-                                                data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
-                                                <span class="svg-icon svg-icon-5 m-0">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                                        viewBox="0 0 24 24" fill="none">
-                                                        <path
-                                                            d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z"
-                                                            fill="black"></path>
-                                                    </svg>
-                                                </span></a>
-                                            <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4"
-                                                data-kt-menu="true" style="">
-                                                <div class="menu-item px-3">
-                                                    <a href="{{ route('admin.stok-masuk.daftar-penerimaan-barang.edit', $order->id) }}"
-                                                        class="menu-link px-3">Edit</a>
-                                                </div>
-                                                <div class="menu-item px-3">
-                                                    <form class="form-delete"
-                                                        action="{{ route('admin.stok-masuk.daftar-penerimaan-barang.destroy', $order->id) }}" method="POST"
-                                                        style="display: inline-block;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit"
-                                                            class="menu-link px-3 border-0 bg-transparent w-100 text-start"
-                                                            data-document-code="{{ $order->code }}">
-                                                            Delete
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center">Tidak ada data tersedia.</td>
-                                    </tr>
-                                @endforelse
+                                <!-- Data will be loaded by DataTables Ajax -->
                             </tbody>
                         </table>
                     </div>
@@ -139,16 +91,87 @@
             @endif
 
             var table = $('#table-on-page').DataTable({
-                "info": false,
-                'order': [],
-                'columnDefs': [{
-                    orderable: false,
-                    targets: 4
-                }, ]
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    url: "{{ route('admin.stok-masuk.daftar-penerimaan-barang.index') }}",
+                    type: "GET",
+                    data: function (d) {
+                        d.search.value = $('#search_input').val(); // Pass search input value
+                    }
+                },
+                drawCallback: function(settings) {
+                    KTMenu.createInstances();
+
+                },
+                columns: [
+                    { data: 'code', name: 'sio.code' },
+                    { data: 'date', name: 'sio.date' },
+                    { data: 'warehouse_name', name: 'warehouse_name' },
+                    { data: 'status', name: 'sio.status' },
+                    { data: 'id', name: 'sio.id', orderable: false, searchable: false },
+                ],
+                order: [[0, 'desc']], // Default order by code descending
+                columnDefs: [
+                    {
+                        targets: 1, // Date column
+                        render: function(data, type, row) {
+                            const d = new Date(data);
+                            const day = ('0' + d.getDate()).slice(-2);
+                            const month = d.toLocaleString('en-GB', { month: 'short' });
+                            const year = d.getFullYear();
+                            return `${day} ${month} ${year}`;
+                        }
+                    },
+                    {
+                        targets: 3, // Status column
+                        render: function(data, type, row) {
+                            let badgeClass = 'primary';
+                            if (data === 'completed') {
+                                badgeClass = 'success';
+                            } else if (data === 'rejected') {
+                                badgeClass = 'danger';
+                            }
+                            return `<span class="badge badge-light-${badgeClass}">${data}</span>`;
+                        }
+                    },
+                    {
+                        targets: 4, // Actions column
+                        render: function(data, type, row) {
+                            let editUrl = "{{ route('admin.stok-masuk.daftar-penerimaan-barang.edit', ':id') }}".replace(':id', row.id);
+                            let destroyUrl = "{{ route('admin.stok-masuk.daftar-penerimaan-barang.destroy', ':id') }}".replace(':id', row.id);
+                            let csrfToken = "{{ csrf_token() }}";
+                            return `
+                                <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
+                                    <span class="svg-icon svg-icon-5 m-0">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                                            <path d="M11.4343 12.7344L7.25 8.55005C6.83579 8.13583 6.16421 8.13584 5.75 8.55005C5.33579 8.96426 5.33579 9.63583 5.75 10.05L11.2929 15.5929C11.6834 15.9835 12.3166 15.9835 12.7071 15.5929L18.25 10.05C18.6642 9.63584 18.6642 8.96426 18.25 8.55005C17.8358 8.13584 17.1642 8.13584 16.75 8.55005L12.5657 12.7344C12.2533 13.0468 11.7467 13.0468 11.4343 12.7344Z" fill="black"></path>
+                                        </svg>
+                                    </span>
+                                </a>
+                                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
+                                    <div class="menu-item px-3">
+                                        <a href="${editUrl}" class="menu-link px-3">Edit</a>
+                                    </div>
+                                    <div class="menu-item px-3">
+                                        <form class="form-delete" action="${destroyUrl}" method="POST">
+                                            <input type="hidden" name="_token" value="${csrfToken}">
+                                            <input type="hidden" name="_method" value="DELETE">
+                                            <button type="submit" class="menu-link px-3 border-0 bg-transparent w-100 text-start" data-document-code="${row.code}">
+                                                Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            `;
+                        }
+                    }
+                ],
             });
 
+            // Re-draw table on search input change
             $('#search_input').on('keyup', function() {
-                table.search(this.value).draw();
+                table.draw();
             });
 
             $('#table-on-page').on('submit', '.form-delete', function(e) {
@@ -168,7 +191,7 @@
                     cancelButtonText: "Tidak, batalkan",
                     customClass: {
                         confirmButton: "btn fw-bold btn-danger",
-                        cancelButton: "btn fw-bold btn-active-light-primary"
+                        cancelButton: "btn fw-bold btn-active-light-light"
                     }
                 }).then(function(result) {
                     if (result.value) {
@@ -179,7 +202,7 @@
                             success: function(response) {
 
                                 toastr.success("Dokumen " + n + " berhasil dihapus.");
-                                table.row(form.closest('tr')).remove().draw();
+                                table.ajax.reload(null, false); // Reload table data
                             },
                             error: function(xhr) {
 
