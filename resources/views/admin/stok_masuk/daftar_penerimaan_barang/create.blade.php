@@ -167,6 +167,13 @@
                 e.preventDefault(); // Prevent default form submission
 
                 var form = $(this);
+                var url = form.attr('action');
+                var method = form.attr('method');
+                var data = form.serialize();
+
+                // Clear previous errors
+                $('.is-invalid').removeClass('is-invalid');
+                $('.invalid-feedback').remove();
 
                 Swal.fire({
                     text: "Apakah Anda yakin ingin menyimpan data penerimaan barang ini?",
@@ -181,7 +188,52 @@
                     }
                 }).then(function(result) {
                     if (result.value) {
-                        form.submit(); // Submit the form if confirmed
+                        $.ajax({
+                            url: url,
+                            type: method,
+                            data: data,
+                            success: function(response) {
+                                Swal.fire({
+                                    text: "Data berhasil disimpan!",
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Lanjutkan",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                }).then(function (result) {
+                                    if (result.isConfirmed) {
+                                        let redirectUrl = "{{ route('admin.stok-masuk.daftar-penerimaan-barang.index') }}";
+                                        if (response && response.redirect_url) {
+                                            redirectUrl = response.redirect_url;
+                                        }
+                                        window.location.href = redirectUrl;
+                                    }
+                                });
+                            },
+                            error: function(xhr) {
+                                if (xhr.status === 422) {
+                                    // Handle validation errors
+                                    var errors = xhr.responseJSON.errors;
+                                    let errorMessages = '';
+                                    $.each(errors, function(key, value) {
+                                        let field = $('[name="' + key + '"]');
+                                        // Handle array validation keys like 'items.0.item_id'
+                                        if(key.includes('.')) {
+                                            const parts = key.split('.');
+                                            field = $('[name="items['+parts[1]+']['+parts[2]+']"]');
+                                        }
+                                        field.addClass('is-invalid');
+                                        field.after('<div class="invalid-feedback">' + value[0] + '</div>');
+                                        errorMessages += `<li>${value[0]}</li>`;
+                                    });
+                                    toastr.error('<ul>' + errorMessages + '</ul>', 'Validasi Gagal');
+                                } else {
+                                    // Handle other server errors
+                                    toastr.error('Terjadi kesalahan pada server. Silakan coba lagi.', 'Error');
+                                }
+                            }
+                        });
                     }
                 });
             });
