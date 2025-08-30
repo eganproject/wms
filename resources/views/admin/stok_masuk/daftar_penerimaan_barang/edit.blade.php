@@ -76,7 +76,7 @@
                                             @foreach ($items as $item)
                                                 <option value="{{ $item->id }}" data-koli="{{ $item->koli ?? 1 }}"
                                                     {{ $existingItem->item_id == $item->id ? 'selected' : '' }}>
-                                                    {{ $item->nama_barang }}</option>
+                                                    {{ $item->sku . ' - ' . $item->nama_barang }}</option>
                                             @endforeach
                                         </select>
                                     </td>
@@ -131,7 +131,7 @@
                             <select name="items[${itemIndex}][item_id]" class="form-select item-select" data-control="select2" required>
                                 <option></option>
                                 @foreach ($items as $item)
-                                    <option value="{{ $item->id }}" data-koli="{{ $item->koli ?? 1 }}">{{ $item->nama_barang }}</option>
+                                    <option value="{{ $item->id }}" data-koli="{{ $item->koli ?? 1 }}">{{ $item->sku . ' - ' . $item->nama_barang }}</option>
                                 @endforeach
                             </select>
                         </td>

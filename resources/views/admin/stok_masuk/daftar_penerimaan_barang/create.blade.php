@@ -118,7 +118,7 @@
 
                 // Populate dropdown dengan data item dari JSON
                 itemsData.forEach(function(item) {
-                    let option = new Option(item.nama_barang, item.id, false, false);
+                    let option = new Option(item.sku + ' - ' + item.nama_barang, item.id, false, false);
                     $(option).attr('data-koli', item.koli || 1);
                     newSelect.append(option);
                 });
