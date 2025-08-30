@@ -118,6 +118,7 @@
 
 @push('scripts')
     <script>
+        var table; // Declare table globally
         $(document).ready(function() {
             $('#date_filter').flatpickr({
                 defaultDate: new Date()
@@ -156,7 +157,7 @@
                     $('#table-on-page').DataTable().destroy();
                 }
 
-                var table = $('#table-on-page').DataTable({
+                table = $('#table-on-page').DataTable({
                     processing: true,
                     serverSide: true,
                     ajax: {
@@ -217,6 +218,8 @@
                                     badgeClass = 'success';
                                 } else if (data === 'rejected') {
                                     badgeClass = 'danger';
+                                } else if (data === 'shipped') {
+                                    badgeClass = 'warning';
                                 }
                                 return `<span class="badge badge-light-${badgeClass}">${data}</span>`;
                             }
@@ -234,7 +237,7 @@
                                     "{{ route('admin.stok-masuk.daftar-penerimaan-barang.destroy', ':id') }}"
                                     .replace(':id', row.id);
                                 let csrfToken = "{{ csrf_token() }}";
-                                return `
+                                let actionsHtml = `
                                 <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
                                     <span class="svg-icon svg-icon-5 m-0">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -258,8 +261,24 @@
                                             </button>
                                         </form>
                                     </div>
-                                </div>
-                            `;
+                                `;
+
+                                if (row.status === 'requested') {
+                                    actionsHtml += `
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" onclick="confirmStatusChange(${row.id}, 'shipped', '${row.code}')">Shipped</a>
+                                    </div>
+                                    `;
+                                } else if (row.status === 'shipped') {
+                                    actionsHtml += `
+                                    <div class="menu-item px-3">
+                                        <a href="#" class="menu-link px-3" onclick="confirmStatusChange(${row.id}, 'completed', '${row.code}')">Completed</a>
+                                    </div>
+                                    `;
+                                }
+
+                                actionsHtml += `</div>`;
+                                return actionsHtml;
                             }
                         }
                     ],
@@ -332,6 +351,51 @@
                     }
                 });
             });
+
+            window.confirmStatusChange = function(id, status, code) {
+                let confirmationText = "";
+                let successText = "";
+                if (status === 'shipped') {
+                    confirmationText = `Apakah Anda yakin ingin mengubah status penerimaan barang ${code} menjadi 'Dalam Pengiriman'?`;
+                    successText = `Status penerimaan barang ${code} berhasil diubah menjadi 'Dalam Pengiriman'.`;
+                } else if (status === 'completed') {
+                    confirmationText = `Apakah Anda yakin ingin mengubah status penerimaan barang ${code} menjadi 'Selesai'?`;
+                    successText = `Status penerimaan barang ${code} berhasil diubah menjadi 'Selesai'.`;
+                }
+
+                Swal.fire({
+                    text: confirmationText,
+                    icon: "warning",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "Ya, lanjutkan!",
+                    cancelButtonText: "Tidak, batalkan",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-success",
+                        cancelButton: "btn fw-bold btn-active-light-light"
+                    }
+                }).then(function(result) {
+                    if (result.value) {
+                        $.ajax({
+                            url: `/admin/stok-masuk/daftar-penerimaan-barang/${id}/update-status`,
+                            type: 'POST',
+                            data: {
+                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                status: status
+                            },
+                            success: function(response) {
+                                toastr.success(successText);
+                                table.ajax.reload(null, false);
+                            },
+                            error: function(xhr) {
+                                toastr.error("Gagal mengubah status. Silakan coba lagi.");
+                            }
+                        });
+                    } else if (result.dismiss === 'cancel') {
+                        toastr.info("Perubahan status dibatalkan.");
+                    }
+                });
+            };
         });
     </script>
 @endpush

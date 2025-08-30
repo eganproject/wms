@@ -202,4 +202,20 @@ class DaftarPenerimaanBarangController extends Controller
             return response()->json(['success' => false, 'message' => 'Gagal menghapus dokumen.'], 500);
         }
     }
+
+    public function updateStatus(Request $request, StockInOrder $stockInOrder)
+    {
+        $request->validate([
+            'status' => 'required|in:shipped,completed',
+        ]);
+
+        try {
+            $stockInOrder->status = $request->status;
+            $stockInOrder->save();
+
+            return response()->json(['success' => true, 'message' => 'Status berhasil diperbarui.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Gagal memperbarui status: ' . $e->getMessage()], 500);
+        }
+    }
 }

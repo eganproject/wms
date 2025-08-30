@@ -40,6 +40,7 @@ Route::middleware(['auth', 'permission'])->group(function () {
     Route::prefix('admin/stok-masuk')->name('admin.stok-masuk.')->group(function () {
 
         Route::resource('daftar-penerimaan-barang', DaftarPenerimaanBarangController::class)->parameter('daftar-penerimaan-barang', 'stockInOrder');
+        Route::post('daftar-penerimaan-barang/{stockInOrder}/update-status', [DaftarPenerimaanBarangController::class, 'updateStatus'])->name('daftar-penerimaan-barang.updateStatus');
     });
 
 });
