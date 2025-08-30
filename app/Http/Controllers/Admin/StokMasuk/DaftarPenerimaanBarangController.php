@@ -43,26 +43,27 @@ class DaftarPenerimaanBarangController extends Controller
                 0 => 'sio.code',
                 1 => 'sio.date',
                 2 => 'warehouse_name',
-                3 => 'sio.status',
-                4 => 'sio.id', // Actions column, not sortable
+                3 => 'GROUP_CONCAT(i.sku, "(", si.quantity, ")" SEPARATOR ", ") as items_name', // Actions column, not sortable
+                4 => 'sio.status',
+                5 => 'sio.id', // Actions column, not sortable
             ];
             $orderByColumnIndex = $request->input('order.0.column', 0);
             $orderByColumnName = $columns[$orderByColumnIndex] ?? $columns[0];
             $orderDirection = $request->input('order.0.dir', 'asc');
 
             // Base query
-            $query = StockInOrder::query()->from('stock_in_orders as sio')->leftJoin('warehouses as w', 'sio.warehouse_id', '=', 'w.id');
+            $query = StockInOrder::query()->from('stock_in_orders as sio')->leftJoin('warehouses as w', 'sio.warehouse_id', '=', 'w.id')->leftJoin('stock_in_order_items as si', 'sio.id', '=', 'si.stock_in_order_id')->leftJoin('items as i', 'si.item_id', '=', 'i.id')->groupBy('sio.id');
 
             // Total records
             $totalRecords = $query->count();
 
             // Apply filters
             if (!empty($searchValue)) {
-                $query->where(function($q) use ($searchValue) {
+                $query->where(function ($q) use ($searchValue) {
                     $q->where('sio.code', 'LIKE', "%{$searchValue}%")
-                      ->orWhere('sio.date', 'LIKE', "%{$searchValue}%")
-                      ->orWhere('w.name', 'LIKE', "%{$searchValue}%")
-                      ->orWhere('sio.status', 'LIKE', "%{$searchValue}%");
+                        ->orWhere('sio.date', 'LIKE', "%{$searchValue}%")
+                        ->orWhere('w.name', 'LIKE', "%{$searchValue}%")
+                        ->orWhere('sio.status', 'LIKE', "%{$searchValue}%");
                 });
             }
 
@@ -78,11 +79,17 @@ class DaftarPenerimaanBarangController extends Controller
             $totalFiltered = $query->count();
 
             // Data query
-            $data = $query->select('sio.id', 'sio.code', 'sio.date', 'sio.status', 'w.name as warehouse_name')
-                         ->orderBy($orderByColumnName, $orderDirection)
-                         ->offset($start)
-                         ->limit($length)
-                         ->get();
+            $data = $query->select(
+                'sio.id',
+                'sio.code',
+                'sio.date',
+                'sio.status',
+                'w.name as warehouse_name',
+                DB::raw('GROUP_CONCAT(i.sku, " (Qty:", FORMAT(si.quantity,0), ")" SEPARATOR ", ") as items_name') // Baris ini yang ditambahkan/diubah
+            )->orderBy($orderByColumnName, $orderDirection)
+                ->offset($start)
+                ->limit($length)
+                ->get();
 
             return response()->json([
                 'draw' => intval($draw),

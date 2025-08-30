@@ -101,6 +101,7 @@
                                     <th class="min-w-125px sorting">Kode</th>
                                     <th class="min-w-125px sorting">Tanggal</th>
                                     <th class="min-w-125px sorting">Gudang</th>
+                                    <th class="min-w-125px sorting">Item</th>
                                     <th class="min-w-125px sorting">Status</th>
                                     <th class="text-center min-w-125px sorting_disabled">Actions</th>
                                 </tr>
@@ -185,6 +186,10 @@
                             name: 'warehouse_name'
                         },
                         {
+                            data: 'items_name',
+                            name: 'items_name'
+                        },
+                        {
                             data: 'status',
                             name: 'sio.status'
                         },
@@ -211,7 +216,7 @@
                             }
                         },
                         {
-                            targets: 3, // Status column
+                            targets: 4, // Status column
                             render: function(data, type, row) {
                                 let badgeClass = 'primary';
                                 if (data === 'completed') {
@@ -225,7 +230,7 @@
                             }
                         },
                         {
-                            targets: 4, // Actions column
+                            targets: 5, // Actions column
                             render: function(data, type, row) {
                                 let showUrl =
                                     "{{ route('admin.stok-masuk.daftar-penerimaan-barang.show', ':id') }}"
