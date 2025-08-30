@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->mediumText('description')->nullable();
             $table->bigInteger('requested_by')->nullable()->constrained('users')->onDelete('set null');
             $table->bigInteger('approved_by')->nullable()->constrained('users')->onDelete('set null');
+            $table->date('shipped_at')->nullable();
             $table->date('completed_at')->nullable();
             $table->timestamps();
         });
