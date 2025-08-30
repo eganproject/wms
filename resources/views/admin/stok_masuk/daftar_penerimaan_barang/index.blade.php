@@ -169,10 +169,22 @@
                 ],
             });
 
-            // Re-draw table on search input change
-            $('#search_input').on('keyup', function() {
+            // --- Debounce function start ---
+            const debounce = (callback, wait) => {
+                let timeoutId = null;
+                return (...args) => {
+                    window.clearTimeout(timeoutId);
+                    timeoutId = window.setTimeout(() => {
+                        callback.apply(null, args);
+                    }, wait);
+                };
+            }
+            // --- Debounce function end ---
+
+            // Re-draw table on search input change with debounce
+            $('#search_input').on('keyup', debounce(function () {
                 table.draw();
-            });
+            }, 500)); // 500ms delay
 
             $('#table-on-page').on('submit', '.form-delete', function(e) {
                 e.preventDefault();
