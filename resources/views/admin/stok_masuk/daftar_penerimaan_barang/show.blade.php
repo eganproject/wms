@@ -1,33 +1,35 @@
 @extends('layouts.app')
 
 @push('styles')
-<style>
-    @media print {
+    <style>
+        @media print {
 
-        body * {
-            visibility: hidden;
-        }
+            body * {
+                visibility: hidden;
+            }
 
-        #kt_content, #kt_content * {
-            visibility: visible;
-        }
+            #kt_content,
+            #kt_content * {
+                visibility: visible;
+            }
 
-        #kt_content {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 100%;
-        }
+            #kt_content {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+            }
 
-        .card-body {
-            padding: 0 !important;
-        }
+            .card-body {
+                padding: 0 !important;
+            }
 
-        .d-flex.flex-stack.pb-10, #print_button {
-            display: none !important;
+            .d-flex.flex-stack.pb-10,
+            #print_button {
+                display: none !important;
+            }
         }
-    }
-</style>
+    </style>
 @endpush
 
 @push('toolbar')
@@ -46,14 +48,14 @@
                 $ribbonBg = 'success';
             } elseif ($status === 'rejected') {
                 $ribbonBg = 'danger';
-            } elseif ($status === 'shipped'){
+            } elseif ($status === 'shipped') {
                 $ribbonBg = 'warning';
             }
         @endphp
         <div class="card ribbon ribbon-end ribbon-clip">
             <div class="ribbon-label d-print-none">
                 {{ ucfirst($status) }}
-                <span class="ribbon-inner bg-{{$ribbonBg}}"></span>
+                <span class="ribbon-inner bg-{{ $ribbonBg }}"></span>
             </div>
             <div class="card-body p-lg-20">
                 <!--begin::Layout-->
@@ -66,18 +68,19 @@
                             <div class="d-flex flex-stack pb-10">
                                 <!--begin::Logo-->
                                 <a href="#">
-                                    <img alt="Logo" src="{{ asset('metronic/assets/media/svg/brand-logos/code-lab.svg') }}" />
+                                    <img alt="Logo"
+                                        src="{{ asset('metronic/assets/media/svg/brand-logos/code-lab.svg') }}" />
                                 </a>
                                 <!--end::Logo-->
                                 <!--begin::Action-->
-                                <button type="button" id="print_button" class="btn btn-sm btn-primary">Cetak</button>
                                 <!--end::Action-->
                             </div>
                             <!--end::Top-->
                             <!--begin::Wrapper-->
                             <div class="m-0">
                                 <!--begin::Label-->
-                                <div class="fw-bolder fs-3 text-gray-800 mb-8">Penerimaan Barang #{{ $stockInOrder->code }}</div>
+                                <div class="fw-bolder fs-3 text-gray-800 mb-8">Penerimaan Barang #{{ $stockInOrder->code }}
+                                </div>
                                 <!--end::Label-->
                                 <!--begin::Row-->
                                 <div class="row g-5 mb-11">
@@ -87,7 +90,8 @@
                                         <div class="fw-bold fs-7 text-gray-600 mb-1">Tanggal Dibuat:</div>
                                         <!--end::Label-->
                                         <!--end::Col-->
-                                        <div class="fw-bolder fs-6 text-gray-800">{{ \Carbon\Carbon::parse($stockInOrder->date)->format('d M Y') }}</div>
+                                        <div class="fw-bolder fs-6 text-gray-800">
+                                            {{ \Carbon\Carbon::parse($stockInOrder->date)->format('d M Y') }}</div>
                                         <!--end::Col-->
                                     </div>
                                     <!--end::Col-->
@@ -113,10 +117,12 @@
                                         <div class="fw-bold fs-7 text-gray-600 mb-1">Dibuat Oleh:</div>
                                         <!--end::Label-->
                                         <!--end::Text-->
-                                        <div class="fw-bolder fs-6 text-gray-800">{{ $stockInOrder->requestedBy->name }}</div>
+                                        <div class="fw-bolder fs-6 text-gray-800">{{ $stockInOrder->requestedBy->name }}
+                                        </div>
                                         <!--end::Text-->
                                         <!--end::Description-->
-                                        <div class="fw-bold fs-7 text-gray-600">{{ $stockInOrder->requestedBy->jabatan->name ?? '' }}</div>
+                                        <div class="fw-bold fs-7 text-gray-600">
+                                            {{ $stockInOrder->requestedBy->jabatan->name ?? '' }}</div>
                                         <!--end::Description-->
                                     </div>
                                     <div class="col-sm-6">
@@ -132,7 +138,8 @@
                                                     $badgeClass = 'danger';
                                                 }
                                             @endphp
-                                            <span class="badge badge-light-{{ $badgeClass }}">{{ $stockInOrder->status }}</span>
+                                            <span
+                                                class="badge badge-light-{{ $badgeClass }}">{{ $stockInOrder->status }}</span>
                                         </div>
                                     </div>
                                     <!--end::Col-->
@@ -158,19 +165,22 @@
                                         <!--begin::Table body-->
                                         <tbody>
                                             @foreach ($stockInOrder->items as $item)
-                                            <tr class="border-bottom border-bottom-dashed">
-                                                <td class="pe-7">
-                                                    <div class="d-flex align-items-center">
-                                                        <div class="d-flex flex-column">
-                                                            <a href="#" class="text-gray-800 text-hover-primary fs-6 fw-bolder">{{ $item->item->nama_barang }}</a>
-                                                            <span class="text-gray-600 fw-bold">{{ $item->item->description }}</span>
+                                                <tr class="border-bottom border-bottom-dashed">
+                                                    <td class="pe-7">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="d-flex flex-column">
+                                                                <a href="#"
+                                                                    class="text-gray-800 text-hover-primary fs-6 fw-bolder">{{ $item->item->nama_barang }}</a>
+                                                                <span
+                                                                    class="text-gray-600 fw-bold">{{ $item->item->description }}</span>
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                </td>
-                                                <td class="pe-7">{{ $item->item->sku }}</td>
-                                                <td class="text-end">{{ $item->quantity }} {{ $item->item->uom->code }}</td>
-                                                <td class="text-end">{{ $item->koli }}</td>
-                                            </tr>
+                                                    </td>
+                                                    <td class="pe-7">{{ $item->item->sku }}</td>
+                                                    <td class="text-end">{{ $item->quantity }}
+                                                        {{ $item->item->uom->code }}</td>
+                                                    <td class="text-end">{{ $item->koli }}</td>
+                                                </tr>
                                             @endforeach
                                         </tbody>
                                         <!--end::Table body-->
@@ -194,6 +204,19 @@
                                 <!--end::Notes-->
                             </div>
                             <!--end::Wrapper-->
+                        </div>
+                        <div class="d-flex flex-stack flex-wrap mt-lg-20 pt-13 d-print-none">
+                            <!-- begin::Actions-->
+                            <div class="my-1 me-5">
+                                <!-- begin::Pint-->
+                                <a href="/admin/stok-masuk/daftar-penerimaan-barang" class="btn btn-secondary my-1 me-12">Kembali</a>
+                                    
+                                <!-- end::Pint-->
+                            </div>
+                            <!-- end::Actions-->
+                            <!-- begin::Action-->
+                             <button type="button" class="btn btn-success my-1 me-12" id="print_button">Print</button>
+                            <!-- end::Action-->
                         </div>
                         <!--end::Invoice 2 content-->
                     </div>
