@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\StokMasuk\DaftarPenerimaanBarangController;
+use App\Http\Controllers\Admin\TransferGudang\BuatPermintaanTransferController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -51,8 +52,8 @@ Route::middleware(['auth', 'permission'])->group(function () {
     });
 
     Route::prefix('admin/transfer-gudang')->name('admin.transfergudang.')->group(function () {
-        Route::resource('buat-permintaan-transfer', \App\Http\Controllers\Admin\TransferGudang\BuatPermintaanTransferController::class)->parameter('buat-permintaan-transfer', 'transferRequest');
-        Route::post('calculate-item-values', [\App\Http\Controllers\Admin\TransferGudang\BuatPermintaanTransferController::class, 'calculateItemValues'])->name('calculate-item-values');
+        Route::resource('buat-permintaan-transfer', BuatPermintaanTransferController::class)->parameter('buat-permintaan-transfer', 'transferRequest');
+        Route::post('calculate-item-values', [BuatPermintaanTransferController::class, 'calculateItemValues'])->name('calculate-item-values');
     });
 
 });

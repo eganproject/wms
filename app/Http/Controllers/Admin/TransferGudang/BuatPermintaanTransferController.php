@@ -12,10 +12,86 @@ use Illuminate\Support\Facades\DB;
 
 class BuatPermintaanTransferController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $transferRequests = TransferRequest::with(['fromWarehouse', 'toWarehouse', 'requester'])->latest()->paginate(10);
-        return view('admin.transfergudang.buat-permintaan.index', compact('transferRequests'));
+        if ($request->ajax()) {
+            $searchValue = $request->input('search.value', '');
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            $draw = $request->input('draw', 0);
+            $fromWarehouseFilter = $request->input('from_warehouse_id');
+            $statusFilter = $request->input('status');
+            $dateFilter = $request->input('date');
+
+            $columns = [
+                0 => 'tr.code',
+                1 => 'tr.date',
+                2 => 'from_warehouse_name',
+                3 => 'to_warehouse_name',
+                4 => 'tr.status',
+                5 => 'requester_name',
+                6 => 'tr.id',
+            ];
+            $orderByColumnIndex = $request->input('order.0.column', 0);
+            $orderByColumnName = $columns[$orderByColumnIndex] ?? $columns[0];
+            $orderDirection = $request->input('order.0.dir', 'asc');
+
+            $query = TransferRequest::query()
+                ->from('transfer_requests as tr')
+                ->leftJoin('warehouses as fw', 'tr.from_warehouse_id', '=', 'fw.id')
+                ->leftJoin('warehouses as tw', 'tr.to_warehouse_id', '=', 'tw.id')
+                ->leftJoin('users as u', 'tr.requested_by', '=', 'u.id');
+
+            $totalRecords = $query->count();
+
+            if (!empty($searchValue)) {
+                $query->where(function ($q) use ($searchValue) {
+                    $q->where('tr.code', 'LIKE', "%{$searchValue}%")
+                        ->orWhere('fw.name', 'LIKE', "%{$searchValue}%")
+                        ->orWhere('tw.name', 'LIKE', "%{$searchValue}%")
+                        ->orWhere('u.name', 'LIKE', "%{$searchValue}%")
+                        ->orWhere('tr.status', 'LIKE', "%{$searchValue}%");
+                });
+            }
+
+            if ($fromWarehouseFilter && $fromWarehouseFilter !== 'semua') {
+                $query->where('tr.from_warehouse_id', $fromWarehouseFilter);
+            }
+
+            if ($statusFilter && $statusFilter !== 'semua') {
+                $query->where('tr.status', $statusFilter);
+            }
+
+            if ($dateFilter) {
+                $query->whereDate('tr.date', $dateFilter);
+            }
+
+            $totalFiltered = $query->count();
+
+            $data = $query->select(
+                'tr.id',
+                'tr.code',
+                'tr.date',
+                'tr.status',
+                'fw.name as from_warehouse_name',
+                'tw.name as to_warehouse_name',
+                'u.name as requester_name'
+            )
+                ->orderBy($orderByColumnName, $orderDirection)
+                ->offset($start)
+                ->limit($length)
+                ->get();
+
+            return response()->json([
+                'draw' => intval($draw),
+                'recordsTotal' => intval($totalRecords),
+                'recordsFiltered' => intval($totalFiltered),
+                'data' => $data,
+            ]);
+        }
+
+        $warehouses = Warehouse::all();
+        return view('admin.transfergudang.buat-permintaan.index', compact('warehouses'));
     }
 
     public function create()

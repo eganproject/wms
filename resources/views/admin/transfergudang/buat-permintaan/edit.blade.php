@@ -1,7 +1,6 @@
 @extends('layouts.app')
 
 @push('styles')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <style>
         .select2-container .select2-selection--single {
             height: 2.65rem !important;
@@ -17,6 +16,8 @@
 @endpush
 
 @section('content')
+
+    <div class="content flex-row-fluid" id="kt_content">
 <div class="card">
     <div class="card-body">
         <form id="transfer-request-form" action="{{ route('admin.transfergudang.buat-permintaan-transfer.update', $transferRequest->id) }}" method="POST">
@@ -109,6 +110,7 @@
         </form>
     </div>
 </div>
+</div>
 
 <!-- Template for new item row -->
 <template id="item-row-template">
@@ -138,8 +140,6 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 <script>
     $(document).ready(function() {
         let itemIndex = 0;
@@ -281,7 +281,23 @@
                         type: 'POST', // Using POST for PUT due to form method spoofing
                         data: form.serialize(),
                         success: function(response) {
-                            window.location.href = "{{ route('admin.transfergudang.buat-permintaan-transfer.index') }}";
+                             Swal.fire({
+                                    text: "Data berhasil diubah!",
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Lanjutkan",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                }).then(function (result) {
+                                    if (result.isConfirmed) {
+                                        let redirectUrl = "{{ route('admin.transfergudang.buat-permintaan-transfer.index') }}";
+                                        if (response && response.redirect_url) {
+                                            redirectUrl = response.redirect_url;
+                                        }
+                                        window.location.href = redirectUrl;
+                                    }
+                                });
                         },
                         error: function(xhr) {
                             $('.is-invalid').removeClass('is-invalid');
