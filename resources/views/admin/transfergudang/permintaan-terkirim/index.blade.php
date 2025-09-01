@@ -6,8 +6,8 @@
 
 @push('toolbar')
     @include('layouts.partials._toolbar', [
-        'title' => 'Permintaan Transfer Gudang',
-        'breadcrumbs' => ['Admin', 'Transfer Gudang', 'Buat Permintaan Transfer'],
+        'title' => 'Permintaan Transfer Terikirim',
+        'breadcrumbs' => ['Admin', 'Transfer Gudang', 'Permintaan Terkirim'],
     ])
 @endpush
 
@@ -98,14 +98,14 @@
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <a href="{{ route('admin.transfergudang.buat-permintaan-transfer.create') }}"
+                        <a href="{{ route('admin.transfergudang.permintaan-terkirim.create') }}"
                             class="btn btn-primary">Buat Permintaan</a>
                     </div>
                 </div>
             </div>
             <div class="card-body pt-4">
                 <div class="text-center mb-5">
-                    <h3 class="mb-0">Daftar Permintaan Transfer Gudang</h3>
+                    <h3 class="mb-0">Daftar Permintaan Transfer Gudang Terkirim</h3>
                     <small id="filter-info" class="text-muted"></small>
                 </div>
                 <div class="dataTables_wrapper dt-bootstrap4 no-footer">
@@ -185,7 +185,7 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('admin.transfergudang.buat-permintaan-transfer.index') }}",
+                        url: "{{ route('admin.transfergudang.permintaan-terkirim.index') }}",
                         type: "GET",
                         data: function(d) {
                             d.search.value = $('#search_input').val();
@@ -263,13 +263,13 @@
                             targets: 6, // Actions column
                             render: function(data, type, row) {
                                 let showUrl =
-                                    "{{ route('admin.transfergudang.buat-permintaan-transfer.show', ':id') }}"
+                                    "{{ route('admin.transfergudang.permintaan-terkirim.show', ':id') }}"
                                     .replace(':id', row.id);
                                 let editUrl =
-                                    "{{ route('admin.transfergudang.buat-permintaan-transfer.edit', ':id') }}"
+                                    "{{ route('admin.transfergudang.permintaan-terkirim.edit', ':id') }}"
                                     .replace(':id', row.id);
                                 let destroyUrl =
-                                    "{{ route('admin.transfergudang.buat-permintaan-transfer.destroy', ':id') }}"
+                                    "{{ route('admin.transfergudang.permintaan-terkirim.destroy', ':id') }}"
                                     .replace(':id', row.id);
                                 let csrfToken = "{{ csrf_token() }}";
                                 let actionsHtml = `
@@ -405,7 +405,7 @@
                 }).then(function(result) {
                     if (result.value) {
                         $.ajax({
-                            url: `/admin/transfer-gudang/buat-permintaan-transfer/${id}/update-status`,
+                            url: `/admin/transfer-gudang/permintaan-terkirim/${id}/update-status`,
                             type: 'POST',
                             data: {
                                 _token: $('meta[name="csrf-token"]').attr('content'),

@@ -91,7 +91,7 @@ class BuatPermintaanTransferController extends Controller
         }
 
         $warehouses = Warehouse::all();
-        return view('admin.transfergudang.buat-permintaan.index', compact('warehouses'));
+        return view('admin.transfergudang.permintaan-terkirim.index', compact('warehouses'));
     }
 
     public function create()
@@ -99,7 +99,7 @@ class BuatPermintaanTransferController extends Controller
         $warehouses = Warehouse::all();
         $items = Item::all();
         $code = 'TR-' . date('Ymd') . '-' . str_pad(TransferRequest::count() + 1, 4, '0', STR_PAD_LEFT);
-        return view('admin.transfergudang.buat-permintaan.create', compact('warehouses', 'items', 'code'));
+        return view('admin.transfergudang.permintaan-terkirim.create', compact('warehouses', 'items', 'code'));
     }
 
     public function store(Request $request)
@@ -142,7 +142,7 @@ class BuatPermintaanTransferController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.transfergudang.buat-permintaan-transfer.index')->with('success', 'Permintaan transfer berhasil dibuat.');
+            return redirect()->route('admin.transfergudang.permintaan-terkirim.index')->with('success', 'Permintaan transfer berhasil dibuat.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -190,8 +190,8 @@ class BuatPermintaanTransferController extends Controller
 
     public function show(TransferRequest $transferRequest)
     {
-        $transferRequest->load(['fromWarehouse', 'toWarehouse', 'requester', 'items.item']);
-        return view('admin.transfergudang.buat-permintaan.show', compact('transferRequest'));
+        $transferRequest->load(['fromWarehouse', 'toWarehouse', 'requester', 'items']);
+        return view('admin.transfergudang.permintaan-terkirim.show', compact('transferRequest'));
     }
 
     public function edit(TransferRequest $transferRequest)
@@ -199,7 +199,7 @@ class BuatPermintaanTransferController extends Controller
         $warehouses = Warehouse::all();
         $items = Item::all();
         $transferRequest->load('items');
-        return view('admin.transfergudang.buat-permintaan.edit', compact('transferRequest', 'warehouses', 'items'));
+        return view('admin.transfergudang.permintaan-terkirim.edit', compact('transferRequest', 'warehouses', 'items'));
     }
 
     public function update(Request $request, TransferRequest $transferRequest)
@@ -241,7 +241,7 @@ class BuatPermintaanTransferController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.transfergudang.buat-permintaan-transfer.index')->with('success', 'Permintaan transfer berhasil diperbarui.');
+            return redirect()->route('admin.transfergudang.permintaan-terkirim.index')->with('success', 'Permintaan transfer berhasil diperbarui.');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -252,7 +252,7 @@ class BuatPermintaanTransferController extends Controller
     public function destroy(TransferRequest $transferRequest)
     {
         if ($transferRequest->status != 'pending') {
-            return redirect()->route('admin.transfergudang.buat-permintaan-transfer.index')->with('error', 'Hanya permintaan dengan status pending yang dapat dihapus.');
+            return redirect()->route('admin.transfergudang.permintaan-terkirim.index')->with('error', 'Hanya permintaan dengan status pending yang dapat dihapus.');
         }
 
         try {
@@ -260,10 +260,10 @@ class BuatPermintaanTransferController extends Controller
             $transferRequest->items()->delete();
             $transferRequest->delete();
             DB::commit();
-            return redirect()->route('admin.transfergudang.buat-permintaan-transfer.index')->with('success', 'Permintaan transfer berhasil dihapus.');
+            return redirect()->route('admin.transfergudang.permintaan-terkirim.index')->with('success', 'Permintaan transfer berhasil dihapus.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->route('admin.transfergudang.buat-permintaan-transfer.index')->with('error', 'Gagal menghapus permintaan transfer.');
+            return redirect()->route('admin.transfergudang.permintaan-terkirim.index')->with('error', 'Gagal menghapus permintaan transfer.');
         }
     }
 }

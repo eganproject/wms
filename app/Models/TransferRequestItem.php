@@ -14,4 +14,14 @@ class TransferRequestItem extends Model
         'koli',
         'description',
     ];
+
+    public function transferRequest()
+    {
+        return $this->belongsTo(TransferRequest::class);
+    }
+
+    public function item()
+    {
+        return $this->belongsTo(Item::class);
+    }
 }

@@ -19,7 +19,7 @@
     <div class="content flex-row-fluid" id="kt_content">
         <div class="card">
             <div class="card-body">
-                <form id="transfer-request-form" action="{{ route('admin.transfergudang.buat-permintaan-transfer.store') }}"
+                <form id="transfer-request-form" action="{{ route('admin.transfergudang.permintaan-terkirim.store') }}"
                     method="POST">
                     @csrf
                     <div class="row">
@@ -98,7 +98,7 @@
 
                     <div class="mt-10">
                         <button type="submit" class="btn btn-primary">Simpan</button>
-                        <a href="{{ route('admin.transfergudang.buat-permintaan-transfer.index') }}"
+                        <a href="{{ route('admin.transfergudang.permintaan-terkirim.index') }}"
                             class="btn btn-light">Batal</a>
                     </div>
                 </form>
@@ -291,7 +291,7 @@
                                 }).then(function(result) {
                                     if (result.isConfirmed) {
                                         let redirectUrl =
-                                            "{{ route('admin.transfergudang.buat-permintaan-transfer.index') }}";
+                                            "{{ route('admin.transfergudang.permintaan-terkirim.index') }}";
                                         if (response && response.redirect_url) {
                                             redirectUrl = response.redirect_url;
                                         }

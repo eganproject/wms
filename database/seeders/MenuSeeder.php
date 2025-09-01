@@ -201,9 +201,9 @@ class MenuSeeder extends Seeder
 
         // Children of Transfer Gudang
         Menu::updateOrCreate(
-            ['name' => 'Buat Permintaan Transfer'],
+            ['name' => 'Permintaan Terkirim'],
             [
-                'url' => '/admin/transfer-gudang/buat-permintaan-transfer',
+                'url' => '/admin/transfer-gudang/permintaan-terkirim',
                 'icon' => 'fas fa-plus-circle',
                 'parent_id' => $transferGudang->id,
                 'order' => 1,
@@ -211,9 +211,9 @@ class MenuSeeder extends Seeder
         );
 
         Menu::updateOrCreate(
-            ['name' => 'Daftar Permintaan Transfer'],
+            ['name' => 'Permintaan Masuk'],
             [
-                'url' => '/admin/transfer-gudang/daftar-permintaan',
+                'url' => '/admin/transfer-gudang/permintaan-masuk',
                 'icon' => 'fas fa-list-ul',
                 'parent_id' => $transferGudang->id,
                 'order' => 2,

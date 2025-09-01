@@ -52,7 +52,7 @@ Route::middleware(['auth', 'permission'])->group(function () {
     });
 
     Route::prefix('admin/transfer-gudang')->name('admin.transfergudang.')->group(function () {
-        Route::resource('buat-permintaan-transfer', BuatPermintaanTransferController::class)->parameter('buat-permintaan-transfer', 'transferRequest');
+        Route::resource('permintaan-terkirim', BuatPermintaanTransferController::class)->parameter('permintaan-terkirim', 'transferRequest');
         Route::post('calculate-item-values', [BuatPermintaanTransferController::class, 'calculateItemValues'])->name('calculate-item-values');
     });
 
