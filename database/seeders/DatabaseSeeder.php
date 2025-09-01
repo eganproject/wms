@@ -16,6 +16,10 @@ class DatabaseSeeder extends Seeder
             JabatanSeeder::class,
             MenuSeeder::class,
             UserSeeder::class,
+            WarehouseSeeder::class,
+            UomSeeder::class,
+            ItemCategorySeeder::class,
+            ItemSeeder::class,
         ]);
     }
 }
