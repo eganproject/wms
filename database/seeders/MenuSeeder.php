@@ -189,6 +189,37 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        // Transfer Gudang
+        $transferGudang = Menu::updateOrCreate(
+            ['name' => 'Transfer Gudang'],
+            [
+                'url' => null,
+                'icon' => 'fas fa-random',
+                'order' => 5,
+            ]
+        );
+
+        // Children of Transfer Gudang
+        Menu::updateOrCreate(
+            ['name' => 'Buat Permintaan Transfer'],
+            [
+                'url' => '/admin/transfer-gudang/buat-permintaan',
+                'icon' => 'fas fa-plus-circle',
+                'parent_id' => $transferGudang->id,
+                'order' => 1,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['name' => 'Daftar Permintaan Transfer'],
+            [
+                'url' => '/admin/transfer-gudang/daftar-permintaan',
+                'icon' => 'fas fa-list-ul',
+                'parent_id' => $transferGudang->id,
+                'order' => 2,
+            ]
+        );
+
         // Assign permissions to a role
         $developerJabatan = Jabatan::where('name', 'Developer')->first();
 
