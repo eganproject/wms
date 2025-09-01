@@ -6,8 +6,8 @@
 
 @push('toolbar')
     @include('layouts.partials._toolbar', [
-        'title' => 'Permintaan Transfer Terikirim',
-        'breadcrumbs' => ['Admin', 'Transfer Gudang', 'Permintaan Terkirim'],
+        'title' => 'Permintaan Transfer Masuk',
+        'breadcrumbs' => ['Admin', 'Transfer Gudang', 'Permintaan Masuk'],
     ])
 @endpush
 
@@ -36,7 +36,6 @@
                         <!--begin::Filter-->
                         <button type="button" class="btn btn-light-primary me-3" data-kt-menu-trigger="click"
                             data-kt-menu-placement="bottom-end">
-                            <!--begin::Svg Icon | path: icons/duotune/general/gen031.svg-->
                             <span class="svg-icon svg-icon-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                     fill="none">
@@ -45,24 +44,19 @@
                                         fill="black" />
                                 </svg>
                             </span>
-                            <!--end::Svg Icon-->Filter</button>
+                            Filter</button>
                         <!--begin::Menu 1-->
                         <div class="menu menu-sub menu-sub-dropdown w-300px w-md-325px" data-kt-menu="true"
                             id="kt-toolbar-filter">
-                            <!--begin::Header-->
                             <div class="px-7 py-5">
                                 <div class="fs-4 text-dark fw-bolder">Filter Options</div>
                             </div>
-                            <!--end::Header-->
-                            <!--begin::Separator-->
                             <div class="separator border-gray-200"></div>
-                            <!--end::Separator-->
-                            <!--begin::Content-->
                             <div class="px-7 py-5">
                                 <div class="mb-10">
-                                    <label class="form-label fs-5 fw-bold mb-3">Gudang Asal:</label>
+                                    <label class="form-label fs-5 fw-bold mb-3">Gudang Tujuan:</label>
                                     <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
-                                        id="from_warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
+                                        id="to_warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
                                         <option value="semua">Semua</option>
                                         @foreach ($warehouses as $warehouse)
                                             <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -93,19 +87,13 @@
                                     <button type="button" class="btn btn-primary" id="apply_filter">Submit</button>
                                 </div>
                             </div>
-                            <!--end::Content-->
                         </div>
-                    </div>
-
-                    <div class="d-flex justify-content-end">
-                        <a href="{{ route('admin.transfergudang.permintaan-terkirim.create') }}"
-                            class="btn btn-primary">Buat Permintaan</a>
                     </div>
                 </div>
             </div>
             <div class="card-body pt-4">
                 <div class="text-center mb-5">
-                    <h3 class="mb-0">Daftar Permintaan Transfer Terkirim</h3>
+                    <h3 class="mb-0">Daftar Permintaan Transfer Gudang Masuk</h3>
                     <small id="filter-info" class="text-muted"></small>
                 </div>
                 <div class="dataTables_wrapper dt-bootstrap4 no-footer">
@@ -167,14 +155,14 @@
             @endif
 
             function loadDataTable() {
-                var fromWarehouseFilter = $('#from_warehouse_filter').val();
+                var toWarehouseFilter = $('#to_warehouse_filter').val();
                 var statusFilter = $('#status_filter').val();
                 var dateFilter = $('#date_filter').val();
 
-                var fromWarehouseText = $('#from_warehouse_filter option:selected').text();
+                var toWarehouseText = $('#to_warehouse_filter option:selected').text();
                 var statusText = $('#status_filter option:selected').text();
 
-                let filterInfoText = `${dateFilter} | Gudang Asal: ${fromWarehouseText} | Status: ${statusText}`;
+                let filterInfoText = `${dateFilter} | Gudang Tujuan: ${toWarehouseText} | Status: ${statusText}`;
                 $('#filter-info').text(filterInfoText);
 
                 if ($.fn.DataTable.isDataTable('#table-on-page')) {
@@ -185,11 +173,11 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('admin.transfergudang.permintaan-terkirim.index') }}",
+                        url: "{{ route('admin.transfergudang.permintaan-masuk.index') }}",
                         type: "GET",
                         data: function(d) {
                             d.search.value = $('#search_input').val();
-                            d.from_warehouse_id = fromWarehouseFilter;
+                            d.to_warehouse_id = toWarehouseFilter;
                             d.status = statusFilter;
                             d.date = dateFilter;
                         }
@@ -263,15 +251,9 @@
                             targets: 6, // Actions column
                             render: function(data, type, row) {
                                 let showUrl =
-                                    "{{ route('admin.transfergudang.permintaan-terkirim.show', ':id') }}"
+                                    "{{ route('admin.transfergudang.permintaan-masuk.show', ':id') }}"
                                     .replace(':id', row.id);
-                                let editUrl =
-                                    "{{ route('admin.transfergudang.permintaan-terkirim.edit', ':id') }}"
-                                    .replace(':id', row.id);
-                                let destroyUrl =
-                                    "{{ route('admin.transfergudang.permintaan-terkirim.destroy', ':id') }}"
-                                    .replace(':id', row.id);
-                                let csrfToken = "{{ csrf_token() }}";
+
                                 let actionsHtml = `
                                 <a href="#" class="btn btn-sm btn-light btn-active-light-primary" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-end">Actions
                                     <span class="svg-icon svg-icon-5 m-0">
@@ -282,25 +264,20 @@
                                 </a>
                                 <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                     <div class="menu-item px-3">
-                                        <a href="${showUrl}" class="menu-link px-3">View</a>
+                                        <a href="${showUrl}" class="menu-link px-3">Detail</a>
                                     </div>`;
 
                                 if (row.status === 'pending') {
                                     actionsHtml += `
                                     <div class="menu-item px-3">
-                                        <a href="${editUrl}" class="menu-link px-3">Edit</a>
-                                    </div>
+                                        <a href="#" class="menu-link px-3" onclick="confirmStatusChange(${row.id}, 'approved', '${row.code}')">Approve</a>
+                                    </div>`;
+                                } else if (row.status === 'approved') {
+                                    actionsHtml += `
                                     <div class="menu-item px-3">
-                                        <form class="form-delete" action="${destroyUrl}" method="POST">
-                                            <input type="hidden" name="_token" value="${csrfToken}">
-                                            <input type="hidden" name="_method" value="DELETE">
-                                            <button type="submit" class="menu-link px-3 border-0 bg-transparent w-100 text-start" data-document-code="${row.code}">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </div>
-                                    `;
-                                } 
+                                        <a href="#" class="menu-link px-3" onclick="confirmStatusChange(${row.id}, 'shipped', '${row.code}')">Kirim Barang</a>
+                                    </div>`;
+                                }
 
                                 actionsHtml += `</div>`;
                                 return actionsHtml;
@@ -334,61 +311,15 @@
                 table.draw();
             }, 500)); // 500ms delay
 
-            $('#table-on-page').on('submit', '.form-delete', function(e) {
-                e.preventDefault();
-
-                var form = $(this);
-                var n = form.find('button[data-document-code]').data('document-code');
-                var url = form.attr('action');
-                var data = form.serialize();
-
-                Swal.fire({
-                    text: "Apakah yakin ingin menghapus dokumen " + n + "?",
-                    icon: "warning",
-                    showCancelButton: true,
-                    buttonsStyling: false,
-                    confirmButtonText: "Ya, hapus!",
-                    cancelButtonText: "Tidak, batalkan",
-                    customClass: {
-                        confirmButton: "btn fw-bold btn-danger",
-                        cancelButton: "btn fw-bold btn-active-light-light"
-                    }
-                }).then(function(result) {
-                    if (result.value) {
-                        $.ajax({
-                            url: url,
-                            type: 'POST',
-                            data: data,
-                            success: function(response) {
-                                toastr.success("Dokumen " + n + " berhasil dihapus.");
-                                table.ajax.reload(null, false); // Reload table data
-                            },
-                            error: function(xhr) {
-                                toastr.error("Gagal menghapus dokumen " + n +
-                                    ". Silakan coba lagi.");
-                            }
-                        });
-                    } else if (result.dismiss === 'cancel') {
-                        toastr.info("Penghapusan dokumen " + n + " dibatalkan.");
-                    }
-                });
-            });
-
             window.confirmStatusChange = function(id, status, code) {
                 let confirmationText = "";
                 let successText = "";
                 if (status === 'approved') {
                     confirmationText = `Apakah Anda yakin ingin menyetujui permintaan transfer ${code}?`;
                     successText = `Permintaan transfer ${code} berhasil disetujui.`;
-                } else if (status === 'rejected') {
-                    confirmationText = `Apakah Anda yakin ingin menolak permintaan transfer ${code}?`;
-                    successText = `Permintaan transfer ${code} berhasil ditolak.`;
                 } else if (status === 'shipped') {
                     confirmationText = `Apakah Anda yakin ingin mengubah status permintaan transfer ${code} menjadi 'Dikirim'?`;
                     successText = `Status permintaan transfer ${code} berhasil diubah menjadi 'Dikirim'.`;
-                } else if (status === 'completed') {
-                    confirmationText = `Apakah Anda yakin ingin mengubah status permintaan transfer ${code} menjadi 'Selesai'?`;
-                    successText = `Status permintaan transfer ${code} berhasil diubah menjadi 'Selesai'.`;
                 }
 
                 Swal.fire({
@@ -405,10 +336,10 @@
                 }).then(function(result) {
                     if (result.value) {
                         $.ajax({
-                            url: `/admin/transfer-gudang/permintaan-terkirim/${id}/update-status`,
+                            url: `/admin/transfer-gudang/permintaan-masuk/${id}/update-status`,
                             type: 'POST',
                             data: {
-                                _token: $('meta[name="csrf-token"]').attr('content'),
+                                _token: '{{ csrf_token() }}',
                                 status: status
                             },
                             success: function(response) {
