@@ -139,12 +139,22 @@ class MenuSeeder extends Seeder
         );
 
         Menu::updateOrCreate(
+            ['name' => 'Warehouse Stok'],
+            [
+                'url' => '/admin/manajemen-stok/warehouse-stok',
+                'icon' => 'fas fa-warehouse',
+                'parent_id' => $manajemenStok->id,
+                'order' => 2,
+            ]
+        );
+
+        Menu::updateOrCreate(
             ['name' => 'Master Stok'],
             [
                 'url' => '/admin/manajemen-stok/master-stok',
                 'icon' => 'fas fa-archive',
                 'parent_id' => $manajemenStok->id,
-                'order' => 2,
+                'order' => 3,
             ]
         );
 
