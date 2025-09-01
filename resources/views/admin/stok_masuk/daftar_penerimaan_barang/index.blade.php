@@ -93,6 +93,10 @@
                 </div>
             </div>
             <div class="card-body pt-4">
+                <div class="text-center mb-5">
+                    <h3 class="mb-0">Daftar Penerimaan Barang</h3>
+                    <small id="filter-info" class="text-muted"></small>
+                </div>
                 <div class="dataTables_wrapper dt-bootstrap4 no-footer">
                     <div class="table-responsive min-h-500px">
                         <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="table-on-page">
@@ -153,6 +157,8 @@
             function loadDataTable() {
                 var statusFilter = $('#status_filter').val();
                 var dateFilter = $('#date_filter').val();
+                var statusText = $('#status_filter option:selected').text();
+                $('#filter-info').text(`${dateFilter} - ${statusText}`);
 
                 if ($.fn.DataTable.isDataTable('#table-on-page')) {
                     $('#table-on-page').DataTable().destroy();
