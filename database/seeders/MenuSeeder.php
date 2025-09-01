@@ -203,7 +203,7 @@ class MenuSeeder extends Seeder
         Menu::updateOrCreate(
             ['name' => 'Buat Permintaan Transfer'],
             [
-                'url' => '/admin/transfer-gudang/buat-permintaan',
+                'url' => '/admin/transfer-gudang/buat-permintaan-transfer',
                 'icon' => 'fas fa-plus-circle',
                 'parent_id' => $transferGudang->id,
                 'order' => 1,

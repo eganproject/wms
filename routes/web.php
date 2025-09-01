@@ -50,6 +50,11 @@ Route::middleware(['auth', 'permission'])->group(function () {
         Route::get('warehouse-stok', [WarehouseStokController::class, 'index'])->name('warehousestok.index');
     });
 
+    Route::prefix('admin/transfer-gudang')->name('admin.transfergudang.')->group(function () {
+        Route::resource('buat-permintaan-transfer', \App\Http\Controllers\Admin\TransferGudang\BuatPermintaanTransferController::class)->parameter('buat-permintaan-transfer', 'transferRequest');
+        Route::post('calculate-item-values', [\App\Http\Controllers\Admin\TransferGudang\BuatPermintaanTransferController::class, 'calculateItemValues'])->name('calculate-item-values');
+    });
+
 });
 
 
