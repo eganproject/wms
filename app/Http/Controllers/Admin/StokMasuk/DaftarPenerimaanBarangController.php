@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin\StokMasuk;
 
 use App\Http\Controllers\Controller;
 
+use App\Models\Inventory;
 use App\Models\StockInOrder;
+use App\Models\StockMovement;
 use App\Models\Warehouse;
 use App\Models\Item;
 use Illuminate\Http\Request;
@@ -217,6 +219,45 @@ class DaftarPenerimaanBarangController extends Controller
         ]);
 
         try {
+            $stockInOrder->load('items');
+
+
+            if ($request->status == 'completed') {
+                $stockInOrder->completed_at = now();
+                foreach ($stockInOrder->items as $item) {
+                    $movement = StockMovement::create([
+                        'warehouse_id' => $stockInOrder->warehouse_id,
+                        'item_id' => $item->item_id,
+                        'date' => now(),
+                        'quantity' => $item->quantity,
+                        'koli' => $item->koli,
+                        'type' => 'stock_in',
+                        'description' => 'Penerimaan barang',
+                        'user_id' => auth()->id(),
+                        'reference_id' => $item->id,
+                        'reference_type' => 'stock_in_order_items'
+                    ]);
+                    $inventory = Inventory::where('warehouse_id', $stockInOrder->warehouse_id)->where('item_id', $item->item_id)->first();
+                    if ($inventory) {
+                        $inventory->quantity += $item->quantity;
+                        $inventory->koli += $item->koli;
+                        $inventory->save();
+                    }else{
+                        Inventory::create([
+                            'warehouse_id' => $stockInOrder->warehouse_id,
+                            'item_id' => $item->item_id,
+                            'quantity' => $item->quantity,
+                            'koli' => $item->koli,
+                        ]);
+                    }
+                }
+
+
+
+            } else if ($request->status == 'shipped') {
+                $stockInOrder->shipped_at = now();
+            }
+
             $stockInOrder->status = $request->status;
             $stockInOrder->save();
 

@@ -14,13 +14,14 @@ return new class extends Migration {
             $table->id();
             $table->integer('item_id');
             $table->integer('warehouse_id');
+            $table->date('date')->default(now());
             $table->decimal('quantity', 20, 2)->default(0);
             $table->decimal('koli', 20, 2)->default(0);
             $table->enum('type', ['stock_in', 'stock_out', 'transfer_in', 'transfer_out', 'adjustment']);
             $table->mediumText('description')->nullable();
             $table->bigInteger('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->bigInteger('reference_id')->comment('ID dari dokumen sumber (misal: id dari stock_in_orders atau transfer_requests)')->nullable();
-            $table->enum('reference_type', ['stock_in_orders', 'transfer_requests', 'stock_out'])->comment('Tipe dokumen sumber (misal: stock_in_orders atau transfer_requests)');
+            $table->enum('reference_type', ['stock_in_order_items', 'transfer_requests', 'stock_out'])->comment('Tipe dokumen sumber (misal: stock_in_orders atau transfer_requests)');
             $table->timestamps();
         });
     }

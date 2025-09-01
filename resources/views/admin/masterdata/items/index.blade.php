@@ -35,7 +35,7 @@
                     <div class="d-flex align-items-center position-relative my-1 ms-3">
                         <select id="category_filter" class="form-select form-select-solid" data-control="select2" data-placeholder="Filter by Kategori">
                             <option></option>
-                            <option value="">All Categories</option>
+                            <option value="semua">Semua Kategori</option>
                             @foreach ($itemcategories as $category)
                                 <option value="{{ $category->id }}" {{ (isset($selected_category_id) && $selected_category_id == $category->id) ? 'selected' : '' }}>
                                     {{ $category->name }}

@@ -20,7 +20,13 @@ class ItemController extends Controller
     public function index(Request $request)
     {
         $itemcategories = ItemCategory::all();
-        $selected_category_id = $request->get('category_id');
+        if($request->get('category_id') !== 'semua') {
+            
+            $selected_category_id = $request->get('category_id');
+        }else{
+
+            $selected_category_id = null;
+        }
 
         $items = Item::with(['uom', 'itemCategory'])
             ->when($selected_category_id, function ($query, $category_id) {
