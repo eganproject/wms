@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\Masterdata\PermissionController;
 use App\Http\Controllers\Admin\Masterdata\UomController;
 use App\Http\Controllers\Admin\Masterdata\ItemController;
 use App\Http\Controllers\Admin\Masterdata\ItemCategoryController;
+use App\Http\Controllers\Admin\ManajemenStok\KartuStokController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -41,6 +42,10 @@ Route::middleware(['auth', 'permission'])->group(function () {
 
         Route::resource('daftar-penerimaan-barang', DaftarPenerimaanBarangController::class)->parameter('daftar-penerimaan-barang', 'stockInOrder');
         Route::post('daftar-penerimaan-barang/{stockInOrder}/update-status', [DaftarPenerimaanBarangController::class, 'updateStatus'])->name('daftar-penerimaan-barang.updateStatus');
+    });
+
+    Route::prefix('admin/manajemen-stok')->name('admin.manajemenstok.')->group(function () {
+        Route::get('kartu-stok', [KartuStokController::class, 'index'])->name('kartustok.index');
     });
 
 });

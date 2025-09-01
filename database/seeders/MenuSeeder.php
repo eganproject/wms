@@ -131,7 +131,7 @@ class MenuSeeder extends Seeder
         Menu::updateOrCreate(
             ['name' => 'Kartu Stok'],
             [
-                'url' => '/admin/stok/kartu',
+                'url' => '/admin/manajemen-stok/kartu-stok',
                 'icon' => 'fas fa-id-card',
                 'parent_id' => $manajemenStok->id,
                 'order' => 1,
@@ -141,7 +141,7 @@ class MenuSeeder extends Seeder
         Menu::updateOrCreate(
             ['name' => 'Master Stok'],
             [
-                'url' => '/admin/stok/master',
+                'url' => '/admin/manajemen-stok/master-stok',
                 'icon' => 'fas fa-archive',
                 'parent_id' => $manajemenStok->id,
                 'order' => 2,
