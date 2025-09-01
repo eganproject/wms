@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Masterdata\UomController;
 use App\Http\Controllers\Admin\Masterdata\ItemController;
 use App\Http\Controllers\Admin\Masterdata\ItemCategoryController;
 use App\Http\Controllers\Admin\ManajemenStok\KartuStokController;
+use App\Http\Controllers\Admin\ManajemenStok\WarehouseStokController;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -46,6 +47,7 @@ Route::middleware(['auth', 'permission'])->group(function () {
 
     Route::prefix('admin/manajemen-stok')->name('admin.manajemenstok.')->group(function () {
         Route::get('kartu-stok', [KartuStokController::class, 'index'])->name('kartustok.index');
+        Route::get('warehouse-stok', [WarehouseStokController::class, 'index'])->name('warehousestok.index');
     });
 
 });
