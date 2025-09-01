@@ -53,6 +53,16 @@
                         <div class="separator border-gray-200"></div>
                         <div class="px-7 py-5">
                             <div class="mb-10">
+                                <label class="form-label fs-5 fw-bold mb-3">Gudang:</label>
+                                <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
+                                    id="warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
+                                    <option value="">Semua Gudang</option>
+                                    @foreach($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-10">
                                 <label class="form-label fs-5 fw-bold mb-3">Tanggal:</label>
                                 <input class="form-control form-control-solid" placeholder="Pilih Rentang Tanggal"
                                     id="date_filter" />
@@ -78,6 +88,8 @@
                                 <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
                                     <th class="min-w-125px sorting">Tanggal</th>
                                     <th class="min-w-125px sorting">Kode</th>
+                                    <th class="min-w-125px sorting">Nama Item</th>
+                                    <th class="min-w-125px sorting">Nama Gudang</th>
                                     <th class="min-w-125px sorting">Masuk</th>
                                     <th class="min-w-125px sorting">Keluar</th>
                                     <th class="min-w-125px sorting">Saldo</th>
@@ -136,12 +148,15 @@
                         type: "GET",
                         data: function(d) {
                             d.search.value = $('#search_input').val();
-                            d.date_filter = dateFilter;
+                            d.date_filter = $('#date_filter').val();
+                            d.warehouse_filter = $('#warehouse_filter').val();
                         }
                     },
                     columns: [
                         { data: 'date', name: 'date' },
                         { data: 'reference', name: 'reference' },
+                        { data: 'sku_name', name: 'sku_name' },
+                        { data: 'warehouse_name', name: 'warehouse_name' },
                         { data: 'stock_in', name: 'stock_in', searchable: false },
                         { data: 'stock_out', name: 'stock_out', searchable: false },
                         { data: 'balance', name: 'balance', searchable: false }
@@ -149,13 +164,13 @@
                     order: [[0, 'desc']], // Default order by date descending
                     columnDefs: [
                         {
-                            targets: 1, // Kode column
+                            targets: [1, 2, 3], // Kode, Nama Item, Nama Gudang columns
                             render: function(data, type, row) {
                                 return data ? data : '-';
                             }
                         },
                         {
-                            targets: [2, 3, 4], // Masuk, Keluar, Saldo columns
+                            targets: [4, 5, 6], // Masuk, Keluar, Saldo columns
                             render: function(data, type, row) {
                                 return data ? parseFloat(data).toLocaleString('id-ID') : '0';
                             }
