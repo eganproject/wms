@@ -23,9 +23,9 @@
         <!--end::Heaeder menu toggle-->
         <!--begin::Header Logo-->
         <div class="header-logo me-5 me-md-10 flex-grow-1 flex-lg-grow-0">
-            <a href="../../demo2/dist/index.html">
+            <a href="/admin/dashboard">
                 <img alt="Logo" src="/metronic/assets/media/logos/logo-demo2.png" class="logo-default h-25px" />
-                <img alt="Logo" src="/metronic/assets/media/logos/logo-demo2-sticky.png"
+                <img alt="Logo" src="/metronic/assets/media/logos/logo-demo2.png"
                     class="logo-sticky h-25px" />
             </a>
         </div>
@@ -66,7 +66,7 @@
                         <div class="btn btn-icon btn-active-light-primary w-30px h-30px w-md-40px h-md-40px"
                             data-kt-menu-trigger="click" data-kt-menu-attach="parent"
                             data-kt-menu-placement="bottom-end">
-                            <img class="h-30px w-30px rounded" src="/metronic/assets/media/avatars/150-25.jpg"
+                            <img class="h-30px w-30px rounded" src="/metronic/assets/media/avatars/blank.png"
                                 alt="" />
                         </div>
                         <!--begin::Menu-->
@@ -77,7 +77,7 @@
                                 <div class="menu-content d-flex align-items-center px-3">
                                     <!--begin::Avatar-->
                                     <div class="symbol symbol-50px me-5">
-                                        <img alt="Logo" src="/metronic/assets/media/avatars/150-25.jpg" />
+                                        <img alt="Logo" src="/metronic/assets/media/avatars/profile.png" />
                                     </div>
                                     <!--end::Avatar-->
                                     <!--begin::Username-->

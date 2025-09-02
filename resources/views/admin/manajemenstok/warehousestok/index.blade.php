@@ -83,9 +83,9 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="table-on-page">
                             <thead>
                                 <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
-                                    <th class="min-w-125px sorting">SKU</th>
-                                    <th class="min-w-125px sorting">Nama Item</th>
                                     <th class="min-w-125px sorting">Nama Gudang</th>
+                                    <th class="min-w-125px sorting">Nama Item</th>
+                                    <th class="min-w-125px sorting">SKU</th>
                                     <th class="min-w-125px sorting">Kuantitas</th>
                                     <th class="min-w-125px sorting">Koli</th>
                                 </tr>
@@ -149,9 +149,9 @@
                         }
                     },
                     columns: [
-                        { data: 'sku', name: 'items.sku' },
-                        { data: 'item_name', name: 'items.name' },
                         { data: 'warehouse_name', name: 'warehouses.name' },
+                        { data: 'item_name', name: 'items.name' },
+                        { data: 'sku', name: 'items.sku' },
                         { data: 'quantity', name: 'inventories.quantity', searchable: false },
                         { data: 'koli', name: 'inventories.koli', searchable: false }
                     ],
