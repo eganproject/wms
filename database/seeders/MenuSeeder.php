@@ -220,6 +220,68 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        // Stok Keluar
+        $stokKeluar = Menu::updateOrCreate(
+            ['name' => 'Stok Keluar'],
+            [
+                'url' => null,
+                'icon' => 'fas fa-minus-circle',
+                'order' => 6,
+            ]
+        );
+
+        // Children of Stok Keluar
+        Menu::updateOrCreate(
+            ['name' => 'Pengeluaran Barang'],
+            [
+                'url' => '/admin/stok-keluar/pengeluaran-barang',
+                'icon' => 'fas fa-box-open',
+                'parent_id' => $stokKeluar->id,
+                'order' => 1,
+            ]
+        );
+
+        // Laporan
+        $laporan = Menu::updateOrCreate(
+            ['name' => 'Laporan'],
+            [
+                'url' => null,
+                'icon' => 'fas fa-file-alt',
+                'order' => 7,
+            ]
+        );
+
+        // Children of Laporan
+        Menu::updateOrCreate(
+            ['name' => 'Laporan Stok'],
+            [
+                'url' => '/admin/laporan/laporan-stok',
+                'icon' => 'fas fa-boxes',
+                'parent_id' => $laporan->id,
+                'order' => 1,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['name' => 'Laporan Pergerakan Barang'],
+            [
+                'url' => '/admin/laporan/laporan-pergerakan-barang',
+                'icon' => 'fas fa-history',
+                'parent_id' => $laporan->id,
+                'order' => 2,
+            ]
+        );
+
+        Menu::updateOrCreate(
+            ['name' => 'Laporan Transfer Gudang'],
+            [
+                'url' => '/admin/laporan/laporan-transfer-gudang',
+                'icon' => 'fas fa-random',
+                'parent_id' => $laporan->id,
+                'order' => 3,
+            ]
+        );
+
         // Assign permissions to a role
         $developerJabatan = Jabatan::where('name', 'Developer')->first();
 
