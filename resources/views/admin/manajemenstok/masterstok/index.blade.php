@@ -2,8 +2,8 @@
 
 @push('toolbar')
     @include('layouts.partials._toolbar', [
-        'title' => 'Stok Gudang',
-        'breadcrumbs' => ['Admin', 'Manajemen Stok', 'Stok Gudang'],
+        'title' => 'Master Stok',
+        'breadcrumbs' => ['Admin', 'Manajemen Stok', 'Master Stok'],
     ])
 @endpush
 
@@ -27,7 +27,6 @@
                             placeholder="Cari Stok">
                     </div>
                 </div>
-                @if(auth()->user()->warehouse_id === null)
                 <div class="card-toolbar">
                     <!--begin::Filter-->
                     <button type="button" class="btn btn-light-primary me-3" data-kt-menu-trigger="click"
@@ -50,12 +49,12 @@
                         <div class="separator border-gray-200"></div>
                         <div class="px-7 py-5">
                             <div class="mb-10">
-                                <label class="form-label fs-5 fw-bold mb-3">Gudang:</label>
+                                <label class="form-label fs-5 fw-bold mb-3">Kategori Item:</label>
                                 <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
-                                    id="warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
-                                    <option value="">Semua Gudang</option>
-                                    @foreach($warehouses as $warehouse)
-                                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                    id="item_category_filter" data-dropdown-parent="#kt-toolbar-filter">
+                                    <option value="">Semua Kategori</option>
+                                    @foreach($itemCategories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -67,11 +66,10 @@
                         </div>
                     </div>
                 </div>
-                @endif
             </div>
             <div class="card-body pt-4">
                 <div class="text-center mb-5">
-                    <h3 class="mb-0">Stok Gudang</h3>
+                    <h3 class="mb-0">Master Stok</h3>
                     <small id="filter-info" class="text-muted"></small>
                 </div>
                 <div class="dataTables_wrapper dt-bootstrap4 no-footer">
@@ -79,11 +77,10 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="table-on-page">
                             <thead>
                                 <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
-                                    <th class="min-w-125px sorting">Nama Gudang</th>
-                                    <th class="min-w-125px sorting">Nama Item</th>
                                     <th class="min-w-125px sorting">SKU</th>
-                                    <th class="min-w-125px sorting">Kuantitas</th>
-                                    <th class="min-w-125px sorting">Koli</th>
+                                    <th class="min-w-125px sorting">Nama Item</th>
+                                    <th class="min-w-125px sorting">Total Kuantitas</th>
+                                    <th class="min-w-125px sorting">Total Koli</th>
                                 </tr>
                             </thead>
                             <tbody class="fw-bold text-gray-600">
@@ -119,15 +116,9 @@
             };
 
             function loadDataTable() {
-                var warehouseFilter = '';
-                @if(auth()->user()->warehouse_id !== null)
-                    warehouseFilter = {{ auth()->user()->warehouse_id }};
-                    $('#filter-info').text('Menampilkan data untuk gudang Anda');
-                @else
-                    warehouseFilter = $('#warehouse_filter').val();
-                    var warehouseName = $('#warehouse_filter').find('option:selected').text();
-                    $('#filter-info').text(warehouseFilter ? `Gudang: ${warehouseName}` : 'Menampilkan semua data');
-                @endif
+                var itemCategoryFilter = $('#item_category_filter').val();
+                var categoryName = $('#item_category_filter').find('option:selected').text();
+                $('#filter-info').text(itemCategoryFilter ? `Kategori: ${categoryName}` : 'Menampilkan semua data');
 
                 if ($.fn.DataTable.isDataTable('#table-on-page')) {
                     $('#table-on-page').DataTable().destroy();
@@ -137,30 +128,29 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('admin.manajemenstok.warehousestok.index') }}",
+                        url: "{{ route('admin.manajemenstok.masterstok.index') }}",
                         type: "GET",
                         data: function(d) {
                             d.search.value = $('#search_input').val();
-                            d.warehouse_filter = warehouseFilter;
+                            d.item_category_filter = itemCategoryFilter;
                         }
                     },
                     columns: [
-                        { data: 'warehouse_name', name: 'warehouses.name' },
-                        { data: 'item_name', name: 'items.name' },
                         { data: 'sku', name: 'items.sku' },
-                        { data: 'quantity', name: 'inventories.quantity', searchable: false },
-                        { data: 'koli', name: 'inventories.koli', searchable: false }
+                        { data: 'item_name', name: 'items.nama_barang' },
+                        { data: 'total_quantity', name: 'total_quantity', searchable: false },
+                        { data: 'total_koli', name: 'total_koli', searchable: false }
                     ],
                     order: [[1, 'asc']], // Default order by item name ascending
                     columnDefs: [
                         {
-                            targets: [0, 1, 2],
+                            targets: [0, 1],
                             render: function(data, type, row) {
                                 return data ? data : '-';
                             }
                         },
                         {
-                            targets: [3, 4],
+                            targets: [2, 3],
                             render: function(data, type, row) {
                                 return data ? parseFloat(data).toLocaleString('id-ID') : '0';
                             }

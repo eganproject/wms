@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ManajemenStok\InventoryController;
 use App\Http\Controllers\Admin\StokMasuk\DaftarPenerimaanBarangController;
 use App\Http\Controllers\Admin\StokMasuk\PenerimaanTransferController;
 use App\Http\Controllers\Admin\TransferGudang\BuatPermintaanTransferController;
@@ -54,6 +55,7 @@ Route::middleware(['auth', 'permission'])->group(function () {
     Route::prefix('admin/manajemen-stok')->name('admin.manajemenstok.')->group(function () {
         Route::get('kartu-stok', [KartuStokController::class, 'index'])->name('kartustok.index');
         Route::get('warehouse-stok', [WarehouseStokController::class, 'index'])->name('warehousestok.index');
+        Route::get('master-stok', [InventoryController::class, 'index'])->name('masterstok.index');
     });
 
     Route::prefix('admin/transfer-gudang')->name('admin.transfergudang.')->group(function () {
