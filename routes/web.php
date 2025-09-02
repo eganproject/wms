@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\StokMasuk\DaftarPenerimaanBarangController;
+use App\Http\Controllers\Admin\StokMasuk\PenerimaanTransferController;
 use App\Http\Controllers\Admin\TransferGudang\BuatPermintaanTransferController;
 use App\Http\Controllers\Admin\TransferGudang\PermintaanMasukController;
 use Illuminate\Support\Facades\Route;
@@ -45,6 +46,9 @@ Route::middleware(['auth', 'permission'])->group(function () {
 
         Route::resource('daftar-penerimaan-barang', DaftarPenerimaanBarangController::class)->parameter('daftar-penerimaan-barang', 'stockInOrder');
         Route::post('daftar-penerimaan-barang/{stockInOrder}/update-status', [DaftarPenerimaanBarangController::class, 'updateStatus'])->name('daftar-penerimaan-barang.updateStatus');
+
+        Route::resource('penerimaan-transfer', PenerimaanTransferController::class)->only(['index', 'show'])->parameter('penerimaan-transfer', 'transferRequest');
+        Route::post('penerimaan-transfer/{transferRequest}/update-status', [PenerimaanTransferController::class, 'updateStatus'])->name('penerimaan_transfer.updateStatus');
     });
 
     Route::prefix('admin/manajemen-stok')->name('admin.manajemenstok.')->group(function () {
