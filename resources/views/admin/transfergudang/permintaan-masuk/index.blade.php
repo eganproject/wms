@@ -78,8 +78,13 @@
                                 </div>
                                 <div class="mb-10">
                                     <label class="form-label fs-5 fw-bold mb-3">Tanggal:</label>
-                                    <input class="form-control form-control-solid" placeholder="Pilih Tanggal"
-                                        id="date_filter" />
+                                    <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
+                                        id="date_filter_options" data-dropdown-parent="#kt-toolbar-filter">
+                                        <option value="semua">Semua</option>
+                                        <option value="pilih_tanggal">Pilih Tanggal</option>
+                                    </select>
+                                    <input class="form-control form-control-solid mt-3" placeholder="Pilih Tanggal"
+                                        id="date_filter" style="display: none;" />
                                 </div>
                                 <div class="d-flex justify-content-end">
                                     <button type="reset" class="btn btn-light btn-active-light-primary me-2"
@@ -126,7 +131,21 @@
         var table; // Declare table globally
         $(document).ready(function() {
             $('#date_filter').flatpickr({
-                defaultDate: new Date()
+                defaultDate: new Date(),
+                onChange: function(selectedDates, dateStr, instance) {
+                    if ($('#date_filter_options').val() !== 'pilih_tanggal') {
+                        $('#date_filter_options').val('pilih_tanggal').trigger('change');
+                    }
+                }
+            });
+
+            $('#date_filter_options').on('change', function() {
+                if ($(this).val() === 'pilih_tanggal') {
+                    $('#date_filter').show();
+                } else {
+                    $('#date_filter').hide();
+                    $('#date_filter').val(''); // Clear the date when 'Semua' is selected
+                }
             });
 
             toastr.options = {
@@ -157,12 +176,13 @@
             function loadDataTable() {
                 var toWarehouseFilter = $('#to_warehouse_filter').val();
                 var statusFilter = $('#status_filter').val();
-                var dateFilter = $('#date_filter').val();
+                var dateFilter = $('#date_filter_options').val() === 'semua' ? 'semua' : $('#date_filter').val();
 
                 var toWarehouseText = $('#to_warehouse_filter option:selected').text();
                 var statusText = $('#status_filter option:selected').text();
+                var dateText = dateFilter === 'semua' ? 'Semua Tanggal' : dateFilter;
 
-                let filterInfoText = `${dateFilter} | Gudang Tujuan: ${toWarehouseText} | Status: ${statusText}`;
+                let filterInfoText = `Tanggal: ${dateText} | Gudang Tujuan: ${toWarehouseText} | Status: ${statusText}`;
                 $('#filter-info').text(filterInfoText);
 
                 if ($.fn.DataTable.isDataTable('#table-on-page')) {
@@ -217,8 +237,8 @@
                         },
                     ],
                     order: [
-                        [0, 'desc']
-                    ], // Default order by code descending
+                        [1, 'desc']
+                    ], // Default order by date descending
                     columnDefs: [{
                             targets: 1, // Date column
                             render: function(data, type, row) {

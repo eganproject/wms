@@ -61,7 +61,7 @@ class PermintaanMasukController extends Controller
                 $query->where('tr.status', $statusFilter);
             }
 
-            if ($dateFilter) {
+            if ($dateFilter && $dateFilter !== 'semua') {
                 $query->whereDate('tr.date', $dateFilter);
             }
 
