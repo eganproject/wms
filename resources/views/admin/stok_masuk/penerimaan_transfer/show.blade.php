@@ -219,7 +219,7 @@
                             <!-- begin::Actions-->
                             <div class="my-1 me-5">
                                 <!-- begin::Pint-->
-                                <a href="{{ route('admin.stok_masuk.penerimaan_transfer.index') }}"
+                                <a href="{{ route('admin.stok-masuk.penerimaan-transfer.index') }}"
                                     class="btn btn-secondary my-1 me-12">Kembali</a>
 
                                 <!-- end::Pint-->
