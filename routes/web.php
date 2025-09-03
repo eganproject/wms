@@ -1,22 +1,24 @@
 <?php
 
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\ManajemenStok\InventoryController;
+use App\Http\Controllers\Admin\ManajemenStok\KartuStokController;
+use App\Http\Controllers\Admin\ManajemenStok\WarehouseStokController;
+use App\Http\Controllers\Admin\Masterdata\ItemCategoryController;
+use App\Http\Controllers\Admin\Masterdata\ItemController;
+use App\Http\Controllers\Admin\Masterdata\JabatanController;
+use App\Http\Controllers\Admin\Masterdata\MenuController;
+use App\Http\Controllers\Admin\Masterdata\PermissionController;
+use App\Http\Controllers\Admin\Masterdata\UomController;
+use App\Http\Controllers\Admin\Masterdata\UserController;
+use App\Http\Controllers\Admin\Masterdata\WarehouseController;
+use App\Http\Controllers\Admin\StokKeluar\PengeluaranBarangController;
 use App\Http\Controllers\Admin\StokMasuk\DaftarPenerimaanBarangController;
 use App\Http\Controllers\Admin\StokMasuk\PenerimaanTransferController;
 use App\Http\Controllers\Admin\TransferGudang\BuatPermintaanTransferController;
 use App\Http\Controllers\Admin\TransferGudang\PermintaanMasukController;
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\Masterdata\JabatanController;
-use App\Http\Controllers\Admin\Masterdata\UserController;
-use App\Http\Controllers\Admin\Masterdata\MenuController;
-use App\Http\Controllers\Admin\Masterdata\PermissionController;
-use App\Http\Controllers\Admin\Masterdata\UomController;
-use App\Http\Controllers\Admin\Masterdata\ItemController;
-use App\Http\Controllers\Admin\Masterdata\ItemCategoryController;
-use App\Http\Controllers\Admin\ManajemenStok\KartuStokController;
-use App\Http\Controllers\Admin\ManajemenStok\WarehouseStokController;
+use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
     Route::get('/', [LoginController::class, 'showLoginForm'])->name('login');
@@ -25,14 +27,13 @@ Route::middleware('guest')->group(function () {
 
 Route::post('logout', [LoginController::class, 'logout'])->name('logout');
 
-
 Route::middleware(['auth', 'permission'])->group(function () {
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     Route::prefix('admin/masterdata')->name('admin.masterdata.')->group(function () {
         Route::resource('jabatans', JabatanController::class);
         Route::resource('users', UserController::class);
-        Route::resource('warehouses', \App\Http\Controllers\Admin\Masterdata\WarehouseController::class);
+        Route::resource('warehouses', WarehouseController::class);
         Route::resource('menus', MenuController::class);
         Route::resource('itemcategories', ItemCategoryController::class);
         Route::resource('uoms', UomController::class);
@@ -44,12 +45,15 @@ Route::middleware(['auth', 'permission'])->group(function () {
     });
 
     Route::prefix('admin/stok-masuk')->name('admin.stok-masuk.')->group(function () {
-
         Route::resource('daftar-penerimaan-barang', DaftarPenerimaanBarangController::class)->parameter('daftar-penerimaan-barang', 'stockInOrder');
         Route::post('daftar-penerimaan-barang/{stockInOrder}/update-status', [DaftarPenerimaanBarangController::class, 'updateStatus'])->name('daftar-penerimaan-barang.updateStatus');
 
         Route::resource('penerimaan-transfer', PenerimaanTransferController::class)->only(['index', 'show'])->parameter('penerimaan-transfer', 'transferRequest');
         Route::post('penerimaan-transfer/{transferRequest}/update-status', [PenerimaanTransferController::class, 'updateStatus'])->name('penerimaan_transfer.updateStatus');
+    });
+
+    Route::prefix('admin/stok-keluar')->name('admin.stok-keluar.')->group(function () {
+        Route::resource('pengeluaran-barang', PengeluaranBarangController::class)->parameter('pengeluaran-barang', 'pengeluaranBarang');
     });
 
     Route::prefix('admin/manajemen-stok')->name('admin.manajemenstok.')->group(function () {
@@ -66,5 +70,4 @@ Route::middleware(['auth', 'permission'])->group(function () {
         Route::post('calculate-item-values', [BuatPermintaanTransferController::class, 'calculateItemValues'])->name('calculate-item-values');
         Route::get('get-items-by-warehouse/{warehouse_id}', [BuatPermintaanTransferController::class, 'getItemsByWarehouse'])->name('get-items-by-warehouse');
     });
-
 });
