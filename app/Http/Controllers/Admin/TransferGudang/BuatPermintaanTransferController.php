@@ -7,6 +7,7 @@ use App\Models\TransferRequest;
 use App\Models\TransferRequestItem;
 use App\Models\Warehouse;
 use App\Models\Item;
+use App\Models\Inventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -265,5 +266,15 @@ class BuatPermintaanTransferController extends Controller
             DB::rollBack();
             return redirect()->route('admin.transfergudang.permintaan-terkirim.index')->with('error', 'Gagal menghapus permintaan transfer.');
         }
+    }
+
+    public function getItemsByWarehouse($warehouse_id)
+    {
+        $items = Inventory::with('item')
+            ->where('warehouse_id', $warehouse_id)
+            ->where('quantity', '>', 0)
+            ->get();
+
+        return response()->json($items);
     }
 }

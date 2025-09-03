@@ -63,6 +63,7 @@ Route::middleware(['auth', 'permission'])->group(function () {
         Route::resource('permintaan-masuk', PermintaanMasukController::class)->only(['index', 'show'])->parameter('permintaan-masuk', 'transferRequest');
         Route::post('permintaan-masuk/{transferRequest}/update-status', [PermintaanMasukController::class, 'updateStatus'])->name('permintaan-masuk.updateStatus');
         Route::post('calculate-item-values', [BuatPermintaanTransferController::class, 'calculateItemValues'])->name('calculate-item-values');
+        Route::get('get-items-by-warehouse/{warehouse_id}', [BuatPermintaanTransferController::class, 'getItemsByWarehouse'])->name('get-items-by-warehouse');
     });
 
 });

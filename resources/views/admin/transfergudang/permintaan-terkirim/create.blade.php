@@ -39,7 +39,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Gudang Asal</label>
-                            <select name="from_warehouse_id"
+                            <select name="from_warehouse_id" id="from_warehouse_id"
                                 class="form-select @error('from_warehouse_id') is-invalid @enderror" data-control="select2"
                                 data-placeholder="Pilih gudang asal">
                                 <option></option>
@@ -115,7 +115,7 @@
                     <option></option>
                     @foreach ($items as $item)
                         <option value="{{ $item->id }}" data-koli="{{ $item->koli_per_uom ?? 1 }}">
-                            {{ $item->name }} (SKU: {{ $item->sku }})</option>
+                            {{ $item->nama_barang }} (SKU: {{ $item->sku }})</option>
                     @endforeach
                 </select>
             </td>
@@ -142,6 +142,7 @@
     <script>
         $(document).ready(function() {
             let itemIndex = 0;
+            let availableItems = [];
 
             function initializeSelect2(element) {
                 $(element).select2({
@@ -150,43 +151,158 @@
                 });
             }
 
-            function addNewRow(item = null) {
+            function updateItemSelectOptions(selectElement) {
+                const currentVal = $(selectElement).val();
+                $(selectElement).empty().append($('<option></option>'));
+                availableItems.forEach(function(inventoryItem) {
+                    let option = new Option(
+                        `${inventoryItem.item.nama_barang} (SKU: ${inventoryItem.item.sku})`,
+                        inventoryItem.item_id,
+                        false,
+                        false
+                    );
+                    $(option).attr('data-quantity', inventoryItem.quantity);
+                    $(option).attr('data-koli', inventoryItem.item.koli_per_uom || 1);
+                    $(selectElement).append(option);
+                });
+                $(selectElement).val(currentVal).trigger('change');
+            }
+
+            function addNewRow() {
                 const template = document.getElementById('item-row-template').innerHTML;
                 const newRowHtml = template.replace(/__INDEX__/g, itemIndex);
                 const newRow = $(newRowHtml);
                 $('#items-table tbody').append(newRow);
 
                 const select = newRow.find('.item-select');
+                updateItemSelectOptions(select);
                 initializeSelect2(select);
-
-                if (item) {
-                    select.val(item.item_id).trigger('change');
-                    newRow.find('.quantity-input').val(item.quantity);
-                    newRow.find('.koli-input').val(item.koli);
-                    newRow.find('input[name*="description"]').val(item.description);
-                }
 
                 itemIndex++;
             }
 
-            // Add existing items from old input
-            let oldItems = @json(old('items', []));
-            if (oldItems && oldItems.length > 0) {
-                oldItems.forEach(function(item) {
-                    addNewRow(item);
-                });
-            } else {
-                addNewRow(); // Add one empty row by default
-            }
-
             $('#add-item-btn').on('click', function() {
+                if (!$('#from_warehouse_id').val()) {
+                    Swal.fire(
+                        'Peringatan',
+                        'Silakan pilih Gudang Asal terlebih dahulu.',
+                        'warning'
+                    );
+                    return;
+                }
                 addNewRow();
             });
+
             $('#items-table').on('click', '.remove-item-btn', function() {
                 $(this).closest('tr').remove();
             });
 
-            // Function to handle AJAX calculation
+            $('#from_warehouse_id').on('change', function() {
+                const warehouseId = $(this).val();
+                $('#items-table tbody').empty();
+                itemIndex = 0;
+                availableItems = [];
+
+                if (!warehouseId) {
+                    return;
+                }
+
+                $.ajax({
+                    url: `{{ url('admin/transfer-gudang/get-items-by-warehouse') }}/${warehouseId}`,
+                    type: 'GET',
+                    success: function(items) {
+                        availableItems = items;
+                        addNewRow(); // Add a default row after fetching items
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching items:', xhr);
+                        toastr.error('Gagal mengambil data item dari gudang.', 'Error');
+                    }
+                });
+            });
+
+                        // Store previous value on focus
+            $('#items-table').on('focus', '.item-select', function() {
+                $(this).data('previous-value', $(this).val());
+            });
+
+            $('#items-table').on('change', '.item-select', function() {
+                const currentSelect = this;
+                const selectedItemId = $(currentSelect).val();
+
+                // Check for duplicates
+                if (selectedItemId) {
+                    let isDuplicate = false;
+                    $('.item-select').not(currentSelect).each(function() {
+                        if ($(this).val() === selectedItemId) {
+                            isDuplicate = true;
+                            return false; // Exit loop
+                        }
+                    });
+
+                    if (isDuplicate) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Item Sudah Dipilih',
+                            text: 'Item ini sudah ada di daftar. Silakan pilih item lain.',
+                            confirmButtonText: 'OK'
+                        });
+
+                        // Revert to the previous value
+                        const previousValue = $(currentSelect).data('previous-value');
+                        $(currentSelect).val(previousValue).trigger('change.select2');
+                        return; // Stop further execution
+                    }
+                }
+
+                $(currentSelect).data('previous-value', selectedItemId);
+
+
+                const selectedOption = $(this).find('option:selected');
+                const quantity = selectedOption.data('quantity');
+                const stockInfo = $(this).closest('tr').find('.available-stock');
+
+                if (quantity !== undefined) {
+                    stockInfo.text(`Stok: ${quantity}`);
+                } else {
+                    stockInfo.text('');
+                }
+                calculateItemValues($(this).closest('tr'), 'quantity');
+            });
+
+            function validateQuantity(inputElement) {
+                const row = $(inputElement).closest('tr');
+                const selectedOption = row.find('.item-select option:selected');
+                const availableQuantity = parseFloat(selectedOption.data('quantity'));
+                const enteredQuantity = parseFloat($(inputElement).val());
+
+                if (isNaN(availableQuantity)) return;
+
+                if (enteredQuantity > availableQuantity) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Kuantitas Melebihi Stok',
+                        text: `Stok yang tersedia hanya ${availableQuantity}. Kuantitas yang Anda masukkan telah disesuaikan.`,
+                        confirmButtonText: 'OK'
+                    });
+                    $(inputElement).val(availableQuantity);
+                    calculateItemValues(row, 'quantity'); // Recalculate koli
+                }
+            }
+
+            $('#items-table').on('input', '.quantity-input', function() {
+                validateQuantity(this);
+                calculateItemValues($(this).closest('tr'), 'quantity');
+            });
+
+            $('#items-table').on('input', '.koli-input', function() {
+                calculateItemValues($(this).closest('tr'), 'koli');
+                // After koli changes quantity, re-validate
+                const row = $(this).closest('tr');
+                const quantityInput = row.find('.quantity-input');
+                validateQuantity(quantityInput);
+            });
+
             function calculateItemValues(row, changedField) {
                 let itemId = row.find('.item-select').val();
                 let quantityInput = row.find('.quantity-input');
@@ -196,22 +312,12 @@
                     item_id: itemId
                 };
 
+                if (!itemId) return;
+
                 if (changedField === 'quantity') {
                     data.quantity = parseFloat(quantityInput.val()) || 0;
                 } else if (changedField === 'koli') {
                     data.koli = parseFloat(koliInput.val()) || 0;
-                } else {
-                    return; // No relevant field changed
-                }
-
-                if (!itemId) {
-                    // If no item is selected, clear the other field and return
-                    if (changedField === 'quantity') {
-                        koliInput.val('');
-                    } else if (changedField === 'koli') {
-                        quantityInput.val('');
-                    }
-                    return;
                 }
 
                 $.ajax({
@@ -227,37 +333,19 @@
                     },
                     error: function(xhr) {
                         console.error('Error calculating item values:', xhr);
-                        toastr.error('Gagal menghitung nilai item.', 'Error');
                     }
                 });
             }
 
-            // Event listener for quantity input and item select change
-            $('#items-table').on('input', '.quantity-input', function() {
-                calculateItemValues($(this).closest('tr'), 'quantity');
-            });
-
-            // Event listener for koli input
-            $('#items-table').on('input', '.koli-input', function() {
-                calculateItemValues($(this).closest('tr'), 'koli');
-            });
-
-            // Event listener for item select change (to trigger recalculation if item changes)
-            $('#items-table').on('change', '.item-select', function() {
-                let row = $(this).closest('tr');
-                // If quantity has a value, recalculate koli based on new item
-                if (parseFloat(row.find('.quantity-input').val()) > 0) {
-                    calculateItemValues(row, 'quantity');
-                } else if (parseFloat(row.find('.koli-input').val()) > 0) {
-                    // If koli has a value, recalculate quantity based on new item
-                    calculateItemValues(row, 'koli');
-                }
-            });
-
             // Initialize select2 for main warehouse selects
             $(`[data-control='select2']`).select2();
 
-            // Form submission with AJAX
+            // Trigger change on page load if warehouse is pre-selected (e.g., from old input)
+            if ($('#from_warehouse_id').val()) {
+                $('#from_warehouse_id').trigger('change');
+            }
+
+            // Form submission logic remains the same
             $('#transfer-request-form').on('submit', function(e) {
                 e.preventDefault();
                 var form = $(this);
@@ -275,6 +363,23 @@
                     }
                 }).then(function(result) {
                     if (result.value) {
+                        // Before submitting, ensure no quantity is over stock one last time
+                        let allQuantitiesValid = true;
+                        $('.quantity-input').each(function() {
+                            const row = $(this).closest('tr');
+                            const selectedOption = row.find('.item-select option:selected');
+                            const availableQuantity = parseFloat(selectedOption.data('quantity'));
+                            const enteredQuantity = parseFloat($(this).val());
+                            if (!isNaN(availableQuantity) && enteredQuantity > availableQuantity) {
+                                allQuantitiesValid = false;
+                            }
+                        });
+
+                        if (!allQuantitiesValid) {
+                            Swal.fire('Error', 'Satu atau lebih item memiliki kuantitas melebihi stok. Silakan perbaiki.', 'error');
+                            return;
+                        }
+
                         $.ajax({
                             url: form.attr('action'),
                             type: 'POST',
@@ -290,12 +395,7 @@
                                     }
                                 }).then(function(result) {
                                     if (result.isConfirmed) {
-                                        let redirectUrl =
-                                            "{{ route('admin.transfergudang.permintaan-terkirim.index') }}";
-                                        if (response && response.redirect_url) {
-                                            redirectUrl = response.redirect_url;
-                                        }
-                                        window.location.href = redirectUrl;
+                                        window.location.href = "{{ route('admin.transfergudang.permintaan-terkirim.index') }}";
                                     }
                                 });
                             },
@@ -310,7 +410,7 @@
                                             const parts = key.split('.');
                                             field = $('[name="items[' + parts[
                                                 1] + '][' + parts[2] + ']"]'
-                                                );
+                                            );
                                         }
                                         field.addClass('is-invalid').after(
                                             '<div class="invalid-feedback">' +
