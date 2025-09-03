@@ -21,6 +21,7 @@ class PenerimaanTransferController extends Controller
             $length = $request->input('length', 10);
             $draw = $request->input('draw', 0);
             $toWarehouseFilter = $request->input('to_warehouse_id');
+            $statusFilter = $request->input('status'); // Get status filter from request
             $dateFilter = $request->input('date');
 
             $columns = [
@@ -40,8 +41,15 @@ class PenerimaanTransferController extends Controller
                 ->from('transfer_requests as tr')
                 ->leftJoin('warehouses as fw', 'tr.from_warehouse_id', '=', 'fw.id')
                 ->leftJoin('warehouses as tw', 'tr.to_warehouse_id', '=', 'tw.id')
-                ->leftJoin('users as u', 'tr.requested_by', '=', 'u.id')
-                ->where('tr.status', 'shipped');
+                ->leftJoin('users as u', 'tr.requested_by', '=', 'u.id');
+                // Removed hardcoded ->where('tr.status', 'shipped');
+
+            // Apply status filter
+            if ($statusFilter && $statusFilter !== 'semua') {
+                $query->where('tr.status', $statusFilter);
+            } else { // Default to shipped and completed if 'semua' or no filter is provided
+                $query->whereIn('tr.status', ['shipped', 'completed']);
+            }
 
             $totalRecords = $query->count();
 

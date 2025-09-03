@@ -64,6 +64,15 @@
                                     </select>
                                 </div>
                                 <div class="mb-10">
+                                    <label class="form-label fs-5 fw-bold mb-3">Status:</label>
+                                    <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
+                                        id="status_filter" data-dropdown-parent="#kt-toolbar-filter">
+                                        <option value="shipped">Shipped</option>
+                                        <option value="completed">Completed</option>
+                                        <option value="semua" selected>Semua</option>
+                                    </select>
+                                </div>
+                                <div class="mb-10">
                                     <label class="form-label fs-5 fw-bold mb-3">Tanggal:</label>
                                     <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
                                         id="date_filter_options" data-dropdown-parent="#kt-toolbar-filter">
@@ -162,12 +171,14 @@
 
             function loadDataTable() {
                 var toWarehouseFilter = $('#to_warehouse_filter').val();
+                var statusFilter = $('#status_filter').val();
                 var dateFilter = $('#date_filter_options').val() === 'semua' ? 'semua' : $('#date_filter').val();
 
                 var toWarehouseText = $('#to_warehouse_filter option:selected').text();
+                var statusText = $('#status_filter option:selected').text();
                 var dateText = dateFilter === 'semua' ? 'Semua Tanggal' : dateFilter;
 
-                let filterInfoText = `Tanggal: ${dateText} | Gudang Tujuan: ${toWarehouseText}`;
+                let filterInfoText = `Tanggal: ${dateText} | Gudang Tujuan: ${toWarehouseText} | Status: ${statusText}`;
                 $('#filter-info').text(filterInfoText);
 
                 if ($.fn.DataTable.isDataTable('#table-on-page')) {
@@ -183,6 +194,7 @@
                         data: function(d) {
                             d.search.value = $('#search_input').val();
                             d.to_warehouse_id = toWarehouseFilter;
+                            d.status = statusFilter;
                             d.date = dateFilter;
                         }
                     },
