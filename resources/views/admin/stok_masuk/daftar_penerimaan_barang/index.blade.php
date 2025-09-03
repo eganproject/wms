@@ -79,7 +79,7 @@
                                 <div class="d-flex justify-content-end">
                                     <button type="reset" class="btn btn-light btn-active-light-primary me-2"
                                         data-kt-menu-dismiss="true">Batal</button>
-                                    <button type="button" class="btn btn-primary" id="apply_filter" >Submit</button>
+                                    <button type="button" class="btn btn-primary" id="apply_filter">Submit</button>
                                 </div>
                             </div>
                             <!--end::Content-->
@@ -259,8 +259,13 @@
                                 <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-bold fs-7 w-125px py-4" data-kt-menu="true">
                                     <div class="menu-item px-3">
                                         <a href="${showUrl}" class="menu-link px-3">View</a>
-                                    </div>
-                                    <div class="menu-item px-3">
+                                    </div>`;
+
+
+
+                                if (row.status === 'requested') {
+                                    actionsHtml += `
+                                      <div class="menu-item px-3">
                                         <a href="${editUrl}" class="menu-link px-3">Edit</a>
                                     </div>
                                     <div class="menu-item px-3">
@@ -272,10 +277,6 @@
                                             </button>
                                         </form>
                                     </div>
-                                `;
-
-                                if (row.status === 'requested') {
-                                    actionsHtml += `
                                     <div class="menu-item px-3">
                                         <a href="#" class="menu-link px-3" onclick="confirmStatusChange(${row.id}, 'shipped', '${row.code}')">Shipped</a>
                                     </div>
@@ -367,10 +368,13 @@
                 let confirmationText = "";
                 let successText = "";
                 if (status === 'shipped') {
-                    confirmationText = `Apakah Anda yakin ingin mengubah status penerimaan barang ${code} menjadi 'Dalam Pengiriman'?`;
-                    successText = `Status penerimaan barang ${code} berhasil diubah menjadi 'Dalam Pengiriman'.`;
+                    confirmationText =
+                        `Apakah Anda yakin ingin mengubah status penerimaan barang ${code} menjadi 'Dalam Pengiriman'?`;
+                    successText =
+                    `Status penerimaan barang ${code} berhasil diubah menjadi 'Dalam Pengiriman'.`;
                 } else if (status === 'completed') {
-                    confirmationText = `Apakah Anda yakin ingin mengubah status penerimaan barang ${code} menjadi 'Selesai'?`;
+                    confirmationText =
+                        `Apakah Anda yakin ingin mengubah status penerimaan barang ${code} menjadi 'Selesai'?`;
                     successText = `Status penerimaan barang ${code} berhasil diubah menjadi 'Selesai'.`;
                 }
 
