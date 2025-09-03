@@ -155,6 +155,7 @@ class PermintaanMasukController extends Controller
             ]);
 
             $transferRequest->status = 'shipped';
+            $transferRequest->shipped_at = now();
             $transferRequest->save();
 
             DB::commit();
