@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Admin\TransferGudang;
 
 use App\Http\Controllers\Controller;
-
+use App\Models\Shipment;
 use Illuminate\Http\Request;
-
 use App\Models\TransferRequest;
 use App\Models\Warehouse;
+use Illuminate\Support\Facades\DB;
 
 class PermintaanMasukController extends Controller
 {
@@ -106,18 +106,13 @@ class PermintaanMasukController extends Controller
     public function updateStatus(Request $request, TransferRequest $transferRequest)
     {
         $request->validate([
-            'status' => 'required|in:approved,shipped',
+            'status' => 'required|in:approved',
         ]);
 
         $newStatus = $request->status;
 
-        // Basic state machine validation
         if ($newStatus === 'approved' && $transferRequest->status !== 'pending') {
             return response()->json(['success' => false, 'message' => 'Hanya permintaan dengan status pending yang bisa disetujui.'], 422);
-        }
-
-        if ($newStatus === 'shipped' && $transferRequest->status !== 'approved') {
-            return response()->json(['success' => false, 'message' => 'Hanya permintaan yang sudah disetujui yang bisa dikirim.'], 422);
         }
 
         try {
@@ -130,4 +125,45 @@ class PermintaanMasukController extends Controller
         }
     }
 
+    public function createShipment(Request $request, TransferRequest $transferRequest)
+    {
+        $request->validate([
+            'shipping_date' => 'required|date',
+            'vehicle_type' => 'required|string|max:255',
+            'license_plate' => 'required|string|max:255',
+            'driver_name' => 'nullable|string|max:255',
+            'driver_contact' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+        ]);
+
+        if ($transferRequest->status !== 'approved') {
+            return response()->json(['success' => false, 'message' => 'Hanya permintaan yang sudah disetujui yang bisa dikirim.'], 422);
+        }
+
+        try {
+            DB::beginTransaction();
+
+            Shipment::create([
+                'transfer_request_id' => $transferRequest->id,
+                'shipping_date' => $request->shipping_date,
+                'vehicle_type' => $request->vehicle_type,
+                'license_plate' => $request->license_plate,
+                'driver_name' => $request->driver_name,
+                'driver_contact' => $request->driver_contact,
+                'description' => $request->description,
+                'shipped_by' => auth()->id(),
+            ]);
+
+            $transferRequest->status = 'shipped';
+            $transferRequest->save();
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Data pengiriman berhasil disimpan dan status permintaan telah diubah menjadi dikirim.']);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Gagal membuat data pengiriman: ' . $e->getMessage()], 500);
+        }
+    }
 }

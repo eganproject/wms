@@ -124,6 +124,62 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" tabindex="-1" id="kt_modal_kirim_barang">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Form Pengiriman Barang</h5>
+                    <div class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="svg-icon svg-icon-2x"></span>
+                    </div>
+                </div>
+                <form id="kirim_barang_form" method="POST">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="shipping_date" class="form-label required">Tanggal Kirim</label>
+                            <input type="date" class="form-control" id="shipping_date" name="shipping_date" required>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="vehicle_type" class="form-label required">Tipe Kendaraan</label>
+                                <input type="text" class="form-control" id="vehicle_type" name="vehicle_type" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="license_plate" class="form-label required">Plat Nomor</label>
+                                <input type="text" class="form-control" id="license_plate" name="license_plate" required>
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="driver_name" class="form-label">Nama Pengemudi</label>
+                                <input type="text" class="form-control" id="driver_name" name="driver_name">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="driver_contact" class="form-label">Kontak Pengemudi</label>
+                                <input type="text" class="form-control" id="driver_contact" name="driver_contact">
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Deskripsi / Catatan</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            <div class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Kirim Barang</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('scripts')
@@ -295,7 +351,7 @@
                                 } else if (row.status === 'approved') {
                                     actionsHtml += `
                                     <div class="menu-item px-3">
-                                        <a href="#" class="menu-link px-3" onclick="confirmStatusChange(${row.id}, 'shipped', '${row.code}')">Kirim Barang</a>
+                                        <a href="#" class="menu-link px-3 kirim-barang-btn" data-bs-toggle="modal" data-bs-target="#kt_modal_kirim_barang" data-id="${row.id}" data-code="${row.code}">Kirim Barang</a>
                                     </div>`;
                                 }
 
@@ -337,9 +393,6 @@
                 if (status === 'approved') {
                     confirmationText = `Apakah Anda yakin ingin menyetujui permintaan transfer ${code}?`;
                     successText = `Permintaan transfer ${code} berhasil disetujui.`;
-                } else if (status === 'shipped') {
-                    confirmationText = `Apakah Anda yakin ingin mengubah status permintaan transfer ${code} menjadi 'Dikirim'?`;
-                    successText = `Status permintaan transfer ${code} berhasil diubah menjadi 'Dikirim'.`;
                 }
 
                 Swal.fire({
@@ -375,6 +428,71 @@
                     }
                 });
             };
+
+            const kirimBarangModal = document.getElementById('kt_modal_kirim_barang');
+            const form = kirimBarangModal.querySelector('#kirim_barang_form');
+
+            kirimBarangModal.addEventListener('show.bs.modal', event => {
+                const button = event.relatedTarget;
+                const transferId = button.getAttribute('data-id');
+                const transferCode = button.getAttribute('data-code');
+
+                const modalTitle = kirimBarangModal.querySelector('.modal-title');
+                modalTitle.textContent = 'Form Pengiriman Barang: ' + transferCode;
+
+                let action = `/admin/transfer-gudang/permintaan-masuk/${transferId}/create-shipment`;
+                form.action = action;
+            });
+
+            $(form).on('submit', function(e) {
+                e.preventDefault();
+                $('.is-invalid').removeClass('is-invalid');
+                $('.invalid-feedback').text('');
+
+                Swal.fire({
+                    text: "Apakah Anda yakin ingin menyimpan data pengiriman ini?",
+                    icon: "question",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "Ya, Simpan!",
+                    cancelButtonText: "Tidak, Batalkan",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-primary",
+                        cancelButton: "btn fw-bold btn-active-light-primary"
+                    }
+                }).then(function(result) {
+                    if (result.value) {
+                        let formData = new FormData(form);
+                        $.ajax({
+                            url: $(form).attr('action'),
+                            type: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                $(kirimBarangModal).modal('hide');
+                                toastr.success(`Data pengiriman berhasil disimpan.`);
+                                table.ajax.reload(null, false);
+                                form.reset();
+                            },
+                            error: function(xhr) {
+                                if (xhr.status === 422) {
+                                    var errors = xhr.responseJSON.errors;
+                                    $.each(errors, function(key, value) {
+                                        let field = $('[name="' + key + '"]');
+                                        field.addClass('is-invalid');
+                                        field.next('.invalid-feedback').text(value[0]);
+                                    });
+                                    toastr.error('Silakan perbaiki error validasi yang ada.','Validasi Gagal');
+                                } else {
+                                    toastr.error("Gagal menyimpan data pengiriman. Silakan coba lagi.");
+                                }
+                            }
+                        });
+                    }
+                });
+            });
+
         });
     </script>
 @endpush
