@@ -102,10 +102,10 @@
             </td>
             <td><span class="available-stock text-muted">-</span></td>
             <td>
-                <input type="number" name="items[__INDEX__][quantity]" class="form-control quantity-input" min="1" value="1">
+                <input type="number" name="items[__INDEX__][quantity]" class="form-control quantity-input" min="1" value="1" step="any">
             </td>
             <td>
-                <input type="number" name="items[__INDEX__][koli]" class="form-control koli-input" min="0" value="0">
+                <input type="number" name="items[__INDEX__][koli]" class="form-control koli-input" min="0" value="0" step="any">
             </td>
             <td class="text-end">
                 <button type="button" class="btn btn-icon btn-sm btn-danger remove-item-btn"><i class="bi bi-trash"></i></button>

@@ -86,7 +86,7 @@ class PengeluaranBarangController extends Controller
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
-            'items.*.koli' => 'required|numeric|min:1',
+            'items.*.koli' => 'required|min:0',
             'items.*.quantity' => [
                 'required',
                 'numeric',
@@ -155,11 +155,11 @@ class PengeluaranBarangController extends Controller
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
-            'items.*.koli' => 'required|numeric|min:1',
+            'items.*.koli' => 'required|numeric|min:0',
             'items.*.quantity' => [
                 'required',
                 'numeric',
-                'min:1',
+                'min:0',
                 function ($attribute, $value, $fail) use ($request, $pengeluaranBarang) {
                     $index = explode('.', $attribute)[1];
                     $itemId = $request->input("items.$index.item_id");
