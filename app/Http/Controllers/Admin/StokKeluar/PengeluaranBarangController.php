@@ -14,6 +14,21 @@ use Illuminate\Validation\Rule;
 
 class PengeluaranBarangController extends Controller
 {
+    private function generateNewCode()
+    {
+        $prefix = 'OUT';
+        $date = now()->format('Ymd');
+        $latestOrder = StockOut::where('code', 'LIKE', "$prefix-$date-%")->latest('id')->first();
+
+        if ($latestOrder) {
+            $sequence = (int) substr($latestOrder->code, -4) + 1;
+        } else {
+            $sequence = 1;
+        }
+
+        return sprintf('%s-%s-%04d', $prefix, $date, $sequence);
+    }
+
     public function index(Request $request)
     {
         if ($request->ajax()) {
@@ -74,7 +89,8 @@ class PengeluaranBarangController extends Controller
     {
         $warehouses = Warehouse::all();
         $inventory = Inventory::with(['item.uom', 'item'])->where('quantity', '>', 0)->get()->groupBy('warehouse_id');
-        return view('admin.stok_keluar.create', compact('warehouses', 'inventory'));
+        $newCode = $this->generateNewCode();
+        return view('admin.stok_keluar.create', compact('warehouses', 'inventory', 'newCode'));
     }
 
     public function store(Request $request)

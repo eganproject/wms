@@ -28,14 +28,18 @@
                     <div class="row">
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Tanggal Pengeluaran</label>
-                            <input type="text" name="stock_out_date" id="stock_out_date" class="form-control @error('stock_out_date') is-invalid @enderror" value="{{ old('stock_out_date', date('Y-m-d')) }}">
+                            <input type="text" name="stock_out_date" id="stock_out_date" class="form-control form-control-solid @error('stock_out_date') is-invalid @enderror" value="{{ old('stock_out_date', date('Y-m-d')) }}">
                             @error('stock_out_date')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-5">
+                            <label class="form-label required">Kode Pengeluaran</label>
+                            <input type="text" name="code" id="code" class="form-control form-control-solid" value="{{ $newCode }}" readonly>
+                        </div>
+                        <div class="col-md-6 mb-5">
                             <label class="form-label required">Gudang</label>
-                            <select name="warehouse_id" id="warehouse_id" class="form-select @error('warehouse_id') is-invalid @enderror" data-control="select2" data-placeholder="Pilih gudang">
+                            <select name="warehouse_id" id="warehouse_id" class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror" data-control="select2" data-placeholder="Pilih gudang">
                                 <option></option>
                                 @foreach ($warehouses as $warehouse)
                                     <option value="{{ $warehouse->id }}" {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
@@ -49,7 +53,7 @@
 
                     <div class="mb-5">
                         <label class="form-label">Catatan</label>
-                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3">{{ old('notes') }}</textarea>
+                        <textarea name="notes" class="form-control form-control-solid @error('notes') is-invalid @enderror" rows="3">{{ old('notes') }}</textarea>
                          @error('notes')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
@@ -97,15 +101,15 @@
     <template id="item-row-template">
         <tr data-index="__INDEX__">
             <td>
-                <select name="items[__INDEX__][item_id]" class="form-select item-select" data-placeholder="Pilih item"></select>
+                <select name="items[__INDEX__][item_id]" class="form-select form-select-solid item-select" data-placeholder="Pilih item"></select>
                 <div class="invalid-feedback-custom text-danger mt-2"></div>
             </td>
             <td><span class="available-stock text-muted">-</span></td>
             <td>
-                <input type="number" name="items[__INDEX__][quantity]" class="form-control quantity-input" min="1" value="1" step="any">
+                <input type="number" name="items[__INDEX__][quantity]" class="form-control form-control-solid quantity-input" min="1" value="1" step="any">
             </td>
             <td>
-                <input type="number" name="items[__INDEX__][koli]" class="form-control koli-input" min="0" value="0" step="any">
+                <input type="number" name="items[__INDEX__][koli]" class="form-control form-control-solid koli-input" min="0" value="0" step="any">
             </td>
             <td class="text-end">
                 <button type="button" class="btn btn-icon btn-sm btn-danger remove-item-btn"><i class="bi bi-trash"></i></button>
@@ -135,7 +139,7 @@
                 $(selectElement).empty().append($('<option value=""></option>'));
                 const itemsInWarehouse = window.inventoryData[warehouseId] || [];
                 itemsInWarehouse.forEach(function(inventoryItem) {
-                    let optionText = `${inventoryItem.item.name} (SKU: ${inventoryItem.item.sku})`;
+                    let optionText = `${inventoryItem.item.nama_barang} (SKU: ${inventoryItem.item.sku})`;
                     let option = new Option(optionText, inventoryItem.item_id, false, false);
                     $(option).attr('data-quantity', inventoryItem.quantity);
                     $(option).attr('data-item-koli', inventoryItem.item.koli); // Add this line

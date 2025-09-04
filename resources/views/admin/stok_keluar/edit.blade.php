@@ -35,6 +35,10 @@
                             @enderror
                         </div>
                         <div class="col-md-6 mb-5">
+                            <label class="form-label required">Kode Pengeluaran</label>
+                            <input type="text" name="code" id="code" class="form-control" value="{{ $pengeluaranBarang->code }}" readonly>
+                        </div>
+                        <div class="col-md-6 mb-5">
                             <label class="form-label required">Gudang</label>
                             <select name="warehouse_id" id="warehouse_id" class="form-select @error('warehouse_id') is-invalid @enderror" data-control="select2" data-placeholder="Pilih gudang">
                                 <option></option>
@@ -69,6 +73,7 @@
                                     <th class="min-w-350px">Item</th>
                                     <th class="min-w-150px">Stok Tersedia</th>
                                     <th class="min-w-150px">Quantity</th>
+                                    <th class="min-w-150px">Jumlah Koli</th>
                                     <th class="min-w-50px text-end">Aksi</th>
                                 </tr>
                             </thead>
@@ -85,7 +90,10 @@
                                     </td>
                                     <td><span class="available-stock text-muted">-</span></td>
                                     <td>
-                                        <input type="number" name="items[{{$index}}][quantity]" class="form-control quantity-input" min="1" value="{{ $itemOut['quantity'] ?? 1 }}">
+                                        <input type="number" name="items[{{$index}}][quantity]" class="form-control quantity-input" min="1" value="{{ $itemOut['quantity'] ?? 1 }}" step="any">
+                                    </td>
+                                    <td>
+                                        <input type="number" name="items[{{$index}}][koli]" class="form-control koli-input" min="0" value="{{ $itemOut['koli'] ?? 0 }}" step="any">
                                     </td>
                                     <td class="text-end">
                                         <button type="button" class="btn btn-icon btn-sm btn-danger remove-item-btn"><i class="bi bi-trash"></i></button>
@@ -120,7 +128,10 @@
             </td>
             <td><span class="available-stock text-muted">-</span></td>
             <td>
-                <input type="number" name="items[__INDEX__][quantity]" class="form-control quantity-input" min="1" value="1">
+                <input type="number" name="items[__INDEX__][quantity]" class="form-control quantity-input" min="1" value="1" step="any">
+            </td>
+            <td>
+                <input type="number" name="items[__INDEX__][koli]" class="form-control koli-input" min="0" value="0" step="any">
             </td>
             <td class="text-end">
                 <button type="button" class="btn btn-icon btn-sm btn-danger remove-item-btn"><i class="bi bi-trash"></i></button>
@@ -164,6 +175,7 @@
                     let availableStock = stockOnHand + originalQuantity;
 
                     $(option).attr('data-quantity', availableStock);
+                    $(option).attr('data-item-koli', inventoryItem.item.koli); // Add this line
                     $(selectElement).append(option);
                 });
 
@@ -233,6 +245,21 @@
                 const quantity = selectedOption.data('quantity');
                 const stockInfo = $(this).closest('tr').find('.available-stock');
                 stockInfo.text(quantity !== undefined ? quantity : '-');
+
+                // Trigger recalculation for quantity and koli when item changes
+                const row = $(this).closest('tr');
+                const quantityInput = row.find('.quantity-input');
+                const koliInput = row.find('.koli-input');
+                
+                // If quantity is already set, update koli based on quantity
+                if (parseFloat(quantityInput.val()) > 0) {
+                    quantityInput.trigger('input');
+                } else if (parseFloat(koliInput.val()) > 0) { // Otherwise, if koli is set, update quantity
+                    koliInput.trigger('input');
+                } else { // Default to 1 quantity if nothing is set
+                    quantityInput.val(1).trigger('input');
+                }
+
                 validateQuantity($(this).closest('tr').find('.quantity-input'));
             });
 
@@ -255,83 +282,58 @@
             }
 
             $('#items-table').on('input', '.quantity-input', function() {
-                validateQuantity(this);
-            });
+                const row = $(this).closest('tr');
+                const selectedOption = row.find('.item-select option:selected');
+                const itemKoli = parseFloat(selectedOption.data('item-koli'));
+                let quantity = parseFloat($(this).val());
+                const koliInput = row.find('.koli-input');
+                const availableQuantity = parseFloat(selectedOption.data('quantity'));
 
-            // Initial setup
-            $(`[data-control='select2']`).select2();
-            const initialWarehouseId = $('#warehouse_id').val();
-            if (initialWarehouseId) {
-                    $('select.item-select').each(function() {
-                        const selectedId = $(this).val();
-                    updateItemSelectOptions(this, initialWarehouseId, selectedId);
-                    initializeSelect2(this);
-                    $(this).trigger('change');
-                });
-            }
-
-            $('#stock-out-form').on('submit', function(e) {
-                e.preventDefault();
-                let isValid = true;
-                const form = this;
-
-                if ($('#items-table tbody tr').length === 0) {
-                    Swal.fire('Peringatan', 'Harap tambahkan setidaknya satu item.', 'warning');
-                    return;
-                }
-
-                $('select.item-select').each(function() {
-                    const td = $(this).closest('td');
-                    td.removeClass('is-invalid');
-                    td.find('.invalid-feedback-custom').text('');
-
-                    if (!$(this).val()) {
-                        isValid = false;
-                        td.addClass('is-invalid');
-                        td.find('.invalid-feedback-custom').text('Item harus dipilih.');
-                    }
-                });
-
-                $('.quantity-input').each(function() {
-                    const row = $(this).closest('tr');
-                    const selectedOption = row.find('select.item-select option:selected');
-                    const availableQuantity = parseFloat(selectedOption.data('quantity'));
-                    const enteredQuantity = parseFloat($(this).val());
-
-                    if (isNaN(enteredQuantity) || enteredQuantity <= 0) {
-                        isValid = false;
-                        $(this).addClass('is-invalid');
-                    } else {
-                        $(this).removeClass('is-invalid');
-                    }
-
-                    if (!isNaN(availableQuantity) && enteredQuantity > availableQuantity) {
-                        isValid = false;
-                        $(this).addClass('is-invalid');
-                    }
-                });
-
-                if (isValid) {
+                // Validate quantity against available stock
+                if (!isNaN(availableQuantity) && quantity > availableQuantity) {
                     Swal.fire({
-                        text: "Apakah Anda yakin ingin menyimpan perubahan ini?",
-                        icon: "question",
-                        showCancelButton: true,
-                        buttonsStyling: false,
-                        confirmButtonText: "Ya, simpan!",
-                        cancelButtonText: "Tidak, batalkan",
-                        customClass: {
-                            confirmButton: "btn fw-bold btn-primary",
-                            cancelButton: "btn fw-bold btn-active-light-primary"
-                        }
-                    }).then(function (result) {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
+                        icon: 'warning',
+                        title: 'Stok Tidak Cukup',
+                        text: `Stok yang tersedia hanya ${availableQuantity}. Kuantitas telah disesuaikan.`
                     });
+                    $(this).val(availableQuantity);
+                    quantity = availableQuantity;
+                }
+
+                // Update koli value whenever quantity changes
+                if (!isNaN(quantity) && !isNaN(itemKoli) && itemKoli > 0) {
+                    const koliValue = parseFloat(quantity) / parseFloat(itemKoli);
+                    koliInput.val(parseFloat(koliValue).toFixed(2));
                 } else {
-                    Swal.fire('Peringatan', 'Harap perbaiki semua error sebelum menyimpan. Pastikan semua item dan kuantitas valid.', 'warning');
+                    koliInput.val(0);
                 }
             });
-        });
-    </script>
-@endpush
+
+            $('#items-table').on('input', '.koli-input', function() {
+                const row = $(this).closest('tr');
+                const selectedOption = row.find('.item-select option:selected');
+                const itemKoli = parseFloat(selectedOption.data('item-koli'));
+                const koli = parseFloat($(this).val());
+                const quantityInput = row.find('.quantity-input');
+                const availableQuantity = parseFloat(selectedOption.data('quantity'));
+
+                if (!isNaN(koli) && !isNaN(itemKoli)) {
+                    const newQuantity = koli * itemKoli;
+                    
+                    // Validate if the new quantity would exceed available stock
+                    if (!isNaN(availableQuantity) && newQuantity > availableQuantity) {
+                        const maxKoli = availableQuantity / itemKoli;
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Stok Tidak Cukup',
+                            text: `Stok yang tersedia hanya ${availableQuantity} (${maxKoli.toFixed(2)} koli). Jumlah koli telah disesuaikan.`
+                        });
+                        $(this).val(maxKoli.toFixed(2));
+                        quantityInput.val(maxKoli * itemKoli);
+                    } else {
+                        quantityInput.val(newQuantity);
+                    }
+                } else {
+                    quantityInput.val(0);
+                }
+            });
