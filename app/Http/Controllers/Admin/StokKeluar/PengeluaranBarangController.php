@@ -88,7 +88,17 @@ class PengeluaranBarangController extends Controller
     public function create()
     {
         $warehouses = Warehouse::all();
-        $inventory = Inventory::with(['item.uom', 'item'])->where('quantity', '>', 0)->get()->groupBy('warehouse_id');
+        $inventory = Inventory::with(['item.uom', 'item'])
+            ->where('quantity', '>', 0)
+            ->orWhere(function ($query) {
+                $query->where('quantity', 0)
+                      ->whereIn('item_id', function ($subQuery) {
+                          $subQuery->select('item_id')
+                                   ->from('stock_out_items');
+                      });
+            })
+            ->get()
+            ->groupBy('warehouse_id');
         $newCode = $this->generateNewCode();
         return view('admin.stok_keluar.create', compact('warehouses', 'inventory', 'newCode'));
     }
@@ -161,7 +171,17 @@ class PengeluaranBarangController extends Controller
     public function edit(StockOut $pengeluaranBarang)
     {
         $warehouses = Warehouse::all();
-        $inventory = Inventory::with(['item.uom', 'item'])->where('quantity', '>', 0)->get()->groupBy('warehouse_id');
+        $inventory = Inventory::with(['item.uom', 'item'])
+            ->where('quantity', '>', 0)
+            ->orWhere(function ($query) {
+                $query->where('quantity', 0)
+                      ->whereIn('item_id', function ($subQuery) {
+                          $subQuery->select('item_id')
+                                   ->from('stock_out_items');
+                      });
+            })
+            ->get()
+            ->groupBy('warehouse_id');
         $pengeluaranBarang->load('items.item');
         return view('admin.stok_keluar.edit', compact('pengeluaranBarang', 'warehouses', 'inventory'));
     }

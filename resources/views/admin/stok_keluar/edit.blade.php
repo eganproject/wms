@@ -141,7 +141,7 @@
                 $(selectElement).empty().append($('<option value=""></option>'));
                 const itemsInWarehouse = window.inventoryData[warehouseId] || [];
                 itemsInWarehouse.forEach(function(inventoryItem) {
-                    let optionText = `${inventoryItem.item.name} (SKU: ${inventoryItem.item.sku})`;
+                    let optionText = `${inventoryItem.item.nama_barang} (SKU: ${inventoryItem.item.sku})`;
                     let option = new Option(optionText, inventoryItem.item_id, false, false);
                     $(option).attr('data-quantity', inventoryItem.quantity);
                     $(option).attr('data-item-koli', inventoryItem.item.koli);
