@@ -85,7 +85,7 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5 dataTable no-footer" id="table-on-page">
                             <thead>
                                 <tr class="text-start text-gray-400 fw-bolder fs-7 text-uppercase gs-0">
-                                    <th class="min-w-100px sorting">ID</th>
+                                    <th class="min-w-50px sorting">ID</th>
                                     <th class="min-w-125px sorting">Tanggal</th>
                                     <th class="min-w-125px sorting">Gudang</th>
                                     <th class="min-w-125px sorting">Dibuat Oleh</th>
@@ -160,7 +160,7 @@
                     },
                     columns: [
                         { data: 'id', name: 'id' },
-                        { data: 'stock_out_date', name: 'stock_out_date' },
+                        { data: 'date', name: 'date' },
                         { data: 'warehouse.name', name: 'warehouse.name' },
                         { data: 'user.name', name: 'user.name' },
                         { data: 'status', name: 'status' },

@@ -41,7 +41,7 @@ class PengeluaranBarangController extends Controller
             $dateFilter = $request->input('date');
 
             $query = StockOut::with(['warehouse', 'user'])
-                ->select('stock_outs.* ');
+                ->select('stock_outs.*');
 
             $totalRecords = $query->count();
 
@@ -66,7 +66,7 @@ class PengeluaranBarangController extends Controller
             }
 
             if ($dateFilter) {
-                $query->whereDate('stock_out_date', $dateFilter);
+                $query->whereDate('date', $dateFilter);
             }
 
             $totalFiltered = $query->count();
@@ -216,7 +216,7 @@ class PengeluaranBarangController extends Controller
 
             $pengeluaranBarang->update([
                 'warehouse_id' => $request->warehouse_id,
-                'stock_out_date' => $request->stock_out_date,
+                'date' => $request->stock_out_date,
                 'notes' => $request->notes,
             ]);
 
