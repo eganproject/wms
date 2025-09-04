@@ -16,12 +16,23 @@ class PermissionController extends Controller
     public function index()
     {
         $jabatans = Jabatan::all();
+        return view('admin.masterdata.permissions.index', compact('jabatans'));
+    }
+
+    public function getPermissionsByJabatan(Request $request)
+    {
+        $jabatanId = $request->input('jabatan_id');
         $menus = Menu::with('children')->whereNull('parent_id')->orderBy('order')->get();
-        $permissions = Permission::all()->keyBy(function($item) {
+        $permissions = Permission::where('jabatan_id', $jabatanId)->get()->keyBy(function($item) {
             return $item->jabatan_id . '-' . $item->menu_id;
         });
+        $jabatans = Jabatan::where('id', $jabatanId)->get();
 
-        return view('admin.masterdata.permissions.index', compact('jabatans', 'menus', 'permissions'));
+        return response()->json([
+            'menus' => $menus,
+            'permissions' => $permissions,
+            'jabatans' => $jabatans
+        ]);
     }
 
     public function update(Request $request)

@@ -43,6 +43,7 @@ Route::middleware(['auth', 'permission'])->group(function () {
 
         Route::get('permissions', [PermissionController::class, 'index'])->name('permissions.index');
         Route::post('permissions/update', [PermissionController::class, 'update'])->name('permissions.update');
+        Route::get('permissions/get-by-jabatan', [PermissionController::class, 'getPermissionsByJabatan'])->name('permissions.get_by_jabatan');
     });
 
     Route::prefix('admin/stok-masuk')->name('admin.stok-masuk.')->group(function () {
