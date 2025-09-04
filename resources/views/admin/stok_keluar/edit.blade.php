@@ -125,6 +125,7 @@
         $(document).ready(function() {
             window.inventoryData = @json($inventory);
             let itemIndex = 0;
+            let isInitialLoad = true; // Flag to indicate initial loading
 
             $("#date").flatpickr({
                 dateFormat: "Y-m-d",
@@ -188,6 +189,17 @@
 
                 $(currentSelect).closest('td').removeClass('is-invalid');
                 $(currentSelect).closest('td').find('.invalid-feedback-custom').text('');
+
+                if (isInitialLoad) {
+                    // Skip duplicate check during initial load
+                    const row = $(this).closest('tr');
+                    const selectedOption = row.find('.item-select option:selected');
+                    const availableQuantity = selectedOption.data('quantity');
+                    const stockInfo = row.find('.available-stock');
+                    stockInfo.text(availableQuantity !== undefined ? availableQuantity : '-');
+                    validateQuantity(row.find('.quantity-input'));
+                    return;
+                }
 
                 if (selectedItemId) {
                     let isDuplicate = false;
@@ -296,6 +308,8 @@
             } else if ($('#warehouse_id').val()) {
                 $('#warehouse_id').trigger('change');
             }
+
+            isInitialLoad = false; // Set flag to false after initial load
 
             $('#stock-out-form').on('submit', function(e) {
                 e.preventDefault();
