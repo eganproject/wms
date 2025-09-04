@@ -73,8 +73,13 @@ class DaftarPenerimaanBarangController extends Controller
                 $query->where('sio.status', $statusFilter);
             }
 
-            if ($dateFilter) {
-                $query->whereDate('sio.date', $dateFilter);
+            if ($dateFilter && $dateFilter !== 'semua') {
+                if (strpos($dateFilter, ' to ') !== false) {
+                    [$startDate, $endDate] = explode(' to ', $dateFilter);
+                    $query->whereBetween('sio.date', [$startDate, $endDate]);
+                } else {
+                    $query->whereDate('sio.date', $dateFilter);
+                }
             }
 
             // Total filtered records
