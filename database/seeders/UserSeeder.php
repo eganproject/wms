@@ -7,6 +7,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Jabatan; // Import Jabatan model
+use App\Models\Warehouse;
 
 class UserSeeder extends Seeder
 {
@@ -20,6 +21,10 @@ class UserSeeder extends Seeder
         $developerJabatan = Jabatan::where('name', 'Developer')->first();
         $adminJabatan = Jabatan::where('name', 'Admin')->first();
 
+        // Get warehouses
+        $gudangSeha = Warehouse::where('name', 'Gudang Seha')->first();
+        $gudangNanggewer = Warehouse::where('name', 'Gudang Nanggewer')->first();
+
         User::updateOrCreate(
             ['email' => 'superadmin@developer.com'],
             [
@@ -29,24 +34,28 @@ class UserSeeder extends Seeder
             ]
         );
 
-        User::updateOrCreate(
-            ['email' => 'mawar@admin.com'],
-            [
-                'name' => 'mawar',
-                'password' => Hash::make('Password!2'),
-                'jabatan_id' => $adminJabatan->id ?? null,
-                'warehouse_id' => 1
-            ]
-        );
+        if ($gudangSeha) {
+            User::updateOrCreate(
+                ['email' => 'mawar@admin.com'],
+                [
+                    'name' => 'mawar',
+                    'password' => Hash::make('Password!2'),
+                    'jabatan_id' => $adminJabatan->id ?? null,
+                    'warehouse_id' => $gudangSeha->id
+                ]
+            );
+        }
 
-        User::updateOrCreate(
-            ['email' => 'melati@admin.com'],
-            [
-                'name' => 'melati',
-                'password' => Hash::make('Password!2'),
-                'jabatan_id' => $adminJabatan->id ?? null,
-                'warehouse_id' => 2
-            ]
-        );
+        if ($gudangNanggewer) {
+            User::updateOrCreate(
+                ['email' => 'melati@admin.com'],
+                [
+                    'name' => 'melati',
+                    'password' => Hash::make('Password!2'),
+                    'jabatan_id' => $adminJabatan->id ?? null,
+                    'warehouse_id' => $gudangNanggewer->id
+                ]
+            );
+        }
     }
 }
