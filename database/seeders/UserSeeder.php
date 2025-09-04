@@ -18,6 +18,7 @@ class UserSeeder extends Seeder
     public function run()
     {
         $developerJabatan = Jabatan::where('name', 'Developer')->first();
+        $adminJabatan = Jabatan::where('name', 'Admin')->first();
 
         User::updateOrCreate(
             ['email' => 'superadmin@developer.com'],
@@ -25,6 +26,26 @@ class UserSeeder extends Seeder
                 'name' => 'Super Admin',
                 'password' => Hash::make('Password!2'),
                 'jabatan_id' => $developerJabatan->id ?? null,
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'mawar@admin.com'],
+            [
+                'name' => 'mawar',
+                'password' => Hash::make('Password!2'),
+                'jabatan_id' => $adminJabatan->id ?? null,
+                'warehouse_id' => 1
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'melati@admin.com'],
+            [
+                'name' => 'melati',
+                'password' => Hash::make('Password!2'),
+                'jabatan_id' => $adminJabatan->id ?? null,
+                'warehouse_id' => 2
             ]
         );
     }

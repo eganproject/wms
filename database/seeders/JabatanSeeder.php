@@ -19,5 +19,17 @@ class JabatanSeeder extends Seeder
             ['name' => 'Developer'],
             ['description' => 'Pengembang Sistem']
         );
+        Jabatan::updateOrCreate(
+            ['name' => 'Manager'],
+            ['description' => 'Pengembang Sistem']
+        );
+        Jabatan::updateOrCreate(
+            ['name' => 'Admin'],
+            ['description' => 'Pengembang Sistem']
+        );
+        Jabatan::updateOrCreate(
+            ['name' => 'Staff'],
+            ['description' => 'Pengembang Sistem']
+        );
     }
 }
