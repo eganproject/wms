@@ -9,7 +9,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>Tanggal:</strong> {{ $pengeluaranBarang->stock_out_date->format('d F Y') }}</p>
+                    <p><strong>Tanggal:</strong> {{ $pengeluaranBarang->date->format('d F Y') }}</p>
                     <p><strong>Gudang:</strong> {{ $pengeluaranBarang->warehouse->name }}</p>
                 </div>
                 <div class="col-md-6">

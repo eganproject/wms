@@ -23,24 +23,24 @@
     <div class="content flex-row-fluid" id="kt_content">
         <div class="card">
             <div class="card-body">
-                <form id="stock-out-form" action="{{ route('admin.stok-keluar.pengeluaran-barang.update', $pengeluaranBarang->id) }}" method="POST">
+                <form id="stock-out-form" action="{{ route('admin.stok-keluar.pengeluaran-barang.update', ['pengeluaranBarang' => $pengeluaranBarang->id]) }}" method="POST">
                     @csrf
                     @method('PUT')
                     <div class="row">
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Tanggal Pengeluaran</label>
-                            <input type="text" name="stock_out_date" id="stock_out_date" class="form-control @error('stock_out_date') is-invalid @enderror" value="{{ old('stock_out_date', $pengeluaranBarang->stock_out_date->format('Y-m-d')) }}">
-                            @error('stock_out_date')
+                            <input type="text" name="date" id="date" class="form-control form-control-solid @error('date') is-invalid @enderror" value="{{ old('date', $pengeluaranBarang->date) }}">
+                            @error('date')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Kode Pengeluaran</label>
-                            <input type="text" name="code" id="code" class="form-control" value="{{ $pengeluaranBarang->code }}" readonly>
+                            <input type="text" name="code" id="code" class="form-control form-control-solid" value="{{ $pengeluaranBarang->code }}" readonly>
                         </div>
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Gudang</label>
-                            <select name="warehouse_id" id="warehouse_id" class="form-select @error('warehouse_id') is-invalid @enderror" data-control="select2" data-placeholder="Pilih gudang">
+                            <select name="warehouse_id" id="warehouse_id" class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror" data-control="select2" data-placeholder="Pilih gudang">
                                 <option></option>
                                 @foreach ($warehouses as $warehouse)
                                     <option value="{{ $warehouse->id }}" {{ old('warehouse_id', $pengeluaranBarang->warehouse_id) == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
@@ -54,14 +54,14 @@
 
                     <div class="mb-5">
                         <label class="form-label">Catatan</label>
-                        <textarea name="notes" class="form-control @error('notes') is-invalid @enderror" rows="3">{{ old('notes', $pengeluaranBarang->notes) }}</textarea>
+                        <textarea name="notes" class="form-control form-control-solid @error('notes') is-invalid @enderror" rows="3">{{ old('notes', $pengeluaranBarang->notes) }}</textarea>
                          @error('notes')
                             <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <h4 class="mt-10">Daftar Item</h4>
-                    @if ($errors->has('items') || $errors->has('items.*'))
+                     @if ($errors->has('items') || $errors->has('items.*'))
                         <div class="alert alert-danger">
                             Terdapat kesalahan pada daftar item. Silakan periksa kembali kuantitas dan pastikan stok mencukupi.
                         </div>
@@ -78,28 +78,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach(old('items', $pengeluaranBarang->items->toArray()) as $index => $itemOut)
-                                <tr data-index="{{$index}}">
-                                    <td>
-                                        <select name="items[{{$index}}][item_id]" class="form-select item-select" data-placeholder="Pilih item">
-                                            @if(isset($itemOut['item_id']))
-                                                <option value="{{ $itemOut['item_id'] }}" selected>{{ data_get($itemOut, 'item.name', '') }} (SKU: {{ data_get($itemOut, 'item.sku', '') }})</option>
-                                            @endif
-                                        </select>
-                                        <div class="invalid-feedback-custom text-danger mt-2"></div>
-                                    </td>
-                                    <td><span class="available-stock text-muted">-</span></td>
-                                    <td>
-                                        <input type="number" name="items[{{$index}}][quantity]" class="form-control quantity-input" min="1" value="{{ $itemOut['quantity'] ?? 1 }}" step="any">
-                                    </td>
-                                    <td>
-                                        <input type="number" name="items[{{$index}}][koli]" class="form-control koli-input" min="0" value="{{ $itemOut['koli'] ?? 0 }}" step="any">
-                                    </td>
-                                    <td class="text-end">
-                                        <button type="button" class="btn btn-icon btn-sm btn-danger remove-item-btn"><i class="bi bi-trash"></i></button>
-                                    </td>
-                                </tr>
-                                @endforeach
+                                <!-- Dynamic rows will be added here -->
                             </tbody>
                             <tfoot>
                                 <tr>
@@ -123,15 +102,15 @@
     <template id="item-row-template">
         <tr data-index="__INDEX__">
             <td>
-                <select name="items[__INDEX__][item_id]" class="form-select item-select" data-placeholder="Pilih item"></select>
+                <select name="items[__INDEX__][item_id]" class="form-select form-select-solid item-select" data-placeholder="Pilih item"></select>
                 <div class="invalid-feedback-custom text-danger mt-2"></div>
             </td>
             <td><span class="available-stock text-muted">-</span></td>
             <td>
-                <input type="number" name="items[__INDEX__][quantity]" class="form-control quantity-input" min="1" value="1" step="any">
+                <input type="number" name="items[__INDEX__][quantity]" class="form-control form-control-solid quantity-input" min="1" value="1" step="any">
             </td>
             <td>
-                <input type="number" name="items[__INDEX__][koli]" class="form-control koli-input" min="0" value="0" step="any">
+                <input type="number" name="items[__INDEX__][koli]" class="form-control form-control-solid koli-input" min="0" value="0" step="any">
             </td>
             <td class="text-end">
                 <button type="button" class="btn btn-icon btn-sm btn-danger remove-item-btn"><i class="bi bi-trash"></i></button>
@@ -145,55 +124,40 @@
     <script>
         $(document).ready(function() {
             window.inventoryData = @json($inventory);
-            window.stockOutItems = @json($pengeluaranBarang->items->keyBy('item_id'));
+            let itemIndex = 0;
 
-            let itemIndex = {{ count(old('items', $pengeluaranBarang->items->toArray())) }};
-
-            $("#stock_out_date").flatpickr({
+            $("#date").flatpickr({
                 dateFormat: "Y-m-d",
-                defaultDate: "{{ old('stock_out_date', $pengeluaranBarang->stock_out_date->format('Y-m-d')) }}"
+                defaultDate: "{{ old('date', $pengeluaranBarang->date) }}"
             });
 
             function initializeSelect2(element) {
                 $(element).select2({ width: '100%', placeholder: "Pilih item" });
             }
 
-            function updateItemSelectOptions(selectElement, warehouseId, selectedId = null) {
-                const currentVal = $(selectElement).val() || selectedId;
+            function updateItemSelectOptions(selectElement, warehouseId) {
+                const selectedItemId = $(selectElement).val();
                 $(selectElement).empty().append($('<option value=""></option>'));
-                
                 const itemsInWarehouse = window.inventoryData[warehouseId] || [];
-
                 itemsInWarehouse.forEach(function(inventoryItem) {
                     let optionText = `${inventoryItem.item.name} (SKU: ${inventoryItem.item.sku})`;
                     let option = new Option(optionText, inventoryItem.item_id, false, false);
-                    
-                    let originalItem = window.stockOutItems[inventoryItem.item_id];
-                    let originalQuantity = originalItem ? parseFloat(originalItem.quantity) : 0;
-                    let stockOnHand = parseFloat(inventoryItem.quantity);
-
-                    let availableStock = stockOnHand + originalQuantity;
-
-                    $(option).attr('data-quantity', availableStock);
-                    $(option).attr('data-item-koli', inventoryItem.item.koli); // Add this line
+                    $(option).attr('data-quantity', inventoryItem.quantity);
+                    $(option).attr('data-item-koli', inventoryItem.item.koli);
                     $(selectElement).append(option);
                 });
-
-                $(selectElement).val(currentVal).trigger('change');
+                $(selectElement).val(selectedItemId).trigger('change');
             }
 
             function addNewRow() {
                 const warehouseId = $('#warehouse_id').val();
                 if (!warehouseId) return;
-
                 const template = document.getElementById('item-row-template').innerHTML.replace(/__INDEX__/g, itemIndex);
                 const newRow = $(template);
                 $('#items-table tbody').append(newRow);
-                
                 const select = newRow.find('.item-select');
                 updateItemSelectOptions(select, warehouseId);
                 initializeSelect2(select);
-                
                 itemIndex++;
             }
 
@@ -241,26 +205,12 @@
                     }
                 }
 
-                const selectedOption = $(this).find('option:selected');
-                const quantity = selectedOption.data('quantity');
-                const stockInfo = $(this).closest('tr').find('.available-stock');
-                stockInfo.text(quantity !== undefined ? quantity : '-');
-
-                // Trigger recalculation for quantity and koli when item changes
                 const row = $(this).closest('tr');
-                const quantityInput = row.find('.quantity-input');
-                const koliInput = row.find('.koli-input');
-                
-                // If quantity is already set, update koli based on quantity
-                if (parseFloat(quantityInput.val()) > 0) {
-                    quantityInput.trigger('input');
-                } else if (parseFloat(koliInput.val()) > 0) { // Otherwise, if koli is set, update quantity
-                    koliInput.trigger('input');
-                } else { // Default to 1 quantity if nothing is set
-                    quantityInput.val(1).trigger('input');
-                }
-
-                validateQuantity($(this).closest('tr').find('.quantity-input'));
+                const selectedOption = row.find('.item-select option:selected');
+                const availableQuantity = selectedOption.data('quantity');
+                const stockInfo = row.find('.available-stock');
+                stockInfo.text(availableQuantity !== undefined ? availableQuantity : '-');
+                validateQuantity(row.find('.quantity-input'));
             });
 
             function validateQuantity(inputElement) {
@@ -269,16 +219,8 @@
                 const availableQuantity = parseFloat(selectedOption.data('quantity'));
                 const enteredQuantity = parseFloat($(inputElement).val());
 
-                if (isNaN(availableQuantity)) return;
-
-                if (enteredQuantity > availableQuantity) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Stok Tidak Cukup',
-                        text: `Stok yang tersedia hanya ${availableQuantity}. Kuantitas telah disesuaikan.`
-                    });
-                    $(inputElement).val(availableQuantity);
-                }
+                if (isNaN(availableQuantity)) return false;
+                return enteredQuantity <= availableQuantity;
             }
 
             $('#items-table').on('input', '.quantity-input', function() {
@@ -318,17 +260,17 @@
                 const availableQuantity = parseFloat(selectedOption.data('quantity'));
 
                 if (!isNaN(koli) && !isNaN(itemKoli)) {
-                    const newQuantity = koli * itemKoli;
+                    const newQuantity = Math.ceil(koli * itemKoli);
                     
                     // Validate if the new quantity would exceed available stock
                     if (!isNaN(availableQuantity) && newQuantity > availableQuantity) {
-                        const maxKoli = availableQuantity / itemKoli;
+                        const maxKoli = Math.floor(availableQuantity / itemKoli);
                         Swal.fire({
                             icon: 'warning',
                             title: 'Stok Tidak Cukup',
-                            text: `Stok yang tersedia hanya ${availableQuantity} (${maxKoli.toFixed(2)} koli). Jumlah koli telah disesuaikan.`
+                            text: `Stok yang tersedia hanya ${availableQuantity} (${maxKoli} koli). Jumlah koli telah disesuaikan.`
                         });
-                        $(this).val(maxKoli.toFixed(2));
+                        $(this).val(maxKoli);
                         quantityInput.val(maxKoli * itemKoli);
                     } else {
                         quantityInput.val(newQuantity);
@@ -337,3 +279,86 @@
                     quantityInput.val(0);
                 }
             });
+
+            $(`[data-control='select2']`).select2();
+
+            // Load existing items for editing
+            const stockOutItems = @json($pengeluaranBarang->items);
+            if (stockOutItems && stockOutItems.length > 0) {
+                stockOutItems.forEach(function(item) {
+                    addNewRow();
+                    let newRow = $('#items-table tbody tr').last();
+                    let select = newRow.find('.item-select');
+                    select.val(item.item_id).trigger('change');
+                    newRow.find('.quantity-input').val(item.quantity);
+                    newRow.find('.koli-input').val(item.koli || (item.item.koli > 0 ? parseFloat(item.quantity) / parseFloat(item.item.koli) : 0));
+                });
+            } else if ($('#warehouse_id').val()) {
+                $('#warehouse_id').trigger('change');
+            }
+
+            $('#stock-out-form').on('submit', function(e) {
+                e.preventDefault();
+                let isValid = true;
+                const form = this;
+
+                if ($('#items-table tbody tr').length === 0) {
+                    Swal.fire('Peringatan', 'Harap tambahkan setidaknya satu item.', 'warning');
+                    return;
+                }
+
+                $('select.item-select').each(function() {
+                    const td = $(this).closest('td');
+                    td.removeClass('is-invalid');
+                    td.find('.invalid-feedback-custom').text('');
+                    
+                    if (!$(this).val()) {
+                        isValid = false;
+                        td.addClass('is-invalid');
+                        td.find('.invalid-feedback-custom').text('Item harus dipilih.');
+                    }
+                });
+
+                $('.quantity-input').each(function() {
+                    const row = $(this).closest('tr');
+                    const selectedOption = row.find('select.item-select option:selected');
+                    const availableQuantity = parseFloat(selectedOption.data('quantity'));
+                    const enteredQuantity = parseFloat($(this).val());
+
+                    if (isNaN(enteredQuantity) || enteredQuantity <= 0) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+
+                    if (!isNaN(availableQuantity) && enteredQuantity > availableQuantity) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                    }
+                });
+
+                if (isValid) {
+                    Swal.fire({
+                        text: "Apakah Anda yakin ingin mengupdate data ini?",
+                        icon: "question",
+                        showCancelButton: true,
+                        buttonsStyling: false,
+                        confirmButtonText: "Ya, update!",
+                        cancelButtonText: "Tidak, batalkan",
+                        customClass: {
+                            confirmButton: "btn fw-bold btn-primary",
+                            cancelButton: "btn fw-bold btn-active-light-primary"
+                        }
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                } else {
+                    Swal.fire('Peringatan', 'Harap perbaiki semua error sebelum menyimpan. Pastikan semua item dan kuantitas valid.', 'warning');
+                }
+            });
+        });
+    </script>
+@endpush

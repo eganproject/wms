@@ -28,8 +28,8 @@
                     <div class="row">
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Tanggal Pengeluaran</label>
-                            <input type="text" name="stock_out_date" id="stock_out_date" class="form-control form-control-solid @error('stock_out_date') is-invalid @enderror" value="{{ old('stock_out_date', date('Y-m-d')) }}">
-                            @error('stock_out_date')
+                            <input type="text" name="date" id="date" class="form-control form-control-solid @error('date') is-invalid @enderror" value="{{ old('date', date('Y-m-d')) }}">
+                            @error('date')
                                 <div class="invalid-feedback d-block">{{ $message }}</div>
                             @enderror
                         </div>
@@ -125,9 +125,9 @@
             window.inventoryData = @json($inventory);
             let itemIndex = 0;
 
-            $("#stock_out_date").flatpickr({
+            $("#date").flatpickr({
                 dateFormat: "Y-m-d",
-                defaultDate: "{{ old('stock_out_date', date('Y-m-d')) }}"
+                defaultDate: "{{ old('date', date('Y-m-d')) }}"
             });
 
             function initializeSelect2(element) {

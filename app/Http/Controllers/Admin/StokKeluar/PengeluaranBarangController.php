@@ -96,10 +96,10 @@ class PengeluaranBarangController extends Controller
     public function store(Request $request)
     {
         // dd($request->all());
-        $request->validate([
+                $request->validate([
             'code' => 'required|string|unique:stock_outs,code',
             'warehouse_id' => 'required|exists:warehouses,id',
-            'stock_out_date' => 'required|date',
+            'date' => 'required|date',
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
@@ -129,7 +129,7 @@ class PengeluaranBarangController extends Controller
                 'code' => $request->code,
                 'warehouse_id' => $request->warehouse_id,
                 'user_id' => auth()->id(),
-                'date' => $request->stock_out_date,
+                'date' => $request->date,
                 'created_by' => auth()->id(),
                 'notes' => $request->notes,
                 'status' => 'completed',
@@ -170,7 +170,7 @@ class PengeluaranBarangController extends Controller
     {
         $request->validate([
             'warehouse_id' => 'required|exists:warehouses,id',
-            'stock_out_date' => 'required|date',
+            'date' => 'required|date',
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
@@ -216,7 +216,7 @@ class PengeluaranBarangController extends Controller
 
             $pengeluaranBarang->update([
                 'warehouse_id' => $request->warehouse_id,
-                'date' => $request->stock_out_date,
+                'date' => $request->date,
                 'notes' => $request->notes,
             ]);
 
