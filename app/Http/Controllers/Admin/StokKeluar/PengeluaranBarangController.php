@@ -73,7 +73,7 @@ class PengeluaranBarangController extends Controller
     public function create()
     {
         $warehouses = Warehouse::all();
-        $inventory = Inventory::with('item.uom')->where('quantity', '>', 0)->get()->groupBy('warehouse_id');
+        $inventory = Inventory::with(['item.uom', 'item'])->where('quantity', '>', 0)->get()->groupBy('warehouse_id');
         return view('admin.stok_keluar.create', compact('warehouses', 'inventory'));
     }
 
@@ -86,6 +86,7 @@ class PengeluaranBarangController extends Controller
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
+            'items.*.koli' => 'required|numeric|min:1',
             'items.*.quantity' => [
                 'required',
                 'numeric',
@@ -106,8 +107,6 @@ class PengeluaranBarangController extends Controller
             ],
         ]);
 
-        dd($request->all());
-
         DB::transaction(function () use ($request) {
             $stockOut = StockOut::create([
                 'warehouse_id' => $request->warehouse_id,
@@ -118,7 +117,11 @@ class PengeluaranBarangController extends Controller
             ]);
 
             foreach ($request->items as $itemData) {
-                $stockOut->items()->create($itemData);
+                $stockOut->items()->create([
+                    'item_id' => $itemData['item_id'],
+                    'quantity' => $itemData['quantity'],
+                    'koli' => $itemData['koli'],
+                ]);
 
                 $inventory = Inventory::where('warehouse_id', $request->warehouse_id)
                                     ->where('item_id', $itemData['item_id'])
@@ -139,7 +142,7 @@ class PengeluaranBarangController extends Controller
     public function edit(StockOut $pengeluaranBarang)
     {
         $warehouses = Warehouse::all();
-        $inventory = Inventory::with('item.uom')->where('quantity', '>', 0)->get()->groupBy('warehouse_id');
+        $inventory = Inventory::with(['item.uom', 'item'])->where('quantity', '>', 0)->get()->groupBy('warehouse_id');
         $pengeluaranBarang->load('items.item');
         return view('admin.stok_keluar.edit', compact('pengeluaranBarang', 'warehouses', 'inventory'));
     }
@@ -152,6 +155,7 @@ class PengeluaranBarangController extends Controller
             'notes' => 'nullable|string',
             'items' => 'required|array|min:1',
             'items.*.item_id' => 'required|exists:items,id',
+            'items.*.koli' => 'required|numeric|min:1',
             'items.*.quantity' => [
                 'required',
                 'numeric',
@@ -198,7 +202,11 @@ class PengeluaranBarangController extends Controller
             ]);
 
             foreach ($request->items as $itemData) {
-                $pengeluaranBarang->items()->create($itemData);
+                $pengeluaranBarang->items()->create([
+                    'item_id' => $itemData['item_id'],
+                    'quantity' => $itemData['quantity'],
+                    'koli' => $itemData['koli'],
+                ]);
                 Inventory::where('warehouse_id', $request->warehouse_id)
                          ->where('item_id', $itemData['item_id'])
                          ->decrement('quantity', $itemData['quantity']);
