@@ -79,6 +79,7 @@ class PengeluaranBarangController extends Controller
 
     public function store(Request $request)
     {
+        
         $request->validate([
             'warehouse_id' => 'required|exists:warehouses,id',
             'stock_out_date' => 'required|date',
@@ -104,6 +105,8 @@ class PengeluaranBarangController extends Controller
                 },
             ],
         ]);
+
+        dd($request->all());
 
         DB::transaction(function () use ($request) {
             $stockOut = StockOut::create([

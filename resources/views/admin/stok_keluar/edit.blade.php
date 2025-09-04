@@ -262,8 +262,8 @@
             $(`[data-control='select2']`).select2();
             const initialWarehouseId = $('#warehouse_id').val();
             if (initialWarehouseId) {
-                $('.item-select').each(function() {
-                    const selectedId = $(this).val();
+                    $('select.item-select').each(function() {
+                        const selectedId = $(this).val();
                     updateItemSelectOptions(this, initialWarehouseId, selectedId);
                     initializeSelect2(this);
                     $(this).trigger('change');
@@ -275,24 +275,41 @@
                 let isValid = true;
                 const form = this;
 
-                $('.item-select').each(function() {
+                if ($('#items-table tbody tr').length === 0) {
+                    Swal.fire('Peringatan', 'Harap tambahkan setidaknya satu item.', 'warning');
+                    return;
+                }
+
+                $('select.item-select').each(function() {
                     const td = $(this).closest('td');
                     td.removeClass('is-invalid');
                     td.find('.invalid-feedback-custom').text('');
 
-                    if (!$(this).hasClass('select2-hidden-accessible')) return;
-
-                    const selectedData = $(this).select2('data');
-                    if (selectedData.length === 0 || !selectedData[0].id) {
+                    if (!$(this).val()) {
                         isValid = false;
                         td.addClass('is-invalid');
                         td.find('.invalid-feedback-custom').text('Item harus dipilih.');
                     }
                 });
 
-                if ($('#items-table tbody tr').length === 0) {
-                    isValid = false;
-                } 
+                $('.quantity-input').each(function() {
+                    const row = $(this).closest('tr');
+                    const selectedOption = row.find('select.item-select option:selected');
+                    const availableQuantity = parseFloat(selectedOption.data('quantity'));
+                    const enteredQuantity = parseFloat($(this).val());
+
+                    if (isNaN(enteredQuantity) || enteredQuantity <= 0) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                    } else {
+                        $(this).removeClass('is-invalid');
+                    }
+
+                    if (!isNaN(availableQuantity) && enteredQuantity > availableQuantity) {
+                        isValid = false;
+                        $(this).addClass('is-invalid');
+                    }
+                });
 
                 if (isValid) {
                     Swal.fire({
@@ -312,7 +329,7 @@
                         }
                     });
                 } else {
-                    Swal.fire('Peringatan', 'Harap perbaiki semua error sebelum menyimpan.', 'warning');
+                    Swal.fire('Peringatan', 'Harap perbaiki semua error sebelum menyimpan. Pastikan semua item dan kuantitas valid.', 'warning');
                 }
             });
         });
