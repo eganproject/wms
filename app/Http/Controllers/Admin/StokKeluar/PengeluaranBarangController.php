@@ -95,8 +95,9 @@ class PengeluaranBarangController extends Controller
 
     public function store(Request $request)
     {
-        
+        // dd($request->all());
         $request->validate([
+            'code' => 'required|string|unique:stock_outs,code',
             'warehouse_id' => 'required|exists:warehouses,id',
             'stock_out_date' => 'required|date',
             'notes' => 'nullable|string',
@@ -125,9 +126,11 @@ class PengeluaranBarangController extends Controller
 
         DB::transaction(function () use ($request) {
             $stockOut = StockOut::create([
+                'code' => $request->code,
                 'warehouse_id' => $request->warehouse_id,
                 'user_id' => auth()->id(),
-                'stock_out_date' => $request->stock_out_date,
+                'date' => $request->stock_out_date,
+                'created_by' => auth()->id(),
                 'notes' => $request->notes,
                 'status' => 'completed',
             ]);

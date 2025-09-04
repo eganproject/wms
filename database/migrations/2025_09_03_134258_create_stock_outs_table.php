@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->date('date');
             $table->foreignId('warehouse_id')->constrained('warehouses')->onDelete('cascade');
-            $table->string('recipient_name');
+            // $table->string('recipient_name');
             $table->mediumText('description')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users')->onDelete('set null');
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending');

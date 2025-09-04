@@ -13,7 +13,6 @@ class StockOut extends Model
         'code',
         'date',
         'warehouse_id',
-        'recipient_name',
         'description',
         'created_by',
         'status',
