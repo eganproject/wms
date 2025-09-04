@@ -168,6 +168,16 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        Menu::updateOrCreate(
+            ['name' => 'Adjustment'],
+            [
+                'url' => '/admin/manajemen-stok/adjustment',
+                'icon' => 'fas fa-sliders-h',
+                'parent_id' => $manajemenStok->id,
+                'order' => 5,
+            ]
+        );
+
         // Stok Masuk
         $stokMasuk = Menu::updateOrCreate(
             ['name' => 'Stok Masuk'],
