@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\Masterdata\PermissionController;
 use App\Http\Controllers\Admin\Masterdata\UomController;
 use App\Http\Controllers\Admin\Masterdata\UserController;
 use App\Http\Controllers\Admin\Masterdata\WarehouseController;
+use App\Http\Controllers\Admin\StockOpnameController;
 use App\Http\Controllers\Admin\StokKeluar\PengeluaranBarangController;
 use App\Http\Controllers\Admin\StokMasuk\DaftarPenerimaanBarangController;
 use App\Http\Controllers\Admin\StokMasuk\PenerimaanTransferController;
@@ -60,6 +61,7 @@ Route::middleware(['auth', 'permission'])->group(function () {
         Route::get('kartu-stok', [KartuStokController::class, 'index'])->name('kartustok.index');
         Route::get('warehouse-stok', [WarehouseStokController::class, 'index'])->name('warehousestok.index');
         Route::get('master-stok', [InventoryController::class, 'index'])->name('masterstok.index');
+        Route::resource('stok-opname', StockOpnameController::class);
     });
 
     Route::prefix('admin/transfer-gudang')->name('admin.transfergudang.')->group(function () {

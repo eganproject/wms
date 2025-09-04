@@ -158,6 +158,16 @@ class MenuSeeder extends Seeder
             ]
         );
 
+        Menu::updateOrCreate(
+            ['name' => 'Stok Opname'],
+            [
+                'url' => '/admin/manajemen-stok/stok-opname',
+                'icon' => 'fas fa-clipboard-check',
+                'parent_id' => $manajemenStok->id,
+                'order' => 4,
+            ]
+        );
+
         // Stok Masuk
         $stokMasuk = Menu::updateOrCreate(
             ['name' => 'Stok Masuk'],
