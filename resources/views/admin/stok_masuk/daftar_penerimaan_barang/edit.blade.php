@@ -128,15 +128,15 @@
                 let newRow = `
                     <tr data-index="${itemIndex}">
                         <td>
-                            <select name="items[${itemIndex}][item_id]" class="form-select item-select" data-control="select2" required>
+                            <select name="items[${itemIndex}][item_id]" class="form-select form-control-select item-select" data-control="select2" required>
                                 <option></option>
                                 @foreach ($items as $item)
                                     <option value="{{ $item->id }}" data-koli="{{ $item->koli ?? 1 }}">{{ $item->sku . ' - ' . $item->nama_barang }}</option>
                                 @endforeach
                             </select>
                         </td>
-                        <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control quantity-input" value="1" min="1" required></td>
-                        <td><input type="number" name="items[${itemIndex}][koli]" class="form-control koli-input" value="0" min="0" step="any"></td>
+                        <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control form-control-solid quantity-input" value="1" min="1" required></td>
+                        <td><input type="number" name="items[${itemIndex}][koli]" class="form-control form-control-solid koli-input" value="0" min="0" step="any"></td>
                         <td><button type="button" class="btn btn-danger btn-sm remove-item-btn">X</button></td>
                     </tr>`;
                 $('#items-table tbody').append(newRow);
