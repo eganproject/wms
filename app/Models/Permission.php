@@ -10,6 +10,12 @@ class Permission extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
+        'jabatan_id',
+        'menu_id',
+        'can_read',
+        'can_create',
+        'can_edit',
+        'can_delete',
+        'can_approve',
     ];
 }
