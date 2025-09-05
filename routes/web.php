@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\ManajemenStok\InventoryController;
 use App\Http\Controllers\Admin\ManajemenStok\KartuStokController;
 use App\Http\Controllers\Admin\ManajemenStok\WarehouseStokController;
 use App\Http\Controllers\Admin\ManajemenStok\StockOpnameController;
+use App\Http\Controllers\Admin\ManajemenStok\AdjustmentController;
 use App\Http\Controllers\Admin\Masterdata\ItemCategoryController;
 use App\Http\Controllers\Admin\Masterdata\ItemController;
 use App\Http\Controllers\Admin\Masterdata\JabatanController;
@@ -63,6 +64,8 @@ Route::middleware(['auth', 'permission'])->group(function () {
         Route::get('warehouse-stok', [WarehouseStokController::class, 'index'])->name('warehousestok.index');
         Route::get('master-stok', [InventoryController::class, 'index'])->name('masterstok.index');
         Route::resource('stok-opname', StockOpnameController::class);
+        Route::resource('adjustment', AdjustmentController::class);
+        Route::post('adjustment/{adjustment}/update-status', [AdjustmentController::class, 'updateStatus'])->name('adjustment.updateStatus');
     });
 
     Route::prefix('admin/transfer-gudang')->name('admin.transfergudang.')->group(function () {
