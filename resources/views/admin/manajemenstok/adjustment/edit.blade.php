@@ -1,175 +1,285 @@
 @extends('layouts.app')
 
+@push('toolbar')
+    @include('layouts.partials._toolbar', [
+        'title' => 'Edit Penyesuaian Stok',
+        'breadcrumbs' => ['Admin', 'Manajemen Stok', 'Edit Penyesuaian Stok'],
+    ])
+@endpush
+
 @section('content')
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Edit Penyesuaian Stok</h3>
-                </div>
-                <form action="{{ route('admin.manajemenstok.adjustment.update', $adjustment->id) }}" method="POST">
+    <div class="content flex-row-fluid" id="kt_content">
+        <div class="card">
+            <div class="card-body">
+                <form id="adjustment-form"
+                    action="{{ route('admin.manajemenstok.adjustment.update', $adjustment->id) }}"
+                    method="POST">
                     @csrf
                     @method('PUT')
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label for="code">Kode Penyesuaian</label>
-                            <input type="text" class="form-control" id="code" name="code" value="{{ old('code', $adjustment->code) }}" readonly>
+                    <div class="row">
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fs-6 fw-bolder text-dark">Kode Dokumen</label>
+                            <input type="text" name="code" class="form-control form-control-solid"
+                                value="{{ old('code', $adjustment->code) }}" readonly>
                         </div>
-                        <div class="form-group">
-                            <label for="adjustment_date">Tanggal Penyesuaian</label>
-                            <input type="date" class="form-control" id="adjustment_date" name="adjustment_date" value="{{ old('adjustment_date', $adjustment->adjustment_date) }}" required>
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fs-6 fw-bolder text-dark">Tanggal</label>
+                            <input type="text" name="adjustment_date"
+                                class="form-control form-control-solid flatpickr-input @error('adjustment_date') is-invalid @enderror"
+                                value="{{ old('adjustment_date', $adjustment->adjustment_date) }}" required>
+                            @error('adjustment_date')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="form-group">
-                            <label for="warehouse_id">Gudang</label>
-                            <select class="form-control" id="warehouse_id" name="warehouse_id" required>
-                                <option value="">Pilih Gudang</option>
-                                @foreach($warehouses as $warehouse)
-                                    <option value="{{ $warehouse->id }}" {{ old('warehouse_id', $adjustment->warehouse_id) == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fs-6 fw-bolder text-dark">Gudang</label>
+                            <select name="warehouse_id"
+                                class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror"
+                                data-control="select2" data-placeholder="Pilih Gudang" required>
+                                <option></option>
+                                @foreach ($warehouses as $warehouse)
+                                    <option value="{{ $warehouse->id }}"
+                                        {{ old('warehouse_id', $adjustment->warehouse_id) == $warehouse->id ? 'selected' : '' }}>
+                                        {{ $warehouse->name }}</option>
                                 @endforeach
                             </select>
+                            @error('warehouse_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
-                        <div class="form-group">
-                            <label for="notes">Catatan</label>
-                            <textarea class="form-control" id="notes" name="notes" rows="3">{{ old('notes', $adjustment->notes) }}</textarea>
+                        <div class="col-md-6 mb-5">
+                            <label class="form-label fs-6 fw-bolder text-dark">Catatan</label>
+                            <textarea name="notes" class="form-control form-control-solid">{{ old('notes', $adjustment->notes) }}</textarea>
                         </div>
-
-                        <h4>Detail Item</h4>
-                        <table class="table table-bordered" id="items-table">
-                            <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th>Kuantitas</th>
-                                    <th>Koli</th>
-                                    <th>UOM</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($adjustment->adjustmentItems as $index => $item)
-                                    <tr>
-                                        <td>
-                                            <select class="form-control item-select" name="items[{{ $index }}][item_id]" required>
-                                                <option value="">Pilih Item</option>
-                                                @foreach($items as $i)
-                                                    <option value="{{ $i->id }}" {{ old('items.' . $index . '.item_id', $item->item_id) == $i->id ? 'selected' : '' }}>{{ $i->sku }} - {{ $i->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input type="number" class="form-control" name="items[{{ $index }}][quantity]" value="{{ old('items.' . $index . '.quantity', $item->quantity) }}" required min="1">
-                                        </td>
-                                        <td>
-                                            <input type="number" class="form-control" name="items[{{ $index }}][koli]" value="{{ old('items.' . $index . '.koli', $item->koli) }}" min="0">
-                                        </td>
-                                        <td>
-                                            <select class="form-control uom-select" name="items[{{ $index }}][uom_id]" required>
-                                                {{-- UOMs will be loaded via AJAX or pre-filled --}}
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger remove-item">Hapus</button>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                        <button type="button" class="btn btn-success" id="add-item">Tambah Item</button>
                     </div>
-                    <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                        <a href="{{ route('admin.manajemenstok.adjustment.index') }}" class="btn btn-secondary">Batal</a>
+
+                    <h3 class="mt-5">Item</h3>
+                    <table class="table table-bordered" id="items-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Satuan</th>
+                                <th width="150px">Quantity</th>
+                                <th width="150px">Koli</th>
+                                <th width="50px">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($adjustment->adjustmentItems as $index => $existingItem)
+                                <tr data-index="{{ $index }}">
+                                    <td>
+                                        <select name="items[{{ $index }}][item_id]" class="form-select form-select-solid item-select"
+                                            data-control="select2" required>
+                                            <option></option>
+                                            @foreach ($items as $item)
+                                                <option value="{{ $item->id }}" 
+                                                    data-koli="{{ $item->koli ?? 1 }}"
+                                                    data-uom-id="{{ $item->uom->id ?? '' }}" 
+                                                    data-uom-name="{{ $item->uom->name ?? '' }}"
+                                                    {{ $existingItem->item_id == $item->id ? 'selected' : '' }}>
+                                                    {{ $item->sku . ' - ' . $item->nama_barang }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <span class="uom-text">{{ $existingItem->item->uom->name ?? '-' }}</span>
+                                        <input type="hidden" name="items[{{ $index }}][uom_id]" class="uom-id-input" value="{{ $existingItem->uom_id }}">
+                                    </td>
+                                    <td><input type="number" name="items[{{ $index }}][quantity]"
+                                            class="form-control form-control-solid quantity-input" value="{{ $existingItem->quantity }}"
+                                            required></td>
+                                    <td><input type="number" name="items[{{ $index }}][koli]"
+                                            class="form-control form-control-solid koli-input" value="{{ $existingItem->koli }}"
+                                            step="any"></td>
+                                    <td><button type="button" class="btn btn-danger btn-sm remove-item-btn">X</button></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                    <button type="button" class="btn btn-primary btn-sm" id="add-item-btn">Tambah Item</button>
+
+                    <div class="d-flex justify-content-end mt-10">
+                        <a href="{{ route('admin.manajemenstok.adjustment.index') }}"
+                            class="btn btn-light me-3">Batal</a>
+                        <button type="submit" class="btn btn-primary">Simpan Perubahan</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-</div>
 @endsection
 
 @push('scripts')
-<script>
-    $(document).ready(function() {
-        let itemIndex = {{ count($adjustment->adjustmentItems) }};
+    <script>
+        var itemsData = @json($items);
 
-        function addItemRow(itemData = null) {
-            let itemOptions = '';
-            @foreach($items as $item)
-                itemOptions += `<option value="{{ $item->id }}" ${itemData && itemData.item_id == {{ $item->id }} ? 'selected' : ''}>{{ $item->sku }} - {{ $item->name }}</option>`;
-            @endforeach
+        $(document).ready(function() {
+            $(".flatpickr-input").flatpickr({
+                dateFormat: "Y-m-d",
+            });
 
-            let newRow = `
-                <tr>
-                    <td>
-                        <select class="form-control item-select" name="items[${itemIndex}][item_id]" required>
-                            <option value="">Pilih Item</option>
-                            ${itemOptions}
-                        </select>
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" name="items[${itemIndex}][quantity]" value="${itemData ? itemData.quantity : ''}" required min="1">
-                    </td>
-                    <td>
-                        <input type="number" class="form-control" name="items[${itemIndex}][koli]" value="${itemData ? itemData.koli : ''}" min="0">
-                    </td>
-                    <td>
-                        <select class="form-control uom-select" name="items[${itemIndex}][uom_id]" required>
-                            <option value="">Pilih UOM</option>
-                        </select>
-                    </td>
-                    <td>
-                        <button type="button" class="btn btn-danger remove-item">Hapus</button>
-                    </td>
-                </tr>
-            `;
-            $('#items-table tbody').append(newRow);
-            itemIndex++;
+            let itemIndex = {{ $adjustment->adjustmentItems->count() }};
 
-            // Load UOMs for the newly added row
-            if (itemData && itemData.item_id) {
-                loadUomsForItem($('#items-table tbody tr:last-child .item-select'), itemData.uom_id);
-            } else {
-                loadUomsForItem($('#items-table tbody tr:last-child .item-select'));
+            function initializeSelect2(selector) {
+                selector.select2({
+                    placeholder: "Pilih Item",
+                });
             }
-        }
 
-        function loadUomsForItem(selectElement, selectedUomId = null) {
-            let itemId = selectElement.val();
-            let uomSelect = selectElement.closest('tr').find('.uom-select');
-            uomSelect.empty().append('<option value="">Pilih UOM</option>');
+            // Inisialisasi select2 untuk baris yang sudah ada
+            $('#items-table .item-select').each(function() {
+                initializeSelect2($(this));
+            });
 
-            if (itemId) {
-                let selectedItem = {!! json_encode($items) !!}.find(item => item.id == itemId);
-                if (selectedItem && selectedItem.uoms) {
-                    selectedItem.uoms.forEach(uom => {
-                        uomSelect.append(`<option value="${uom.id}">${uom.name}</option>`);
-                    });
-                } else if (selectedItem && selectedItem.uom) {
-                    uomSelect.append(`<option value="${selectedItem.uom.id}">${selectedItem.uom.name}</option>`);
-                }
+            function addNewRow() {
+                let newRowHtml = `
+                    <tr data-index="${itemIndex}">
+                        <td>
+                            <select name="items[${itemIndex}][item_id]" class="form-select form-select-solid item-select" required></select>
+                        </td>
+                        <td>
+                            <span class="uom-text">-</span>
+                            <input type="hidden" name="items[${itemIndex}][uom_id]" class="uom-id-input">
+                        </td>
+                        <td><input type="number" name="items[${itemIndex}][quantity]" class="form-control form-control-solid quantity-input" value="1" required></td>
+                        <td><input type="number" name="items[${itemIndex}][koli]" class="form-control form-control-solid koli-input" value="0" step="any"></td>
+                        <td><button type="button" class="btn btn-danger btn-sm remove-item-btn">X</button></td>
+                    </tr>`;
 
-                if (selectedUomId) {
-                    uomSelect.val(selectedUomId);
-                }
+                $('#items-table tbody').append(newRowHtml);
+
+                let newSelect = $(`tr[data-index="${itemIndex}"] .item-select`);
+
+                newSelect.append(new Option('', '', true, true));
+
+                itemsData.forEach(function(item) {
+                    let optionText = item.sku ? `${item.sku} - ${item.nama_barang}` : item.nama_barang;
+                    let option = new Option(optionText, item.id, false, false);
+                    $(option).attr('data-koli', item.koli || 1);
+                    if(item.uom) {
+                        $(option).attr('data-uom-id', item.uom.id);
+                        $(option).attr('data-uom-name', item.uom.name);
+                    }
+                    newSelect.append(option);
+                });
+
+                newSelect.val(null).trigger('change');
+
+                initializeSelect2(newSelect);
+                itemIndex++;
             }
-        }
 
-        // Initial load for existing items
-        @foreach($adjustment->adjustmentItems as $index => $item)
-            loadUomsForItem($('select[name="items[{{ $index }}][item_id]"]'), {{ $item->uom_id }});
-        @endforeach
+            $('#add-item-btn').click(function() {
+                addNewRow();
+            });
 
-        $('#add-item').on('click', function() {
-            addItemRow();
+            $('#items-table').on('click', '.remove-item-btn', function() {
+                $(this).closest('tr').remove();
+            });
+
+            $('#items-table').on('change', '.item-select', function() {
+                let selectedOption = $(this).find('option:selected');
+                let uomId = selectedOption.data('uom-id');
+                let uomName = selectedOption.data('uom-name') || '-';
+                let row = $(this).closest('tr');
+                row.find('.uom-id-input').val(uomId);
+                row.find('.uom-text').text(uomName);
+            });
+
+            // Kalkulasi otomatis Quantity -> Koli
+            $('#items-table').on('input change', '.quantity-input, .item-select', function() {
+                let row = $(this).closest('tr');
+                let quantity = parseFloat(row.find('.quantity-input').val()) || 0;
+                let productKoli = parseFloat(row.find('.item-select option:selected').data('koli')) || 1;
+
+                if (productKoli > 0) {
+                    let calculatedKoli = quantity / productKoli;
+                    row.find('.koli-input').val(calculatedKoli.toFixed(2));
+                }
+            });
+
+            // Kalkulasi otomatis Koli -> Quantity
+            $('#items-table').on('input', '.koli-input', function() {
+                let row = $(this).closest('tr');
+                let koli = parseFloat($(this).val()) || 0;
+                let productKoli = parseFloat(row.find('.item-select option:selected').data('koli')) || 1;
+
+                let calculatedQuantity = koli * productKoli;
+                row.find('.quantity-input').val(calculatedQuantity);
+            });
+
+            // SweetAlert for form submission
+            $('#adjustment-form').on('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
+
+                var form = $(this);
+                var url = form.attr('action');
+                var method = form.attr('method');
+                var data = form.serialize();
+
+                // Clear previous errors
+                $('.is-invalid').removeClass('is-invalid');
+                $('.invalid-feedback').remove();
+
+                Swal.fire({
+                    text: "Apakah Anda yakin ingin mengubah data penyesuaian stok ini?",
+                    icon: "question",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "Ya, Ubah!",
+                    cancelButtonText: "Tidak, Batalkan",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-primary",
+                        cancelButton: "btn fw-bold btn-active-light-primary"
+                    }
+                }).then(function(result) {
+                    if (result.value) {
+                        $.ajax({
+                            url: url,
+                            type: 'POST', // Using POST for AJAX, with _method='PUT' in data
+                            data: data,
+                            success: function(response) {
+                                Swal.fire({
+                                    text: "Data berhasil diubah!",
+                                    icon: "success",
+                                    buttonsStyling: false,
+                                    confirmButtonText: "Lanjutkan",
+                                    customClass: {
+                                        confirmButton: "btn btn-primary"
+                                    }
+                                }).then(function (result) {
+                                    if (result.isConfirmed) {
+                                        window.location.href = "{{ route('admin.manajemenstok.adjustment.index') }}";
+                                    }
+                                });
+                            },
+                            error: function(xhr) {
+                                if (xhr.status === 422) {
+                                    var errors = xhr.responseJSON.errors;
+                                    let errorMessages = '';
+                                    $.each(errors, function(key, value) {
+                                        let field = $(`[name="${key}"]`);
+                                        if(key.includes('.')) {
+                                            const parts = key.split('.');
+                                            field = $(`[name="items[${parts[1]}][${parts[2]}]"]`);
+                                        }
+                                        field.addClass('is-invalid');
+                                        field.after(`<div class="invalid-feedback">${value[0]}</div>`);
+                                        errorMessages += `<li>${value[0]}</li>`;
+                                    });
+                                    toastr.error(`<ul>${errorMessages}</ul>`, 'Validasi Gagal');
+                                } else {
+                                    toastr.error('Terjadi kesalahan pada server. Silakan coba lagi.', 'Error');
+                                }
+                            }
+                        });
+                    }
+                });
+            });
         });
-
-        $(document).on('click', '.remove-item', function() {
-            $(this).closest('tr').remove();
-        });
-
-        $(document).on('change', '.item-select', function() {
-            loadUomsForItem($(this));
-        });
-    });
-</script>
+    </script>
 @endpush

@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->mediumText('description')->nullable();
             $table->bigInteger('user_id')->nullable()->constrained('users')->onDelete('set null');
             $table->bigInteger('reference_id')->comment('ID dari dokumen sumber (misal: id dari stock_in_orders atau transfer_requests)')->nullable();
-            $table->enum('reference_type', ['stock_in_order_items', 'transfer_requests', 'stock_out'])->comment('Tipe dokumen sumber (misal: stock_in_orders atau transfer_requests)');
+            $table->enum('reference_type', ['stock_in_order_items', 'transfer_requests', 'stock_out', 'adjustment_items'])->comment('Tipe dokumen sumber (misal: stock_in_orders atau transfer_requests)');
             $table->timestamps();
         });
     }

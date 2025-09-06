@@ -42,18 +42,35 @@ class AdjustmentController extends Controller
             $statusFilter = $request->input('status');
             $dateFilter = $request->input('date');
 
-            $query = DB::table('adjustments as adj')
-                ->leftJoin('warehouses as w', 'adj.warehouse_id', '=', 'w.id')
-                ->leftJoin('users as u', 'adj.user_id', '=', 'u.id')
-                ->leftJoin('adjustment_items as ai', 'adj.id', '=', 'ai.adjustment_id')
-                ->leftJoin('items as i', 'ai.item_id', '=', 'i.id');
+            // Define columns for sorting
+            $columns = [
+                0 => 'adj.code',
+                1 => 'adj.adjustment_date',
+                2 => 'warehouse_name',
+                3 => 'items_name',
+                4 => 'adj.status',
+                5 => 'adj.id', // Actions column, not sortable
+            ];
+            $orderByColumnIndex = $request->input('order.0.column', 0);
+            $orderByColumnName = $columns[$orderByColumnIndex] ?? $columns[0];
+            $orderDirection = $request->input('order.0.dir', 'asc');
 
+            // Base query
+            $query = Adjustment::query()->from('adjustments as adj')
+                ->leftJoin('warehouses as w', 'adj.warehouse_id', '=', 'w.id')
+                ->leftJoin('adjustment_items as ai', 'adj.id', '=', 'ai.adjustment_id')
+                ->leftJoin('items as i', 'ai.item_id', '=', 'i.id')
+                ->groupBy('adj.id', 'adj.code', 'adj.adjustment_date', 'adj.status', 'w.name');
+
+            // Total records
+            $totalRecords = Adjustment::count();
+
+            // Apply filters
             if (!empty($searchValue)) {
                 $query->where(function ($q) use ($searchValue) {
                     $q->where('adj.code', 'LIKE', "%{$searchValue}%")
                         ->orWhere('adj.adjustment_date', 'LIKE', "%{$searchValue}%")
                         ->orWhere('w.name', 'LIKE', "%{$searchValue}%")
-                        ->orWhere('u.name', 'LIKE', "%{$searchValue}%")
                         ->orWhere('adj.status', 'LIKE', "%{$searchValue}%");
                 });
             }
@@ -65,64 +82,34 @@ class AdjustmentController extends Controller
             if ($dateFilter && $dateFilter !== 'semua') {
                 if (strpos($dateFilter, ' to ') !== false) {
                     [$startDate, $endDate] = explode(' to ', $dateFilter);
-                    $query->whereBetween('adj.adjustment_date', [
-                        Carbon::parse($startDate)->startOfDay(),
-                        Carbon::parse($endDate)->endOfDay()
-                    ]);
+                    $query->whereBetween('adj.adjustment_date', [$startDate, $endDate]);
                 } else {
                     $query->whereDate('adj.adjustment_date', $dateFilter);
                 }
             }
 
-            $totalRecords = Adjustment::count();
-            $totalFilteredQuery = clone $query;
-            $totalFiltered = $totalFilteredQuery->count(DB::raw('DISTINCT adj.id'));
+            // Total filtered records
+            $totalFiltered = (clone $query)->count();
 
-            $data = $query->select([
+
+            // Data query
+            $data = $query->select(
                 'adj.id',
                 'adj.code',
                 'adj.adjustment_date',
                 'adj.status',
                 'w.name as warehouse_name',
-                'u.name as user_name',
-                DB::raw('GROUP_CONCAT(CONCAT(i.name, " (", ai.quantity, ")") SEPARATOR ", ") as items_name')
-            ])
-                ->groupBy('adj.id', 'adj.code', 'adj.adjustment_date', 'adj.status', 'w.name', 'u.name')
-                ->orderBy('adj.created_at', 'desc')
+                DB::raw('GROUP_CONCAT(i.nama_barang, " (Qty:", FORMAT(ai.quantity,0), ")" SEPARATOR ", ") as items_name')
+            )->orderBy($orderByColumnName, $orderDirection)
                 ->offset($start)
                 ->limit($length)
                 ->get();
 
-            $formattedData = $data->map(function ($item) {
-                $statusBadge = match($item->status) {
-                    'pending' => '<span class="badge badge-warning">Pending</span>',
-                    'completed' => '<span class="badge badge-success">Completed</span>',
-                    default => '<span class="badge badge-secondary">' . ucfirst($item->status) . '</span>'
-                };
-
-                $actions = '';
-                if ($item->status === 'pending') {
-                    $actions .= '<a href="' . route('admin.manajemenstok.adjustment.edit', $item->id) . '" class="btn btn-sm btn-primary me-2">Edit</a>';
-                }
-                $actions .= '<a href="' . route('admin.manajemenstok.adjustment.show', $item->id) . '" class="btn btn-sm btn-info">Detail</a>';
-
-                return [
-                    'id' => $item->id,
-                    'code' => $item->code,
-                    'adjustment_date' => Carbon::parse($item->adjustment_date)->format('d/m/Y'),
-                    'warehouse_name' => $item->warehouse_name,
-                    'user_name' => $item->user_name,
-                    'items_name' => $item->items_name,
-                    'status' => $statusBadge,
-                    'actions' => $actions
-                ];
-            });
-
             return response()->json([
                 'draw' => intval($draw),
-                'recordsTotal' => $totalRecords,
-                'recordsFiltered' => $totalFiltered,
-                'data' => $formattedData
+                'recordsTotal' => intval($totalRecords),
+                'recordsFiltered' => intval($totalFiltered),
+                'data' => $data,
             ]);
         }
 
@@ -148,7 +135,6 @@ class AdjustmentController extends Controller
             'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|numeric',
             'items.*.koli' => 'nullable|numeric|min:0',
-            'items.*.uom_id' => 'required|exists:uoms,id',
         ]);
 
         DB::beginTransaction();
@@ -168,7 +154,6 @@ class AdjustmentController extends Controller
                     'item_id' => $itemData['item_id'],
                     'quantity' => $itemData['quantity'],
                     'koli' => $itemData['koli'] ?? null,
-                    'uom_id' => $itemData['uom_id']
                 ]);
             }
 
@@ -228,7 +213,6 @@ class AdjustmentController extends Controller
             'items.*.item_id' => 'required|exists:items,id',
             'items.*.quantity' => 'required|numeric',
             'items.*.koli' => 'nullable|numeric|min:0',
-            'items.*.uom_id' => 'required|exists:uoms,id',
         ]);
 
         DB::beginTransaction();
@@ -250,7 +234,6 @@ class AdjustmentController extends Controller
                     'item_id' => $itemData['item_id'],
                     'quantity' => $itemData['quantity'],
                     'koli' => $itemData['koli'] ?? null,
-                    'uom_id' => $itemData['uom_id']
                 ]);
             }
 

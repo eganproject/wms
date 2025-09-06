@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('warehouse_id')->constrained('warehouses');
             $table->foreignId('user_id')->constrained('users');
             $table->text('notes')->nullable();
+            $table->date('completed_at')->nullable();
             $table->enum('status', ['pending', 'completed'])->default('pending');
             $table->timestamps();
         });
