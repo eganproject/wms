@@ -39,13 +39,14 @@ class DaftarPenerimaanBarangController extends Controller
             $draw = $request->input('draw', 0);
             $statusFilter = $request->input('status');
             $dateFilter = $request->input('date');
+            $warehouseFilter = $request->input('warehouse');
 
             // Define columns for sorting
             $columns = [
                 0 => 'sio.code',
                 1 => 'sio.date',
                 2 => 'warehouse_name',
-                3 => 'GROUP_CONCAT(i.sku, "(", si.quantity, ")" SEPARATOR ", ") as items_name', // Actions column, not sortable
+                3 => 'GROUP_CONCAT(i.sku, " (Qty:", FORMAT(si.quantity,0), ")" SEPARATOR ", ") as items_name', // Actions column, not sortable
                 4 => 'sio.status',
                 5 => 'sio.id', // Actions column, not sortable
             ];
@@ -55,6 +56,14 @@ class DaftarPenerimaanBarangController extends Controller
 
             // Base query
             $query = StockInOrder::query()->from('stock_in_orders as sio')->leftJoin('warehouses as w', 'sio.warehouse_id', '=', 'w.id')->leftJoin('stock_in_order_items as si', 'sio.id', '=', 'si.stock_in_order_id')->leftJoin('items as i', 'si.item_id', '=', 'i.id')->groupBy('sio.id');
+
+            if (auth()->user()->warehouse_id) {
+                $query->where('sio.warehouse_id', auth()->user()->warehouse_id);
+            } else {
+                if ($warehouseFilter && $warehouseFilter !== 'semua') {
+                    $query->where('sio.warehouse_id', $warehouseFilter);
+                }
+            }
 
             // Total records
             $totalRecords = $query->count();
@@ -106,8 +115,12 @@ class DaftarPenerimaanBarangController extends Controller
             ]);
         }
 
-        // If not an AJAX request, return the view as before
-        return view('admin.stok_masuk.daftar_penerimaan_barang.index');
+        $warehouses = [];
+        if (is_null(auth()->user()->warehouse_id)) {
+            $warehouses = Warehouse::all();
+        }
+
+        return view('admin.stok_masuk.daftar_penerimaan_barang.index', compact('warehouses'));
     }
 
     public function show(StockInOrder $stockInOrder)

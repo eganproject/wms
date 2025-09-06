@@ -33,20 +33,28 @@
 
                     <div class="row">
                         <div class="col-md-6 mb-5">
-                            <label class="form-label fs-6 fw-bolder text-dark">Gudang</label>
-                            <select name="warehouse_id"
-                                class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror"
-                                data-control="select2" data-placeholder="Pilih Gudang" required>
-                                <option></option>
-                                @foreach ($warehouses as $warehouse)
-                                    <option value="{{ $warehouse->id }}"
-                                        {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('warehouse_id')
-                                <div class="invalid-feedback">{{ $message }}</div>
-                            @enderror
+                            @if (auth()->user()->warehouse_id)
+                                <input type="hidden" name="warehouse_id" value="{{ auth()->user()->warehouse_id }}">
+                                <label class="form-label fs-6 fw-bolder text-dark">Gudang</label>
+                                <input type="text" class="form-control form-control-solid"
+                                    value="{{ auth()->user()->warehouse->name }}" readonly>
+                            @else
+                                <label class="form-label fs-6 fw-bolder text-dark">Gudang</label>
+                                <select name="warehouse_id"
+                                    class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror"
+                                    data-control="select2" data-placeholder="Pilih Gudang" required>
+                                    <option></option>
+                                    @foreach ($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}"
+                                            {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                                            {{ $warehouse->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('warehouse_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            @endif
                         </div>
                         <div class="col-md-6 mb-5">
                             <label class="form-label fs-6 fw-bolder text-dark">Deskripsi</label>

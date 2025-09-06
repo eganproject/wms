@@ -60,6 +60,19 @@
                             <!--end::Separator-->
                             <!--begin::Content-->
                             <div class="px-7 py-5">
+                                @if (is_null(auth()->user()->warehouse_id))
+                                    <div class="mb-10">
+                                        <label class="form-label fs-5 fw-bold mb-3">Gudang:</label>
+                                        <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
+                                            id="warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
+                                            <option value="semua">Semua</option>
+                                            @foreach ($warehouses as $warehouse)
+                                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
                                 <div class="mb-10">
                                     <label class="form-label fs-5 fw-bold mb-3">Status:</label>
                                     <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
@@ -178,10 +191,18 @@
             function loadDataTable() {
                 var statusFilter = $('#status_filter').val();
                 var dateFilter = $('#date_filter_options').val() === 'semua' ? 'semua' : $('#date_filter').val();
+                var warehouseFilter = $('#warehouse_filter').length ? $('#warehouse_filter').val() : null;
+
                 var statusText = $('#status_filter option:selected').text();
                 var dateText = dateFilter === 'semua' ? 'Semua Tanggal' : dateFilter;
 
-                $('#filter-info').text(`Tanggal: ${dateText} | Status: ${statusText}`);
+                var filterInfoText = `Tanggal: ${dateText} | Status: ${statusText}`;
+                if ($('#warehouse_filter').length) {
+                    var warehouseText = $('#warehouse_filter option:selected').text();
+                    filterInfoText += ` | Gudang: ${warehouseText}`;
+                }
+
+                $('#filter-info').text(filterInfoText);
 
                 if ($.fn.DataTable.isDataTable('#table-on-page')) {
                     $('#table-on-page').DataTable().destroy();
@@ -197,6 +218,9 @@
                             d.search.value = $('#search_input').val();
                             d.status = statusFilter;
                             d.date = dateFilter;
+                            if (warehouseFilter) {
+                                d.warehouse = warehouseFilter;
+                            }
                         }
                     },
                     drawCallback: function(settings) {
