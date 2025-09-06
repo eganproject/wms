@@ -137,33 +137,37 @@ class PenerimaanTransferController extends Controller
                 
                 if ($fromInventory) {
                     $fromInventory->quantity -= $item->quantity;
+                    $fromInventory->koli -= $item->koli;
                     $fromInventory->save();
 
                     StockMovement::create([
                         'item_id' => $item->item_id,
                         'warehouse_id' => $transferRequest->from_warehouse_id,
                         'quantity' => -$item->quantity,
+                        'koli' => -$item->koli,
                         'type' => 'transfer_out',
                         'reference_id' => $transferRequest->id,
-                        'reference_type' => TransferRequest::class,
+                        'reference_type' => 'transfer_requests',
                     ]);
                 }
 
                 // Increase stock in destination warehouse
                 $toInventory = Inventory::firstOrCreate(
                     ['warehouse_id' => $transferRequest->to_warehouse_id, 'item_id' => $item->item_id],
-                    ['quantity' => 0]
+                    ['quantity' => 0, 'koli' => 0]
                 );
                 $toInventory->quantity += $item->quantity;
+                $toInventory->koli += $item->koli;
                 $toInventory->save();
 
                 StockMovement::create([
                     'item_id' => $item->item_id,
                     'warehouse_id' => $transferRequest->to_warehouse_id,
                     'quantity' => $item->quantity,
+                    'koli' => $item->koli,
                     'type' => 'transfer_in',
                     'reference_id' => $transferRequest->id,
-                    'reference_type' => TransferRequest::class,
+                    'reference_type' => 'transfer_requests',
                 ]);
             }
 
