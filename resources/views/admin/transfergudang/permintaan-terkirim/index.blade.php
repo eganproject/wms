@@ -69,7 +69,18 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                
+                                @if (auth()->user()->warehouse_id === null)
+                                    <div class="mb-10">
+                                        <label class="form-label fs-5 fw-bold mb-3">Gudang Tujuan:</label>
+                                        <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
+                                            id="to_warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
+                                            <option value="semua">Semua</option>
+                                            @foreach ($warehouses as $warehouse)
+                                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
                                 <div class="mb-10">
                                     <label class="form-label fs-5 fw-bold mb-3">Status:</label>
                                     <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
@@ -168,13 +179,15 @@
 
             function loadDataTable() {
                 var fromWarehouseFilter = $('#from_warehouse_filter').val();
+                var toWarehouseFilter = $('#to_warehouse_filter').val(); // Get to_warehouse_filter value
                 var statusFilter = $('#status_filter').val();
                 var dateFilter = $('#date_filter').val();
 
                 var fromWarehouseText = $('#from_warehouse_filter option:selected').text();
+                var toWarehouseText = $('#to_warehouse_filter option:selected').text(); // Get to_warehouse_filter text
                 var statusText = $('#status_filter option:selected').text();
 
-                let filterInfoText = `${dateFilter} | Gudang Asal: ${fromWarehouseText} | Status: ${statusText}`;
+                let filterInfoText = `${dateFilter} | Gudang Asal: ${fromWarehouseText} | Gudang Tujuan: ${toWarehouseText} | Status: ${statusText}`;
                 $('#filter-info').text(filterInfoText);
 
                 if ($.fn.DataTable.isDataTable('#table-on-page')) {
@@ -190,6 +203,7 @@
                         data: function(d) {
                             d.search.value = $('#search_input').val();
                             d.from_warehouse_id = fromWarehouseFilter;
+                            d.to_warehouse_id = toWarehouseFilter; // Add to_warehouse_id to data
                             d.status = statusFilter;
                             d.date = dateFilter;
                         }

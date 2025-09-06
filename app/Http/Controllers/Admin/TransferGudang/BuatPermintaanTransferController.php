@@ -21,6 +21,7 @@ class BuatPermintaanTransferController extends Controller
             $length = $request->input('length', 10);
             $draw = $request->input('draw', 0);
             $fromWarehouseFilter = $request->input('from_warehouse_id');
+            $toWarehouseFilter = $request->input('to_warehouse_id');
             $statusFilter = $request->input('status');
             $dateFilter = $request->input('date');
 
@@ -43,6 +44,14 @@ class BuatPermintaanTransferController extends Controller
                 ->leftJoin('warehouses as tw', 'tr.to_warehouse_id', '=', 'tw.id')
                 ->leftJoin('users as u', 'tr.requested_by', '=', 'u.id');
 
+            // Apply user's warehouse filter if not null
+            if (auth()->user()->warehouse_id !== null) {
+                $query->where(function ($q) {
+                    $q->where('tr.from_warehouse_id', auth()->user()->warehouse_id)
+                      ->orWhere('tr.to_warehouse_id', auth()->user()->warehouse_id);
+                });
+            }
+
             $totalRecords = $query->count();
 
             if (!empty($searchValue)) {
@@ -57,6 +66,10 @@ class BuatPermintaanTransferController extends Controller
 
             if ($fromWarehouseFilter && $fromWarehouseFilter !== 'semua') {
                 $query->where('tr.from_warehouse_id', $fromWarehouseFilter);
+            }
+
+            if ($toWarehouseFilter && $toWarehouseFilter !== 'semua') {
+                $query->where('tr.to_warehouse_id', $toWarehouseFilter);
             }
 
             if ($statusFilter && $statusFilter !== 'semua') {
