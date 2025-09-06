@@ -47,8 +47,7 @@ class BuatPermintaanTransferController extends Controller
             // Apply user's warehouse filter if not null
             if (auth()->user()->warehouse_id !== null) {
                 $query->where(function ($q) {
-                    $q->where('tr.from_warehouse_id', auth()->user()->warehouse_id)
-                      ->orWhere('tr.to_warehouse_id', auth()->user()->warehouse_id);
+                    $q->where('tr.to_warehouse_id', auth()->user()->warehouse_id);
                 });
             }
 

@@ -53,6 +53,18 @@
                             </div>
                             <div class="separator border-gray-200"></div>
                             <div class="px-7 py-5">
+                                @if (auth()->user()->warehouse_id == null)
+                                    <div class="mb-10">
+                                        <label class="form-label fs-5 fw-bold mb-3">Gudang Asal:</label>
+                                        <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
+                                            id="from_warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
+                                            <option value="semua">Semua</option>
+                                            @foreach ($warehouses as $warehouse)
+                                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                @endif
                                 <div class="mb-10">
                                     <label class="form-label fs-5 fw-bold mb-3">Gudang Tujuan:</label>
                                     <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
@@ -63,7 +75,6 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                
                                 <div class="mb-10">
                                     <label class="form-label fs-5 fw-bold mb-3">Status:</label>
                                     <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
@@ -139,7 +150,7 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="shipping_date" class="form-label required">Tanggal Kirim</label>
-                            <input type="date" class="form-control" id="shipping_date" name="shipping_date" required>
+                            <input type="text" class="form-control" id="shipping_date" name="shipping_date" required>
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="row">
@@ -204,6 +215,11 @@
                 }
             });
 
+            $('#shipping_date').flatpickr({
+                enableTime: false,
+                dateFormat: "Y-m-d",
+            });
+
             toastr.options = {
                 "closeButton": true,
                 "debug": false,
@@ -231,14 +247,21 @@
 
             function loadDataTable() {
                 var toWarehouseFilter = $('#to_warehouse_filter').val();
+                var fromWarehouseFilter = $('#from_warehouse_filter').val();
                 var statusFilter = $('#status_filter').val();
                 var dateFilter = $('#date_filter_options').val() === 'semua' ? 'semua' : $('#date_filter').val();
 
                 var toWarehouseText = $('#to_warehouse_filter option:selected').text();
+                var fromWarehouseText = $('#from_warehouse_filter option:selected').text();
                 var statusText = $('#status_filter option:selected').text();
                 var dateText = dateFilter === 'semua' ? 'Semua Tanggal' : dateFilter;
 
                 let filterInfoText = `Tanggal: ${dateText} | Gudang Tujuan: ${toWarehouseText} | Status: ${statusText}`;
+
+                if ("{{ auth()->user()->warehouse_id == null }}") {
+                    filterInfoText += ` | Gudang Asal: ${fromWarehouseText}`;
+                }
+
                 $('#filter-info').text(filterInfoText);
 
                 if ($.fn.DataTable.isDataTable('#table-on-page')) {
@@ -254,6 +277,7 @@
                         data: function(d) {
                             d.search.value = $('#search_input').val();
                             d.to_warehouse_id = toWarehouseFilter;
+                            d.from_warehouse_id = fromWarehouseFilter;
                             d.status = statusFilter;
                             d.date = dateFilter;
                         }

@@ -19,6 +19,7 @@ class PermintaanMasukController extends Controller
             $length = $request->input('length', 10);
             $draw = $request->input('draw', 0);
             $toWarehouseFilter = $request->input('to_warehouse_id');
+            $fromWarehouseFilter = $request->input('from_warehouse_id');
             $statusFilter = $request->input('status');
             $dateFilter = $request->input('date');
 
@@ -41,6 +42,10 @@ class PermintaanMasukController extends Controller
                 ->leftJoin('warehouses as tw', 'tr.to_warehouse_id', '=', 'tw.id')
                 ->leftJoin('users as u', 'tr.requested_by', '=', 'u.id');
 
+            if (auth()->user()->warehouse_id) {
+                $query->where('tr.from_warehouse_id', auth()->user()->warehouse_id);
+            }
+
             $totalRecords = $query->count();
 
             if (!empty($searchValue)) {
@@ -51,6 +56,10 @@ class PermintaanMasukController extends Controller
                         ->orWhere('u.name', 'LIKE', "%{$searchValue}%")
                         ->orWhere('tr.status', 'LIKE', "%{$searchValue}%");
                 });
+            }
+
+            if ($fromWarehouseFilter && $fromWarehouseFilter !== 'semua') {
+                $query->where('tr.from_warehouse_id', $fromWarehouseFilter);
             }
 
             if ($toWarehouseFilter && $toWarehouseFilter !== 'semua') {
