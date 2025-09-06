@@ -52,16 +52,21 @@
                         </div>
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Gudang Tujuan</label>
-                            <select name="to_warehouse_id"
-                                class="form-select form-select-solid @error('to_warehouse_id') is-invalid @enderror" data-control="select2"
-                                data-placeholder="Pilih gudang tujuan">
-                                <option></option>
-                                @foreach ($warehouses as $warehouse)
-                                    <option value="{{ $warehouse->id }}"
-                                        {{ old('to_warehouse_id') == $warehouse->id ? 'selected' : '' }}>
-                                        {{ $warehouse->name }}</option>
-                                @endforeach
-                            </select>
+                            @if (auth()->user()->warehouse_id)
+                                <input type="hidden" name="to_warehouse_id" value="{{ auth()->user()->warehouse_id }}">
+                                <input type="text" class="form-control form-control-solid" value="{{ auth()->user()->warehouse->name }}" readonly>
+                            @else
+                                <select name="to_warehouse_id" id="to_warehouse_id"
+                                    class="form-select form-select-solid @error('to_warehouse_id') is-invalid @enderror" data-control="select2"
+                                    data-placeholder="Pilih gudang tujuan">
+                                    <option></option>
+                                    @foreach ($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}"
+                                            {{ old('to_warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                                            {{ $warehouse->name }}</option>
+                                    @endforeach
+                                </select>
+                            @endif
                         </div>
                     </div>
 
@@ -201,6 +206,25 @@
                 $(this).closest('tr').remove();
             });
 
+            function checkWarehouseSelection() {
+                const fromWarehouse = $('#from_warehouse_id').val();
+                const toWarehouse = $('[name="to_warehouse_id"]').val();
+
+                if (fromWarehouse && toWarehouse && fromWarehouse === toWarehouse) {
+                    Swal.fire(
+                        'Gudang Tidak Valid',
+                        'Gudang Asal dan Gudang Tujuan tidak boleh sama.',
+                        'warning'
+                    );
+                    // Clear the destination warehouse selection
+                    if ($('#to_warehouse_id').is('select')) {
+                        $('#to_warehouse_id').val(null).trigger('change');
+                    }
+                }
+            }
+
+            $('#from_warehouse_id, #to_warehouse_id').on('change', checkWarehouseSelection);
+
             $('#from_warehouse_id').on('change', function() {
                 const warehouseId = $(this).val();
                 $('#items-table tbody').empty();
@@ -225,7 +249,7 @@
                 });
             });
 
-                        // Store previous value on focus
+            // Store previous value on focus
             $('#items-table').on('focus', '.item-select', function() {
                 $(this).data('previous-value', $(this).val());
             });
