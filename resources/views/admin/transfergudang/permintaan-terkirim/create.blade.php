@@ -26,12 +26,12 @@
                         <div class="col-md-4 mb-5">
                             <label class="form-label">Kode Permintaan</label>
                             <input type="text" name="code"
-                                class="form-control form-control-solid @error('code') is-invalid @enderror"
+                                class="form-control form-control-solid  @error('code') is-invalid @enderror"
                                 value="{{ $code }}" readonly />
                         </div>
                         <div class="col-md-4 mb-5">
                             <label class="form-label required">Tanggal Permintaan</label>
-                            <input type="date" name="date" class="form-control @error('date') is-invalid @enderror"
+                            <input type="text" name="date" id="date" class="form-control form-control-solid @error('date') is-invalid @enderror"
                                 value="{{ old('date', date('Y-m-d')) }}">
                         </div>
                     </div>
@@ -40,7 +40,7 @@
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Gudang Asal</label>
                             <select name="from_warehouse_id" id="from_warehouse_id"
-                                class="form-select @error('from_warehouse_id') is-invalid @enderror" data-control="select2"
+                                class="form-select form-select-solid @error('from_warehouse_id') is-invalid @enderror" data-control="select2"
                                 data-placeholder="Pilih gudang asal">
                                 <option></option>
                                 @foreach ($warehouses as $warehouse)
@@ -53,7 +53,7 @@
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Gudang Tujuan</label>
                             <select name="to_warehouse_id"
-                                class="form-select @error('to_warehouse_id') is-invalid @enderror" data-control="select2"
+                                class="form-select form-select-solid @error('to_warehouse_id') is-invalid @enderror" data-control="select2"
                                 data-placeholder="Pilih gudang tujuan">
                                 <option></option>
                                 @foreach ($warehouses as $warehouse)
@@ -67,7 +67,7 @@
 
                     <div class="mb-5">
                         <label class="form-label">Deskripsi Permintaan</label>
-                        <textarea name="description" class="form-control @error('description') is-invalid @enderror" rows="3">{{ old('description') }}</textarea>
+                        <textarea name="description" class="form-control form-control-solid @error('description') is-invalid @enderror" rows="3">{{ old('description') }}</textarea>
                     </div>
 
                     <h4 class="mt-10">Daftar Item</h4>
@@ -110,7 +110,7 @@
     <template id="item-row-template">
         <tr data-index="__INDEX__">
             <td>
-                <select name="items[__INDEX__][item_id]" class="form-select item-select" data-placeholder="Pilih item"
+                <select name="items[__INDEX__][item_id]" class="form-select form-select-solid item-select" data-placeholder="Pilih item"
                     required>
                     <option></option>
                     @foreach ($items as $item)
@@ -120,15 +120,15 @@
                 </select>
             </td>
             <td>
-                <input type="number" name="items[__INDEX__][quantity]" class="form-control quantity-input" min="0.01"
+                <input type="number" name="items[__INDEX__][quantity]" class="form-control form-control-solid quantity-input" min="0.01"
                     step="0.01" value="1" required>
             </td>
             <td>
-                <input type="number" name="items[__INDEX__][koli]" class="form-control koli-input" min="0"
+                <input type="number" name="items[__INDEX__][koli]" class="form-control form-control-solid koli-input" min="0"
                     step="any" value="0">
             </td>
             <td>
-                <input type="text" name="items[__INDEX__][description]" class="form-control">
+                <input type="text" name="items[__INDEX__][description]" class="form-control form-control-solid">
             </td>
             <td class="text-end">
                 <button type="button" class="btn btn-icon btn-sm btn-danger remove-item-btn"><i
@@ -141,6 +141,10 @@
 @push('scripts')
     <script>
         $(document).ready(function() {
+            $("#date").flatpickr({
+                dateFormat: "Y-m-d",
+                defaultDate: "{{ old('date', date('Y-m-d')) }}"
+            });
             let itemIndex = 0;
             let availableItems = [];
 
