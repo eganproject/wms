@@ -39,15 +39,20 @@
                         </div>
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Gudang</label>
-                            <select name="warehouse_id" id="warehouse_id" class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror" data-control="select2" data-placeholder="Pilih gudang">
-                                <option></option>
-                                @foreach ($warehouses as $warehouse)
-                                    <option value="{{ $warehouse->id }}" {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
-                                @endforeach
-                            </select>
-                             @error('warehouse_id')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
+                            @if(auth()->user()->warehouse_id)
+                                <input type="text" class="form-control form-control-solid" value="{{ auth()->user()->warehouse->name }}" readonly/>
+                                <input type="hidden" name="warehouse_id" id="warehouse_id" value="{{ auth()->user()->warehouse_id }}" />
+                            @else
+                                <select name="warehouse_id" id="warehouse_id" class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror" data-control="select2" data-placeholder="Pilih gudang">
+                                    <option></option>
+                                    @foreach ($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}" {{ old('warehouse_id') == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
+                                    @endforeach
+                                </select>
+                                 @error('warehouse_id')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            @endif
                         </div>
                     </div>
 
@@ -329,7 +334,7 @@
             $(`[data-control='select2']`).select2();
 
             const oldItems = @json(old('items'));
-            if (oldItems) {
+            if (oldItems && oldItems.length > 0) {
                 let warehouseId = $('#warehouse_id').val();
                 if(warehouseId){
                     oldItems.forEach(function(item, index) {
@@ -343,7 +348,7 @@
                 }
             } else {
                 if ($('#warehouse_id').val()) {
-                    $('#warehouse_id').trigger('change');
+                    addNewRow();
                 }
             }
 

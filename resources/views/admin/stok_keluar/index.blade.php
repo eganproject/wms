@@ -42,6 +42,7 @@
                             </div>
                             <div class="separator border-gray-200"></div>
                             <div class="px-7 py-5">
+                                @if (auth()->user()->warehouse_id === null)
                                 <div class="mb-10">
                                     <label class="form-label fs-5 fw-bold mb-3">Gudang:</label>
                                     <select class="form-select form-select-solid fw-bolder" data-kt-select2="true" id="warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
@@ -51,6 +52,7 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                @endif
                                 <div class="mb-10">
                                     <label class="form-label fs-5 fw-bold mb-3">Status:</label>
                                     <select class="form-select form-select-solid fw-bolder" data-kt-select2="true" id="status_filter" data-dropdown-parent="#kt-toolbar-filter">

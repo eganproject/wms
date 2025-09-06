@@ -43,6 +43,15 @@ class PengeluaranBarangController extends Controller
             $query = StockOut::with(['warehouse', 'user'])
                 ->select('stock_outs.*');
 
+            $userWarehouseId = auth()->user()->warehouse_id;
+            if ($userWarehouseId) {
+                $query->where('warehouse_id', $userWarehouseId);
+            } else {
+                if ($warehouseFilter && $warehouseFilter !== 'semua') {
+                    $query->where('warehouse_id', $warehouseFilter);
+                }
+            }
+
             $totalRecords = $query->count();
 
             if (!empty($searchValue)) {
@@ -57,10 +66,6 @@ class PengeluaranBarangController extends Controller
                 });
             }
             
-            if ($warehouseFilter && $warehouseFilter !== 'semua') {
-                $query->where('warehouse_id', $warehouseFilter);
-            }
-
             if ($statusFilter && $statusFilter !== 'semua') {
                 $query->where('status', $statusFilter);
             }
@@ -81,7 +86,7 @@ class PengeluaranBarangController extends Controller
             ]);
         }
 
-        $warehouses = Warehouse::all();
+        $warehouses = auth()->user()->warehouse_id ? collect() : Warehouse::all();
         return view('admin.stok_keluar.index', compact('warehouses'));
     }
 

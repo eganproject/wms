@@ -40,15 +40,20 @@
                         </div>
                         <div class="col-md-6 mb-5">
                             <label class="form-label required">Gudang</label>
-                            <select name="warehouse_id" id="warehouse_id" class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror" data-control="select2" data-placeholder="Pilih gudang">
-                                <option></option>
-                                @foreach ($warehouses as $warehouse)
-                                    <option value="{{ $warehouse->id }}" {{ old('warehouse_id', $pengeluaranBarang->warehouse_id) == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
-                                @endforeach
-                            </select>
-                             @error('warehouse_id')
-                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                            @enderror
+                            @if(auth()->user()->warehouse_id)
+                                <input type="text" class="form-control form-control-solid" value="{{ $pengeluaranBarang->warehouse->name }}" readonly/>
+                                <input type="hidden" name="warehouse_id" id="warehouse_id" value="{{ $pengeluaranBarang->warehouse_id }}" />
+                            @else
+                                <select name="warehouse_id" id="warehouse_id" class="form-select form-select-solid @error('warehouse_id') is-invalid @enderror" data-control="select2" data-placeholder="Pilih gudang">
+                                    <option></option>
+                                    @foreach ($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}" {{ old('warehouse_id', $pengeluaranBarang->warehouse_id) == $warehouse->id ? 'selected' : '' }}>{{ $warehouse->name }}</option>
+                                    @endforeach
+                                </select>
+                                 @error('warehouse_id')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            @endif
                         </div>
                     </div>
 
