@@ -28,6 +28,7 @@
             <!--end::Wrapper-->
         </div>
         <!--end::Page-->
+        @include('layouts.partials._warehousename')
     </div>
     <!--end::Root-->
     @include('layouts.partials._scripts')
