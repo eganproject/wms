@@ -51,8 +51,12 @@ class KartuStokController extends Controller
             ->leftJoin('stock_in_orders as sio', 'si_items.stock_in_order_id', '=', 'sio.id')
             ->leftJoin('warehouses as w', 'sm.warehouse_id', '=', 'w.id');
 
-            if ($warehouseFilter) {
-                $query->where('sm.warehouse_id', $warehouseFilter);
+            if (auth()->user()->warehouse_id) {
+                $query->where('sm.warehouse_id', auth()->user()->warehouse_id);
+            } else {
+                if ($warehouseFilter) {
+                    $query->where('sm.warehouse_id', $warehouseFilter);
+                }
             }
 
             $totalRecords = $query->count();

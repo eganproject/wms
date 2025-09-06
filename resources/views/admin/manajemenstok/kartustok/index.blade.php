@@ -52,16 +52,20 @@
                         </div>
                         <div class="separator border-gray-200"></div>
                         <div class="px-7 py-5">
-                            <div class="mb-10">
-                                <label class="form-label fs-5 fw-bold mb-3">Gudang:</label>
-                                <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
-                                    id="warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
-                                    <option value="">Semua Gudang</option>
-                                    @foreach($warehouses as $warehouse)
-                                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
+                            @if (!auth()->user()->warehouse_id)
+                                <div class="mb-10">
+                                    <label class="form-label fs-5 fw-bold mb-3">Gudang:</label>
+                                    <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
+                                        id="warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
+                                        <option value="">Semua Gudang</option>
+                                        @foreach ($warehouses as $warehouse)
+                                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                            @else
+                                <input type="hidden" id="warehouse_filter" value="{{ $warehouses->first()->id ?? '' }}">
+                            @endif
                             <div class="mb-10">
                                 <label class="form-label fs-5 fw-bold mb-3">Tanggal:</label>
                                 <input class="form-control form-control-solid" placeholder="Pilih Rentang Tanggal"
@@ -134,7 +138,23 @@
 
             function loadDataTable() {
                 var dateFilter = $('#date_filter').val();
-                $('#filter-info').text(dateFilter ? `Periode: ${dateFilter}` : 'Menampilkan semua data');
+                var warehouseFilter = $('#warehouse_filter').val();
+                var warehouseText = '';
+
+                @if (auth()->user()->warehouse_id)
+                    // User has a fixed warehouse. The name is static from auth.
+                    warehouseText = '{{ auth()->user()->warehouse->name }}';
+                @else
+                    // User is admin/can choose. Get text from dropdown.
+                    if (warehouseFilter) {
+                        warehouseText = $('#warehouse_filter option:selected').text();
+                    } else {
+                        warehouseText = 'Semua Gudang';
+                    }
+                @endif
+
+                var dateText = dateFilter ? `Periode: ${dateFilter}` : 'Menampilkan semua data';
+                $('#filter-info').text(`${dateText} | Gudang: ${warehouseText}`);
 
                 if ($.fn.DataTable.isDataTable('#table-on-page')) {
                     $('#table-on-page').DataTable().destroy();
@@ -144,12 +164,12 @@
                     processing: true,
                     serverSide: true,
                     ajax: {
-                        url: "{{ route('admin.manajemenstok.kartustok.index') }}", // Placeholder, needs to be created
+                        url: "{{ route('admin.manajemenstok.kartustok.index') }}",
                         type: "GET",
                         data: function(d) {
                             d.search.value = $('#search_input').val();
-                            d.date_filter = $('#date_filter').val();
-                            d.warehouse_filter = $('#warehouse_filter').val();
+                            d.date_filter = dateFilter;
+                            d.warehouse_filter = warehouseFilter;
                         }
                     },
                     columns: [
