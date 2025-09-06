@@ -54,6 +54,17 @@
                             <div class="separator border-gray-200"></div>
                             <div class="px-7 py-5">
                                 <div class="mb-10">
+                                    <label class="form-label fs-5 fw-bold mb-3">Gudang Asal:</label>
+                                    <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
+                                        id="from_warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
+                                        <option value="semua">Semua</option>
+                                        @foreach ($warehouses as $warehouse)
+                                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @if (auth()->user()->warehouse_id == null)
+                                <div class="mb-10">
                                     <label class="form-label fs-5 fw-bold mb-3">Gudang Tujuan:</label>
                                     <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
                                         id="to_warehouse_filter" data-dropdown-parent="#kt-toolbar-filter">
@@ -63,6 +74,7 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                @endif
                                 <div class="mb-10">
                                     <label class="form-label fs-5 fw-bold mb-3">Status:</label>
                                     <select class="form-select form-select-solid fw-bolder" data-kt-select2="true"
@@ -170,15 +182,21 @@
             @endif
 
             function loadDataTable() {
+                var fromWarehouseFilter = $('#from_warehouse_filter').val();
                 var toWarehouseFilter = $('#to_warehouse_filter').val();
                 var statusFilter = $('#status_filter').val();
                 var dateFilter = $('#date_filter_options').val() === 'semua' ? 'semua' : $('#date_filter').val();
 
+                var fromWarehouseText = $('#from_warehouse_filter option:selected').text();
                 var toWarehouseText = $('#to_warehouse_filter option:selected').text();
                 var statusText = $('#status_filter option:selected').text();
                 var dateText = dateFilter === 'semua' ? 'Semua Tanggal' : dateFilter;
 
-                let filterInfoText = `Tanggal: ${dateText} | Gudang Tujuan: ${toWarehouseText} | Status: ${statusText}`;
+                let filterInfoText = `Gudang Asal: ${fromWarehouseText} | Tanggal: ${dateText} | Status: ${statusText}`;
+                if ("{{ auth()->user()->warehouse_id == null }}") {
+                    filterInfoText += ` | Gudang Tujuan: ${toWarehouseText}`;
+                }
+                
                 $('#filter-info').text(filterInfoText);
 
                 if ($.fn.DataTable.isDataTable('#table-on-page')) {
@@ -193,6 +211,7 @@
                         type: "GET",
                         data: function(d) {
                             d.search.value = $('#search_input').val();
+                            d.from_warehouse_id = fromWarehouseFilter;
                             d.to_warehouse_id = toWarehouseFilter;
                             d.status = statusFilter;
                             d.date = dateFilter;

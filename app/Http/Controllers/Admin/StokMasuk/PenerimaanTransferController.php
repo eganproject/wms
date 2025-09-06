@@ -21,6 +21,7 @@ class PenerimaanTransferController extends Controller
             $length = $request->input('length', 10);
             $draw = $request->input('draw', 0);
             $toWarehouseFilter = $request->input('to_warehouse_id');
+            $fromWarehouseFilter = $request->input('from_warehouse_id');
             $statusFilter = $request->input('status'); // Get status filter from request
             $dateFilter = $request->input('date');
 
@@ -44,6 +45,10 @@ class PenerimaanTransferController extends Controller
                 ->leftJoin('users as u', 'tr.requested_by', '=', 'u.id');
                 // Removed hardcoded ->where('tr.status', 'shipped');
 
+            if(auth()->user()->warehouse_id) {
+                $query->where('tr.to_warehouse_id', auth()->user()->warehouse_id);
+            }
+
             // Apply status filter
             if ($statusFilter && $statusFilter !== 'semua') {
                 $query->where('tr.status', $statusFilter);
@@ -60,6 +65,10 @@ class PenerimaanTransferController extends Controller
                         ->orWhere('tw.name', 'LIKE', "%{$searchValue}%")
                         ->orWhere('u.name', 'LIKE', "%{$searchValue}%");
                 });
+            }
+
+            if ($fromWarehouseFilter && $fromWarehouseFilter !== 'semua') {
+                $query->where('tr.from_warehouse_id', $fromWarehouseFilter);
             }
 
             if ($toWarehouseFilter && $toWarehouseFilter !== 'semua') {
