@@ -246,17 +246,27 @@
                 const itemKoli = parseFloat(selectedOption.data('item-koli'));
                 let quantity = parseFloat($(this).val());
                 const koliInput = row.find('.koli-input');
+                
+                const itemId = selectedOption.val();
                 const availableQuantity = parseFloat(selectedOption.data('quantity'));
 
+                // Find the original item in the stockOutItems to get its original quantity
+                const originalItem = stockOutItems.find(item => item.item_id == itemId);
+                const originalQuantity = originalItem ? parseFloat(originalItem.quantity) : 0;
+
+                // This is the true available stock for the purpose of this edit
+                const effectiveAvailableStock = availableQuantity + originalQuantity;
+
+
                 // Validate quantity against available stock
-                if (!isNaN(availableQuantity) && quantity > availableQuantity) {
+                if (!isNaN(effectiveAvailableStock) && quantity > effectiveAvailableStock) {
                     Swal.fire({
                         icon: 'warning',
                         title: 'Stok Tidak Cukup',
-                        text: `Stok yang tersedia hanya ${availableQuantity}. Kuantitas telah disesuaikan.`
+                        text: `Stok yang tersedia hanya ${effectiveAvailableStock}. Kuantitas telah disesuaikan.`
                     });
-                    $(this).val(availableQuantity);
-                    quantity = availableQuantity;
+                    $(this).val(effectiveAvailableStock);
+                    quantity = effectiveAvailableStock;
                 }
 
                 // Update koli value whenever quantity changes
@@ -341,8 +351,13 @@
                 $('.quantity-input').each(function() {
                     const row = $(this).closest('tr');
                     const selectedOption = row.find('select.item-select option:selected');
-                    const availableQuantity = parseFloat(selectedOption.data('quantity'));
                     const enteredQuantity = parseFloat($(this).val());
+                    const itemId = selectedOption.val();
+                    const availableQuantity = parseFloat(selectedOption.data('quantity'));
+
+                    const originalItem = stockOutItems.find(item => item.item_id == itemId);
+                    const originalQuantity = originalItem ? parseFloat(originalItem.quantity) : 0;
+                    const effectiveAvailableStock = availableQuantity + originalQuantity;
 
                     if (isNaN(enteredQuantity) || enteredQuantity <= 0) {
                         isValid = false;
@@ -351,7 +366,7 @@
                         $(this).removeClass('is-invalid');
                     }
 
-                    if (!isNaN(availableQuantity) && enteredQuantity > availableQuantity) {
+                    if (!isNaN(effectiveAvailableStock) && enteredQuantity > effectiveAvailableStock) {
                         isValid = false;
                         $(this).addClass('is-invalid');
                     }
